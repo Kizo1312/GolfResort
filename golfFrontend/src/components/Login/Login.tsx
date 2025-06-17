@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import {useModal} from '../../ui/ModalContext'
+import toast from 'react-hot-toast';
 
 type UserInfo = {
   email: string;
@@ -6,6 +8,7 @@ type UserInfo = {
 };
 
 const Login = () => {
+  const {close} = useModal()
   const [user, setUser] = useState<UserInfo>({
     email: '',
     password: ''
@@ -25,9 +28,10 @@ const Login = () => {
 
       if (!response.ok) {
         console.error('Login failed:', data.message || 'User not found');
+        toast.error("Login failed.");
         return;
       }
-
+      close()
       console.log('Login successful:', data);
       // You can store a token here: localStorage.setItem('token', data.token)
 
