@@ -35,6 +35,7 @@ const Register = () => {
 
       if (!res.ok) {
         toast.error(data.message || 'Login failed after registration.');
+        console.log(data.message)
         return;
       }
 
@@ -65,6 +66,7 @@ const Register = () => {
     }
 
     toast.success(data.message || 'Registration successful!');
+    console.log(data.message)
     await handleLogin(); // 🔐 Auto login
   } catch (error) {
     console.error('Error during registration:', error);
