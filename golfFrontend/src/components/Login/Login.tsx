@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useModal } from "../../ui/ModalContext";
+import toast from 'react-hot-toast';
 
 type UserInfo = {
   email: string;
@@ -10,6 +12,7 @@ const Login = () => {
     email: '',
     password: ''
   });
+  const {close} = useModal()
 
   const fetchUser = async () => {
     try {
@@ -25,19 +28,26 @@ const Login = () => {
 
       if (!response.ok) {
         console.error('Login failed:', data.message || 'User not found');
+         toast.error(data.message || 'Registration unsucessful')
         return;
       }
-
+      toast.success('Uspješna registracija!');
+      close()
       console.log('Login successful:', data);
       // You can store a token here: localStorage.setItem('token', data.token)
 
     } catch (error) {
       console.error('An error occurred during login:', error);
+      toast.error('An error occurred during login');
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if((user.email).trim() === '' || (user.password).trim() === '') {
+      console.log('Password and Email fields cannot be empty')
+      return;
+    }
     fetchUser();
   };
 
