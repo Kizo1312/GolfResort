@@ -3,7 +3,7 @@ from flask.views import MethodView
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 from flask_smorest import abort, Blueprint
-from schemas import UserSchema, UserLoginSchema
+from schemas import UserSchema, UserLoginSchema, EditUserSchema
 from passlib.hash import pbkdf2_sha256
 from flask_jwt_extended import (
     create_access_token, 
@@ -62,4 +62,35 @@ class UserList(MethodView):
     @blp.response(200, UserSchema(many=True))
     def get(self):
         return UserModel.query.all()
+    
 
+
+
+@blp.route('/users/<int:user_id>')
+class User(MethodView):
+    @blp.response(200, UserSchema)
+    def get(self, user_id):
+        user= UserModel.query.get_or_404(user_id)
+        return user
+
+    @blp.arguments(EditUserSchema)
+    @blp.response(201, UserSchema)
+    def put(self, user_data, user_id):
+        user = UserModel.query.get_or_404(user_id)
+
+        if user:
+            user.name = user_data["name"]
+            user.last_name = user_data["last_name"]
+            user.email = user_data["email"]
+            user.password = user_data["password"]
+            user.role = user_data["role"]
+            db.session.add(user)
+            db.session.commit()
+        return user 
+
+
+    def delete(self, user_id):
+        user= UserModel.query.get_or_404(user_id)
+        db.session.delete(user)
+        db.session.commit()
+        return {"message": "User deleted."}
