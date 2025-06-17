@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import toast from 'react-hot-toast';
-import { useModal } from '../../ui/ModalContext';
+import toast from "react-hot-toast";
+import { useModal } from "../../ui/ModalContext";
 
 type UserInfo = {
   name: string;
@@ -13,60 +13,62 @@ type UserInfo = {
 const Register = () => {
   const { close } = useModal();
   const [user, setUser] = useState<UserInfo>({
-    name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    repeatPassword: ''
+    name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    repeatPassword: "",
   });
 
   const handleLogin = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:5000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: user.email,
-          password: user.password
-        })
+          password: user.password,
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.message || 'Login failed after registration.');
+        toast.error(data.message || "Login failed after registration.");
         return;
       }
 
       localStorage.setItem("token", data.token);
-      toast.success('Successfully logged in!');
+      toast.success("Successfully logged in!");
       close();
     } catch (err) {
       console.error(err);
-      toast.error('Login error after registration.');
+      toast.error("Login error after registration.");
     }
   };
 
   const fetchUser = async () => {
+    const { name, last_name, email, password } = user;
+
     try {
-      const response = await fetch('http://127.0.0.1:5000/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
+      const response = await fetch("http://127.0.0.1:5000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, last_name, email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message || 'Registration failed.');
+        toast.error(data.message || "Registration failed.");
         return;
       }
 
-      toast.success(data.message || 'Registration successful!');
-      await handleLogin(); // 🔐 Auto login after successful registration
+      toast.success(data.message || "Registration successful!");
+      await handleLogin(); // 🔐 Auto login
     } catch (error) {
-      console.error('Error during registration:', error);
-      toast.error('An error occurred during registration.');
+      console.error("Error during registration:", error);
+      toast.error("An error occurred during registration.");
     }
   };
 
@@ -87,7 +89,9 @@ const Register = () => {
       <form onSubmit={handleSubmit}>
         <div className="flex gap-4">
           <div className="w-1/2">
-            <label htmlFor="name" className="block mb-1">First Name</label>
+            <label htmlFor="name" className="block mb-1">
+              First Name
+            </label>
             <input
               type="text"
               placeholder="First Name"
@@ -99,7 +103,9 @@ const Register = () => {
           </div>
 
           <div className="w-1/2">
-            <label htmlFor="last_name" className="block mb-1">Last Name</label>
+            <label htmlFor="last_name" className="block mb-1">
+              Last Name
+            </label>
             <input
               type="text"
               placeholder="Last Name"
@@ -111,11 +117,11 @@ const Register = () => {
           </div>
         </div>
 
-        <label htmlFor='email'>Email</label>
+        <label htmlFor="email">Email</label>
         <input
-          type='email'
-          placeholder='Email'
-          name='email'
+          type="email"
+          placeholder="Email"
+          name="email"
           value={user.email}
           onChange={(e) => setUser({ ...user, email: e.target.value })}
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -123,9 +129,9 @@ const Register = () => {
 
         <label htmlFor="password">Password</label>
         <input
-          type='password'
-          placeholder='Password'
-          name='password'
+          type="password"
+          placeholder="Password"
+          name="password"
           value={user.password}
           onChange={(e) => setUser({ ...user, password: e.target.value })}
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -133,16 +139,19 @@ const Register = () => {
 
         <label htmlFor="repeatPassword">Repeat Password</label>
         <input
-          type='password'
-          placeholder='Repeat Password'
-          name='repeatPassword'
+          type="password"
+          placeholder="Repeat Password"
+          name="repeatPassword"
           value={user.repeatPassword}
           onChange={(e) => setUser({ ...user, repeatPassword: e.target.value })}
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
-        <div className='w-full flex justify-end'>
-          <button type="submit" className="ml-auto bg-blue-500 text-white px-4 py-2 rounded">
+        <div className="w-full flex justify-end">
+          <button
+            type="submit"
+            className="ml-auto bg-blue-500 text-white px-4 py-2 rounded"
+          >
             Register
           </button>
         </div>
@@ -152,4 +161,3 @@ const Register = () => {
 };
 
 export default Register;
-
