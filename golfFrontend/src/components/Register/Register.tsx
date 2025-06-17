@@ -48,27 +48,29 @@ const Register = () => {
   };
 
   const fetchUser = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
-      });
+  const { name, last_name, email, password } = user;
 
-      const data = await response.json();
+  try {
+    const response = await fetch('http://127.0.0.1:5000/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, last_name, email, password }) 
+    });
 
-      if (!response.ok) {
-        toast.error(data.message || 'Registration failed.');
-        return;
-      }
+    const data = await response.json();
 
-      toast.success(data.message || 'Registration successful!');
-      await handleLogin(); // 🔐 Auto login after successful registration
-    } catch (error) {
-      console.error('Error during registration:', error);
-      toast.error('An error occurred during registration.');
+    if (!response.ok) {
+      toast.error(data.message || 'Registration failed.');
+      return;
     }
-  };
+
+    toast.success(data.message || 'Registration successful!');
+    await handleLogin(); // 🔐 Auto login
+  } catch (error) {
+    console.error('Error during registration:', error);
+    toast.error('An error occurred during registration.');
+  }
+};
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
