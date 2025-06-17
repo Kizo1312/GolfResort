@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useModal } from "../../ui/ModalContext";
+import { useModal } from "../Context/ModalContext";
 import toast from 'react-hot-toast';
 
 type UserInfo = {

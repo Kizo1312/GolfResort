@@ -2,7 +2,7 @@ import {useState} from 'react'
 import Login from './components/Login/Login'
 import Modal from './ui/Modal';
 import Navbar from './components/Navbar/Navbar'
-import { useModal } from "./ui/ModalContext";
+import { useModal } from "./components/Context/ModalContext";
 import Register from './components/Register/Register'
 import { Toaster } from 'react-hot-toast';
 
@@ -12,9 +12,7 @@ const App = () => {
     <>
      <Toaster position="top-right" />
     <Navbar/>
-      <Modal>
-        {logRegister === 'login' ? <Login/> : <Register/>}
-      </Modal>
+      <Modal></Modal>
     </>
   );
 }

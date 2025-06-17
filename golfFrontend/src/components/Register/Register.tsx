@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import toast from 'react-hot-toast';
-import { useModal } from '../../ui/ModalContext';
+import { useModal } from '../Context/ModalContext';
 
 type UserInfo = {
   name: string;

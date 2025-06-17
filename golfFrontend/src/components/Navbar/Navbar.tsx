@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {useModal } from '../../ui/ModalContext'
+import {useModal } from '../Context/ModalContext'
 
 const Navbar = () => {
   const [isOn, setIsOn] = useState(false);
@@ -14,7 +14,7 @@ const Navbar = () => {
         <ul className="hidden md:flex gap-6 text-sm font-medium">
           <li><a href="#" className="hover:text-gray-300">Golf Courses</a></li>
           <li><a href="#" className="hover:text-gray-300">Welness</a></li>
-          <li onClick={open}><a href="#" className="hover:text-gray-300">Log in</a></li>
+          <li onClick={() => open("auth")}><a href="#" className="hover:text-gray-300">Log in</a></li>
           
         </ul>
         
@@ -50,7 +50,7 @@ const Navbar = () => {
           <li><a href="#" className="hover:text-gray-300">Home</a></li>
           <li><a href="#" className="hover:text-gray-300">About</a></li>
           <li><a href="#" className="hover:text-gray-300">Services</a></li>
-          <li onClick={open}><a href="#" className="hover:text-gray-300">Log in</a></li>
+          <li onClick={() => open("auth")}><a href="#" className="hover:text-gray-300">Log in</a></li>
         </ul>
       </div>
     </nav>
