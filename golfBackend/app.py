@@ -4,6 +4,8 @@ from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os
 from resources.users import blp as UserBlueprint
+from resources.services import blp as ServiceBlueprint
+
 from flask_cors import CORS
 
 from db import db  
@@ -25,6 +27,7 @@ app.config["OPENAPI_VERSION"] = "3.0.3"
 
 db.init_app(app)
 app.register_blueprint(UserBlueprint)
+app.register_blueprint(ServiceBlueprint)
 
 
 jwt = JWTManager(app)
