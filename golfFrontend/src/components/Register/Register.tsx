@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import toast from "react-hot-toast";
-import { useModal } from "../../ui/ModalContext";
+import toast from 'react-hot-toast';
+import { useModal } from '../Context/ModalContext';
 
 type UserInfo = {
   name: string;
@@ -34,7 +34,8 @@ const Register = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.message || "Login failed after registration.");
+        toast.error(data.message || 'Login failed after registration.');
+        console.log(data.message)
         return;
       }
 
@@ -48,29 +49,30 @@ const Register = () => {
   };
 
   const fetchUser = async () => {
-    const { name, last_name, email, password } = user;
+  const { name, last_name, email, password } = user;
 
-    try {
-      const response = await fetch("http://127.0.0.1:5000/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, last_name, email, password }),
-      });
+  try {
+    const response = await fetch('http://127.0.0.1:5000/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, last_name, email, password }) 
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        toast.error(data.message || "Registration failed.");
-        return;
-      }
-
-      toast.success(data.message || "Registration successful!");
-      await handleLogin(); // 🔐 Auto login
-    } catch (error) {
-      console.error("Error during registration:", error);
-      toast.error("An error occurred during registration.");
+    if (!response.ok) {
+      toast.error(data.message || 'Registration failed.');
+      return;
     }
-  };
+
+    toast.success(data.message || 'Registration successful!');
+    console.log(data.message)
+    await handleLogin(); // 🔐 Auto login
+  } catch (error) {
+    console.error('Error during registration:', error);
+    toast.error('An error occurred during registration.');
+  }
+};
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
