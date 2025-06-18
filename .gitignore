@@ -1,8 +1,20 @@
-# Python
+# Python cache
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 
-# Node.js
-node_modules/
+# Virtual environment
+golfBackend/venv/
+golfBackend/.env
+
+
+
+
+# macOS / Windows system files
+.DS_Store
+Thumbs.db
+
+# Logs or temp files (if you generate any)
+*.log
+
+
+
