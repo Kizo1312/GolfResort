@@ -48,8 +48,8 @@ const Navbar = () => {
         <ul className="flex flex-col items-center gap-4 px-4 pt-4 pb-6 text-sm font-medium rounded-b-lg">
 
           <li><a href="#" className="hover:text-gray-300">Home</a></li>
-          <li><a href="#" className="hover:text-gray-300">About</a></li>
-          <li><a href="#" className="hover:text-gray-300">Services</a></li>
+          <li><a href="#" className="hover:text-gray-300">Golf Courses</a></li>
+          <li><a href="#" className="hover:text-gray-300">Welness</a></li>
           <li onClick={() => open("auth")}><a href="#" className="hover:text-gray-300">Log in</a></li>
         </ul>
       </div>
