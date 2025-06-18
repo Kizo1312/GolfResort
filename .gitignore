@@ -1,0 +1,15 @@
+#Python cache
+__pycache__/
+
+#Node.js dependencies
+node_modules/
+
+#Frontend build/deps folders (vite)
+golfFrontend/node_modules/
+golfFrontend/node_modules/.vite/
+
+#Virtual environment
+golfBackend/venv/
+
+#Env files
+golfBackend/.env
