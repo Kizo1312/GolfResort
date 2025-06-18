@@ -9,3 +9,5 @@ class UserModel(db.Model):
   email = db.Column(db.String(100), unique = True, nullable = False)
   password = db.Column(db.String(100), unique = False, nullable = False)
   role = db.Column(db.String(20), nullable=False, default='guest')
+
+  reservations = db.relationship("ReservationModel", back_populates="user", cascade="all, delete")
