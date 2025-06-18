@@ -5,6 +5,7 @@ import Navbar from './components/Navbar/Navbar'
 import { useModal } from "./components/Context/ModalContext";
 import Register from './components/Register/Register'
 import { Toaster } from 'react-hot-toast';
+import HomePage from './Pages/Home';
 
 const App = () => {
   const [logRegister, setLogRegister] = useState('login')
@@ -12,6 +13,7 @@ const App = () => {
     <>
      <Toaster position="top-right" />
     <Navbar/>
+    <HomePage/>
       <Modal></Modal>
     </>
   );
