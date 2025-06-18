@@ -60,3 +60,12 @@ class Service(MethodView):
         db.session.delete(service)
         db.session.commit()
         return {"message": "Service deleted."}
+
+@blp.route("/services/<service_category>")
+class Service(MethodView):
+    @blp.response(200, ServiceSchema(many=True))
+    def get(self, service_category):
+        services= ServiceModel.query.filter_by(category=service_category).all()
+        if not services:
+            abort(404, message="Nema usluga u ovoj kategoriji.")
+        return services
