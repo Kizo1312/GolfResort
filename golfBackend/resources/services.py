@@ -20,13 +20,15 @@ class ServiceList(MethodView):
             name=service_data["name"],
             price=service_data["price"],
             category=service_data["category"],
+            description = service_data.get("description"),
             inventory=service_data["inventory"]
         )
         try:
             db.session.add(new_service)
             db.session.commit()
-        except SQLAlchemyError:
-            abort(500, message="An error occurred while creating the service.")
+        except SQLAlchemyError as e:
+            db.session.rollback()  # rollback any partial transaction
+            abort(500, message=f"An error occurred while creating the service: {str(e)}")
         return new_service
 
     @blp.response(200, ServiceSchema(many=True))
@@ -58,3 +60,12 @@ class Service(MethodView):
         db.session.delete(service)
         db.session.commit()
         return {"message": "Service deleted."}
+
+@blp.route("/services/<service_category>")
+class Service(MethodView):
+    @blp.response(200, ServiceSchema(many=True))
+    def get(self, service_category):
+        services= ServiceModel.query.filter_by(category=service_category).all()
+        if not services:
+            abort(404, message="Nema usluga u ovoj kategoriji.")
+        return services

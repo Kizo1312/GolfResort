@@ -1,5 +1,5 @@
 from db import db
-from sqlalchemy import CheckConstraint
+from sqlalchemy import CheckConstraint, Text
 
 class ServiceModel(db.Model):
     __tablename__ = 'services'
@@ -8,6 +8,7 @@ class ServiceModel(db.Model):
     name = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     category = db.Column(db.String(50), nullable=False)
+    description =db.Column(Text, nullable = True )
     inventory = db.Column(db.Integer, nullable=False)
 
     reservation_items = db.relationship("ReservationItemModel", back_populates="service")
