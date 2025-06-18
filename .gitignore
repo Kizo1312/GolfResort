@@ -1,20 +1,17 @@
 # Python cache
 __pycache__/
-*.py[cod]
+
+# Node.js dependencies
+node_modules/
+
+# Frontend build/deps folders (vite)
+golfFrontend/node_modules/
+golfFrontend/node_modules/.vite/
 
 # Virtual environment
 golfBackend/venv/
+
+# Env files 
 golfBackend/.env
-
-
-
-
-# macOS / Windows system files
-.DS_Store
-Thumbs.db
-
-# Logs or temp files (if you generate any)
-*.log
-
 
 
