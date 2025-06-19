@@ -15,4 +15,3 @@ class EditServiceSchema(Schema):
     price= fields.Decimal(required=False)
     description = fields.Str(required=False)
     inventory= fields.Int(required=False)
-    

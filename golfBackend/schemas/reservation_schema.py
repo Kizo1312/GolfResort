@@ -1,12 +1,14 @@
-from marshmallow import Schema, fields, validates, ValidationError
-from datetime import date, time
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import fields
+from models.reservation import ReservationModel
+from .reservation_item_schema import ReservationItemSchema
+from db import db
+class ReservationSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = ReservationModel
+        load_instance = True
+        include_fk = True
+        sqla_session = db.session
 
-class ReservationItemSchema(Schema):
-    service_id = fields.Int(required=True)
-    quantity = fields.Int(required=True, validate=lambda x: x > 0)
-
-class ReservationSchema(Schema):
-    date = fields.Date(required=True)  
-    start_time = fields.Time(required=True)  
-    duration_minutes = fields.Int(required=True, validate=lambda x: x > 0)
-    items = fields.List(fields.Nested(ReservationItemSchema), required=True, validate=lambda l: len(l) > 0)
+    reservation_items = fields.Nested(ReservationItemSchema, many=True, required=True)
+    end_time = fields.Time(dump_only=True)

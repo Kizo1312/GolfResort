@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 from resources.users import blp as UserBlueprint
 from resources.services import blp as ServiceBlueprint
+from resources.reservations import blp as RegistrationBlueprint
 
 from flask_cors import CORS
 
@@ -24,12 +25,14 @@ def create_app(db_url=None):
     app.config["OPENAPI_VERSION"] = "3.0.3"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+    app.config["SQLALCHEMY_SESSION"] = db.session
 
 
 
     db.init_app(app)
     app.register_blueprint(UserBlueprint)
     app.register_blueprint(ServiceBlueprint)
+    app.register_blueprint(RegistrationBlueprint)
 
 
     jwt = JWTManager(app)
@@ -40,3 +43,7 @@ def create_app(db_url=None):
 
 
     return app
+
+
+
+#source .venv/Scripts/activate

@@ -1,13 +1,12 @@
-from app import app, db
+from app import create_app
+from db import db
 from models.user import UserModel
 from passlib.hash import pbkdf2_sha256
 
-with app.app_context():
-    existing_user = UserModel.query.filter_by(email="admin@example.com").first()
+app = create_app()
 
-    if existing_user:
-        print("Admin already exists.")
-    else:
+with app.app_context():
+    if not UserModel.query.filter_by(email="admin@example.com").first():
         admin = UserModel(
             name="Admin",
             last_name="User",
@@ -18,6 +17,8 @@ with app.app_context():
         db.session.add(admin)
         db.session.commit()
         print("Admin user created.")
+    else:
+        print("Admin already exists.")
 
 
 #python seed_admin.py
