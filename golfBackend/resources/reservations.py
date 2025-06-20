@@ -17,42 +17,30 @@ class CreateReservation(MethodView):
     @blp.arguments(ReservationSchema(session=db.session))
     @blp.response(201, ReservationSchema)
     def post(self, reservation_data):
-        # These attributes are now accessed via dot notation
+        
         user_id = reservation_data.user_id
         date = reservation_data.date
         start_time = reservation_data.start_time
         duration = reservation_data.duration_minutes
 
         end_time = (datetime.combine(date, start_time) + timedelta(minutes=duration)).time()
-        reservation_data.end_time = end_time  # Set end_time before saving
+        reservation_data.end_time = end_time  
 
-        # Conflict check for each service
+        
         for item in reservation_data.reservation_items:
             service_id = item.service_id
 
             overlapping = (
-                db.session.query(ReservationModel)
-                .join(ReservationItemModel)
-                .filter(
-                    ReservationItemModel.service_id == service_id,
-                    ReservationModel.date == date,
-                    or_(
-                        and_(
-                            ReservationModel.start_time <= start_time,
-                            ReservationModel.end_time > start_time
-                        ),
-                        and_(
-                            ReservationModel.start_time < end_time,
-                            ReservationModel.end_time >= end_time
-                        ),
-                        and_(
-                            ReservationModel.start_time >= start_time,
-                            ReservationModel.end_time <= end_time
-                        )
+                    db.session.query(ReservationModel)
+                    .join(ReservationItemModel)
+                    .filter(
+                        ReservationItemModel.service_id == service_id,
+                        ReservationModel.date == date,
+                        ReservationModel.start_time < end_time,
+                        ReservationModel.end_time > start_time
                     )
+                    .first()
                 )
-                .first()
-            )
 
             if overlapping:
                 abort(409, message=f"Service ID {service_id} is already reserved during this time.")
