@@ -9,6 +9,7 @@ from db import db
 from models.reservation import ReservationModel
 from models.reservation_item import ReservationItemModel
 from schemas import ReservationSchema
+from models.service import ServiceModel
 
 blp = Blueprint("Reservations", __name__, description="Operations on reservations")
 
@@ -17,34 +18,51 @@ class CreateReservation(MethodView):
     @blp.arguments(ReservationSchema(session=db.session))
     @blp.response(201, ReservationSchema)
     def post(self, reservation_data):
-        
         user_id = reservation_data.user_id
         date = reservation_data.date
         start_time = reservation_data.start_time
         duration = reservation_data.duration_minutes
 
+        
         end_time = (datetime.combine(date, start_time) + timedelta(minutes=duration)).time()
-        reservation_data.end_time = end_time  
+        reservation_data.end_time = end_time
 
         
         for item in reservation_data.reservation_items:
             service_id = item.service_id
+            requested_quantity = item.quantity
+            service = db.session.get(ServiceModel, service_id)
 
-            overlapping = (
-                    db.session.query(ReservationModel)
-                    .join(ReservationItemModel)
-                    .filter(
-                        ReservationItemModel.service_id == service_id,
-                        ReservationModel.date == date,
-                        ReservationModel.start_time < end_time,
-                        ReservationModel.end_time > start_time
-                    )
-                    .first()
+            
+            overlapping_query = (
+                db.session.query(ReservationModel)
+                .join(ReservationItemModel)
+                .filter(
+                    ReservationItemModel.service_id == service_id,
+                    ReservationModel.date == date,
+                    ReservationModel.start_time < end_time,
+                    ReservationModel.end_time > start_time
                 )
+            )
 
-            if overlapping:
-                abort(409, message=f"Service ID {service_id} is already reserved during this time.")
+            if service.category in ["golf teren", "wellness"]:
+                
+                if overlapping_query.first():
+                    abort(409, message=f"Service ID {service_id} is already reserved during this time.")
+            else:
+                
+                overlapping_reservations = overlapping_query.all()
 
+                total_reserved = 0
+                for reservation in overlapping_reservations:
+                    for res_item in reservation.reservation_items:
+                        if res_item.service_id == service_id:
+                            total_reserved += res_item.quantity
+
+                if total_reserved + requested_quantity > service.inventory:
+                    abort(409, message=f"Not enough inventory for service ID {service_id} at the selected time.")
+
+       
         try:
             db.session.add(reservation_data)
             db.session.commit()
