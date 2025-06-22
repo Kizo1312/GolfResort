@@ -9,7 +9,7 @@ type Item = {
 };
 
 const Reservations = () => {
-  const { data, loading, error } = useFetchData<Item[]>("/rezervacije");
+  const { data, loading, error } = useFetchData<Item[]>("/reservations");
 
   if (loading) return <p>Učitavanje...</p>;
   if (error) return <p>Greška: {error}</p>;

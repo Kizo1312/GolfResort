@@ -17,6 +17,7 @@ import Addons from "@/Pages/Admin/Addons";
 import Reservations from "@/Pages/Admin/Reservations";
 import Wellness from "@/Pages/Admin/Wellness";
 import Users from "@/Pages/Admin/Users";
+import Dashboard from "@/Pages/Admin/Dashboard";
 
 // Protected Route
 import ProtectedRoute from "./components/Context/ProtectedRoute";
@@ -43,7 +44,8 @@ const App = () => {
                 <AdminLayout />
               </ProtectedRoute>
             }
-          >
+          > 
+            <Route index element={<Dashboard />} />
             <Route path="tereni" element={<Tereni />} />
             <Route path="dodatne-usluge" element={<Addons />} />
             <Route path="wellness-usluge" element={<Wellness />} />
