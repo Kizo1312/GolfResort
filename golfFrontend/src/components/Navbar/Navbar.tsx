@@ -1,9 +1,16 @@
 import { useState } from "react";
-import {useModal } from '../Context/ModalContext'
+import { useModal } from "../Context/ModalContext";
+import { useAuth } from "../Context/AuthContext";
 
 const Navbar = () => {
   const [isOn, setIsOn] = useState(false);
-  const {open, isOpen} = useModal()
+  const { open } = useModal();
+  const { user, logout } = useAuth();
+
+  const handleAuthClick = () => {
+    if (user) logout();
+    else open("auth");
+  };
 
   return (
     <nav className="text-black px-6 py-4 shadow-md">
@@ -13,11 +20,14 @@ const Navbar = () => {
         {/* Desktop Nav */}
         <ul className="hidden md:flex gap-6 text-sm font-medium">
           <li><a href="#" className="hover:text-gray-300">Golf Courses</a></li>
-          <li><a href="#" className="hover:text-gray-300">Welness</a></li>
-          <li onClick={() => open("auth")}><a href="#" className="hover:text-gray-300">Log in</a></li>
-          
+          <li><a href="#" className="hover:text-gray-300">Wellness</a></li>
+          <li>
+            <button onClick={handleAuthClick} className="hover:text-gray-300">
+              {user ? "Log out" : "Log in"}
+            </button>
+          </li>
         </ul>
-        
+
         {/* Hamburger Icon */}
         <button
           onClick={() => setIsOn(!isOn)}
@@ -46,11 +56,14 @@ const Navbar = () => {
         }`}
       >
         <ul className="flex flex-col items-center gap-4 px-4 pt-4 pb-6 text-sm font-medium rounded-b-lg">
-
           <li><a href="#" className="hover:text-gray-300">Home</a></li>
           <li><a href="#" className="hover:text-gray-300">Golf Courses</a></li>
-          <li><a href="#" className="hover:text-gray-300">Welness</a></li>
-          <li onClick={() => open("auth")}><a href="#" className="hover:text-gray-300">Log in</a></li>
+          <li><a href="#" className="hover:text-gray-300">Wellness</a></li>
+          <li>
+            <button onClick={handleAuthClick} className="hover:text-gray-300">
+              {user ? "Log out" : "Log in"}
+            </button>
+          </li>
         </ul>
       </div>
     </nav>
@@ -58,4 +71,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

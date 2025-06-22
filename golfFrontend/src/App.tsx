@@ -1,48 +1,48 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import {useState} from 'react'
-import Login from './components/Login/Login'
+import { Toaster } from "react-hot-toast";
 import Modal from './ui/Modal';
-import Navbar from './components/Navbar/Navbar'
+
+// Context
+import { AuthProvider } from "./components/Context/AuthContext";
 import { useModal } from "./components/Context/ModalContext";
-import Register from './components/Register/Register'
-import { Toaster } from 'react-hot-toast';
+
+// Layouts & Pages
 import HomePage from './Pages/Home';
 import AdminLayout from './components/Layouts/AdminLayout';
 import ItemList from './Pages/Admin/List';
+import UserLayout from './components/Layouts/UserLayout';
 
-
-// const App = () => {
-//   const [logRegister, setLogRegister] = useState('login')
-//   return (
-//     <>
-//     {/* <Toaster position="top-right" />
-//     <Navbar/>
-//     <HomePage/>
-//     <Modal></Modal> */}
-//     <Router>
-//       <Routes>
-//         <Route path="/admin" element={<AdminLayout />}>
-//           <Route path="tereni" element={<ItemList />} />
-//         </Route>
-//       </Routes>
-//     </Router>
-//     </>
-//   );
-// }
-
-// export default App;
-
+// Protected Route
+import ProtectedRoute from "./components/Context/ProtectedRoute";
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="tereni" element={<ItemList />} />
-        </Route>
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Toaster position="top-right" />
+        <Modal />
+
+        <Routes>
+          {/* User Routes */}
+          <Route path="/" element={<UserLayout />}>
+            <Route path="home" element={<HomePage />} />
+            {/* <Route path="profile" element={<UserProfile />} /> */}
+          </Route>
+
+          {/* Admin Routes - ZAŠTIĆENO */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="tereni" element={<ItemList />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
 
