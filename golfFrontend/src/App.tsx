@@ -9,8 +9,14 @@ import { useModal } from "./components/Context/ModalContext";
 // Layouts & Pages
 import HomePage from './Pages/Home';
 import AdminLayout from './components/Layouts/AdminLayout';
-import ItemList from './Pages/Admin/List';
 import UserLayout from './components/Layouts/UserLayout';
+// Admin Pages
+
+import Tereni from "@/Pages/Admin/Tereni";
+import Addons from "@/Pages/Admin/Addons";
+import Reservations from "@/Pages/Admin/Reservations";
+import Wellness from "@/Pages/Admin/Wellness";
+import Users from "@/Pages/Admin/Users";
 
 // Protected Route
 import ProtectedRoute from "./components/Context/ProtectedRoute";
@@ -38,7 +44,11 @@ const App = () => {
               </ProtectedRoute>
             }
           >
-            <Route path="tereni" element={<ItemList />} />
+            <Route path="tereni" element={<Tereni />} />
+            <Route path="dodatne-usluge" element={<Addons />} />
+            <Route path="wellness-usluge" element={<Wellness />} />
+            <Route path="korisnici" element={<Users />} />
+            <Route path="rezervacije" element={<Reservations />} />
           </Route>
         </Routes>
       </Router>

@@ -1,6 +1,12 @@
 import { Outlet, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useAuth } from "../Context/AuthContext";
+import LogoutButton from "../Context/LogoutButton";
 
 const AdminLayout = () => {
+  const { logout } = useAuth();
+
   return (
     <div className="h-screen flex flex-col bg-gray-100">
       {/* Navbar */}
@@ -67,7 +73,7 @@ const AdminLayout = () => {
           <div className="pt-6 border-t mt-6">
             <ul className="space-y-2">
               <li className="text-gray-600 cursor-pointer">View as user</li>
-              <li className="text-red-500 font-semibold cursor-pointer">Log Out</li>
+              <LogoutButton />
             </ul>
           </div>
         </aside>
