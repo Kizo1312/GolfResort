@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import toast from 'react-hot-toast';
-import { useModal } from '../Context/ModalContext';
+import toast from "react-hot-toast";
+import { useModal } from "../Context/ModalContext";
+import { useAuth } from "../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 type UserInfo = {
   name: string;
@@ -12,6 +14,9 @@ type UserInfo = {
 
 const Register = () => {
   const { close } = useModal();
+  const { login } = useAuth(); // ✅ dodano
+  const navigate = useNavigate(); // ✅ dodano
+
   const [user, setUser] = useState<UserInfo>({
     name: "",
     last_name: "",
@@ -20,7 +25,7 @@ const Register = () => {
     repeatPassword: "",
   });
 
-  const handleLogin = async () => {
+  const autoLogin = async () => {
     try {
       const res = await fetch("http://127.0.0.1:5000/login", {
         method: "POST",
@@ -34,45 +39,46 @@ const Register = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.message || 'Login failed after registration.');
-        console.log(data.message)
+        toast.error(data.message || "Login failed after registration.");
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      toast.success("Successfully logged in!");
-      close();
+      login(data); // ✅ postavi globalni context
+      toast.success("Prijava uspješna!");
+      close(); // zatvori modal
+
+      // ✅ redirect po ulozi
+      navigate(data.user.role === "admin" ? "/admin/tereni" : "/user/home");
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
       toast.error("Login error after registration.");
     }
   };
 
   const fetchUser = async () => {
-  const { name, last_name, email, password } = user;
+    const { name, last_name, email, password } = user;
 
-  try {
-    const response = await fetch('http://127.0.0.1:5000/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, last_name, email, password }) 
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:5000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, last_name, email, password }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      toast.error(data.message || 'Registration failed.');
-      return;
+      if (!response.ok) {
+        toast.error(data.message || "Registration failed.");
+        return;
+      }
+
+      toast.success(data.message || "Registration successful!");
+      await autoLogin(); // ✅ auto login nakon registracije
+    } catch (error) {
+      console.error("Error during registration:", error);
+      toast.error("An error occurred during registration.");
     }
-
-    toast.success(data.message || 'Registration successful!');
-    console.log(data.message)
-    await handleLogin(); // 🔐 Auto login
-  } catch (error) {
-    console.error('Error during registration:', error);
-    toast.error('An error occurred during registration.');
-  }
-};
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,7 +103,6 @@ const Register = () => {
             <input
               type="text"
               placeholder="First Name"
-              name="name"
               value={user.name}
               onChange={(e) => setUser({ ...user, name: e.target.value })}
               className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -111,7 +116,6 @@ const Register = () => {
             <input
               type="text"
               placeholder="Last Name"
-              name="last_name"
               value={user.last_name}
               onChange={(e) => setUser({ ...user, last_name: e.target.value })}
               className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -123,7 +127,6 @@ const Register = () => {
         <input
           type="email"
           placeholder="Email"
-          name="email"
           value={user.email}
           onChange={(e) => setUser({ ...user, email: e.target.value })}
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -133,7 +136,6 @@ const Register = () => {
         <input
           type="password"
           placeholder="Password"
-          name="password"
           value={user.password}
           onChange={(e) => setUser({ ...user, password: e.target.value })}
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -143,9 +145,10 @@ const Register = () => {
         <input
           type="password"
           placeholder="Repeat Password"
-          name="repeatPassword"
           value={user.repeatPassword}
-          onChange={(e) => setUser({ ...user, repeatPassword: e.target.value })}
+          onChange={(e) =>
+            setUser({ ...user, repeatPassword: e.target.value })
+          }
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
