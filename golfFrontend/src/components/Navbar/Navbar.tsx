@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useModal } from "../Context/ModalContext";
 import { useAuth } from "../Context/AuthContext";
+import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
   const [isOn, setIsOn] = useState(false);
@@ -12,17 +13,40 @@ const Navbar = () => {
     else open("auth");
   };
 
+  const linkStyle = ({ isActive }: { isActive: boolean }) =>
+    isActive
+      ? "block px-4 py-2 rounded-lg bg-green-600 text-white font-semibold"
+      : "block px-4 py-2 rounded-lg text-gray-700 hover:bg-green-100 hover:text-green-700 font-semibold";
+
   return (
     <nav className="text-black px-6 py-4 shadow-md">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="text-xl font-bold">Golf resort</div>
 
         {/* Desktop Nav */}
-        <ul className="hidden md:flex gap-6 text-sm font-medium">
-          <li><a href="#" className="hover:text-gray-300">Golf Courses</a></li>
-          <li><a href="#" className="hover:text-gray-300">Wellness</a></li>
+        <ul className="hidden md:flex gap-4 text-sm font-medium">
           <li>
-            <button onClick={handleAuthClick} className="hover:text-gray-300">
+            <NavLink to="/home" className={linkStyle}>
+              Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/golf-courses" className={linkStyle}>
+              Golf Courses
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/wellness" className={linkStyle}>
+              Wellness
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/rezervacije" className={linkStyle}>
+              Rezervacije
+            </NavLink>
+          </li>
+          <li>
+            <button onClick={handleAuthClick} className="hover:text-gray-500 font-semibold">
               {user ? "Log out" : "Log in"}
             </button>
           </li>
@@ -55,17 +79,61 @@ const Navbar = () => {
           isOn ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <ul className="flex flex-col items-center gap-4 px-4 pt-4 pb-6 text-sm font-medium rounded-b-lg">
-          <li><a href="#" className="hover:text-gray-300">Home</a></li>
-          <li><a href="#" className="hover:text-gray-300">Golf Courses</a></li>
-          <li><a href="#" className="hover:text-gray-300">Wellness</a></li>
-          <li>
-            <button onClick={handleAuthClick} className="hover:text-gray-300">
+        <ul className="flex flex-col items-center gap-0">
+          <li className="w-full">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `block w-full px-4 py-2 text-sm font-medium flex items-center ${
+                  isActive
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700 hover:bg-green-100 hover:text-green-700"
+                }`
+              }
+            >
+              Home
+            </NavLink>
+          </li>
+          <li className="w-full">
+            <NavLink
+              to="/golf"
+              className={({ isActive }) =>
+                `block w-full px-4 py-2 text-sm font-medium flex items-center ${
+                  isActive
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700 hover:bg-green-100 hover:text-green-700"
+                }`
+              }
+            >
+              Golf Courses
+            </NavLink>
+          </li>
+          <li className="w-full">
+            <NavLink
+              to="/wellness"
+              className={({ isActive }) =>
+                `block w-full px-4 py-2 text-sm font-medium flex items-center ${
+                  isActive
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700 hover:bg-green-100 hover:text-green-700"
+                }`
+              }
+            >
+              Wellness
+            </NavLink>
+          </li>
+          <li className="w-full">
+            <button
+              onClick={handleAuthClick}
+              className="w-full px-4 py-2 text-left text-sm font-medium flex items-center text-gray-700 hover:bg-green-100 hover:text-green-700"
+            >
               {user ? "Log out" : "Log in"}
             </button>
           </li>
         </ul>
       </div>
+
+
     </nav>
   );
 };

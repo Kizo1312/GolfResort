@@ -1,13 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Modal from './ui/Modal';
-
+import { useEffect } from "react";
 // Context
 import { AuthProvider } from "./components/Context/AuthContext";
 import { useModal } from "./components/Context/ModalContext";
 
 // Layouts & Pages
 import HomePage from './Pages/Home';
+import ReservationCategory from './Pages/Reservations/ReservationCategory';
 import AdminLayout from './components/Layouts/AdminLayout';
 import UserLayout from './components/Layouts/UserLayout';
 // Admin Pages
@@ -23,6 +24,15 @@ import Dashboard from "@/Pages/Admin/Dashboard";
 import ProtectedRoute from "./components/Context/ProtectedRoute";
 
 const App = () => {
+  useEffect(() => {
+  fetch("http://127.0.0.1:5000/services")
+    .then((res) => {
+      if (!res.ok) throw new Error("Greška prilikom dohvata podataka");
+      return res.json();
+    })
+    .then((data) => console.log("SERVISI:", data))
+    .catch((err) => console.error("Greška:", err));
+}, []);
   return (
     <AuthProvider>
       <Router>
@@ -33,6 +43,10 @@ const App = () => {
           {/* User Routes */}
           <Route path="/" element={<UserLayout />}>
             <Route path="home" element={<HomePage />} />
+            <Route path="rezervacije" element={<ReservationCategory />} />
+            {/* Ostale korisničke rute mogu ići ovde */}
+            {/* <Route path="about" element={<About />} /> */}
+            {/* <Route path="contact" element={<Contact />} /> */}
             {/* <Route path="profile" element={<UserProfile />} /> */}
           </Route>
 
