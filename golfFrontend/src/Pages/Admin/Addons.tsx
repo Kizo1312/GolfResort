@@ -1,0 +1,21 @@
+import { useFetchData } from "@/hooks/useFetchData";
+import ItemTable from "@/components/Admin/ItemTable";
+
+type Item = {
+  id: number;
+  name: string;
+  price: string;
+  description: string;
+};
+
+const Addons = () => {
+const { data, loading, error } = useFetchData<Item[]>("/services/dodatna usluga");
+
+if (loading) return <p>Učitavanje...</p>;
+if (error) return <p>Greška: {error}</p>;
+if (!data) return <p>Nema podataka</p>;
+
+  return <ItemTable items={data} />;
+};
+
+export default Addons;
