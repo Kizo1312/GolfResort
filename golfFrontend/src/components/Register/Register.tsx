@@ -67,6 +67,7 @@ const Register = () => {
 
     toast.success(data.message || 'Registration successful!');
     console.log(data.message)
+    console.log(data);
     await handleLogin(); // 🔐 Auto login
   } catch (error) {
     console.error('Error during registration:', error);
