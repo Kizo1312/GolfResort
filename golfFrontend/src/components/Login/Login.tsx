@@ -1,53 +1,54 @@
 import React, { useState } from "react";
 import { useModal } from "../Context/ModalContext";
-import toast from 'react-hot-toast';
+import { useAuth } from "../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
-type UserInfo = {
+type Credentials = {
   email: string;
   password: string;
 };
 
 const Login = () => {
-  const [user, setUser] = useState<UserInfo>({
-    email: '',
-    password: ''
+  const [credentials, setCredentials] = useState<Credentials>({
+    email: "",
+    password: "",
   });
-  const {close} = useModal()
+
+  const { close } = useModal();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(user)
+      const res = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        console.error('Login failed:', data.message || 'User not found');
-         toast.error(data.message || 'Registration unsucessful')
+      if (!res.ok) {
+        toast.error(data.message || "Login neuspješan.");
         return;
       }
-      toast.success('Uspješna registracija!');
-      close()
-      console.log('Login successful:', data);
-      // You can store a token here: localStorage.setItem('token', data.token)
 
-    } catch (error) {
-      console.error('An error occurred during login:', error);
-      toast.error('An error occurred during login');
+      toast.success("Uspješna prijava!");
+      login(data);  // postavi globalni context
+      close();      // zatvori modal
+
+      // ➜ automatski redirect prema ulozi
+      navigate(data.user.role === "admin" ? "/admin/tereni" : "/user/home");
+    } catch (err) {
+      toast.error("Greška pri prijavi.");
+      console.error(err);
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if((user.email).trim() === '' || (user.password).trim() === '') {
-      console.log('Password and Email fields cannot be empty')
-      return;
-    }
+    if (!credentials.email.trim() || !credentials.password.trim()) return;
     fetchUser();
   };
 
@@ -57,26 +58,33 @@ const Login = () => {
       <form onSubmit={handleSubmit}>
         <label htmlFor="email-field">Email</label>
         <input
-          type="email"
           id="email-field"
+          type="email"
           placeholder="Email"
-          value={user.email}
-          onChange={(e) => setUser({ ...user, email: e.target.value })}
+          value={credentials.email}
+          onChange={(e) =>
+            setCredentials({ ...credentials, email: e.target.value })
+          }
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
         <label htmlFor="password-field">Password</label>
         <input
-          type="password"
           id="password-field"
+          type="password"
           placeholder="Password"
-          value={user.password}
-          onChange={(e) => setUser({ ...user, password: e.target.value })}
+          value={credentials.password}
+          onChange={(e) =>
+            setCredentials({ ...credentials, password: e.target.value })
+          }
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
         <div className="w-full flex justify-end">
-          <button type="submit" className="ml-auto bg-blue-500 text-white px-4 py-2 rounded">
+          <button
+            type="submit"
+            className="ml-auto bg-blue-500 text-white px-4 py-2 rounded"
+          >
             Login
           </button>
         </div>
@@ -86,3 +94,4 @@ const Login = () => {
 };
 
 export default Login;
+
