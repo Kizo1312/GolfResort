@@ -9,13 +9,13 @@ type Item = {
 };
 
 const Addons = () => {
-const { data, loading, error } = useFetchData<Item[]>("/services/dodatna usluga");
+const { data, loading, error, refetch } = useFetchData<Item[]>("/services/dodatna usluga");
 
 if (loading) return <p>Učitavanje...</p>;
 if (error) return <p>Greška: {error}</p>;
 if (!data) return <p>Nema podataka</p>;
 
-  return <ItemTable items={data} />;
+  return <ItemTable items={data} onUpdate={refetch} />;
 };
 
 export default Addons;

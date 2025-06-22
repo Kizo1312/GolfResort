@@ -3,6 +3,7 @@ import { useModal } from "../components/Context/ModalContext";
 import Login from "../components/Login/Login";
 import Register from "../components/Register/Register";
 // import TerrainDetails from "../components/Terrain/TerrainDetails"; // nova komponenta
+import EditItemModal from "../components/EditItemModal";
 
 const Modal = () => {
   const { isOpen, modalType, modalProps, close } = useModal();
@@ -50,6 +51,13 @@ const Modal = () => {
             {activeTab === "login" ? <Login /> : <Register />}
           </>
         )}
+        {modalType === "edit-item" && (
+        <EditItemModal
+          item={modalProps.item}
+          onClose={close}
+          onUpdate={modalProps.onUpdate} // ← dodaj
+        />
+      )}
 
         {/* TERRAIN DETAILS MODAL */}
         {/* {modalType === "terrain-details" && (

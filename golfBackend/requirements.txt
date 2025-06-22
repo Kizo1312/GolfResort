@@ -7,3 +7,4 @@ marshmallow
 python-dotenv
 passlib
 psycopg2-binary
+marshmallow-sqlalchemy

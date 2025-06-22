@@ -9,7 +9,7 @@ type User = {
 };
 
 const Users = () => {
-  const { data, loading, error } = useFetchData<User[]>("/users");
+  const { data, loading, error, refetch } = useFetchData<User[]>("/users");
 
   if (loading) return <p>Učitavanje...</p>;
   if (error) return <p>Greška: {error}</p>;

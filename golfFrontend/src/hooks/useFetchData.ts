@@ -5,7 +5,7 @@ export function useFetchData<T>(endpoint: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = () => {
     setLoading(true);
     fetch(`http://127.0.0.1:5000${endpoint}`)
       .then((res) => {
@@ -18,7 +18,11 @@ export function useFetchData<T>(endpoint: string) {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, [endpoint]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: fetchData };
 }
