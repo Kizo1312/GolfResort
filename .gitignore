@@ -1,10 +1,9 @@
 # Python cache
 __pycache__/
+*.pyc
 
 # Node.js dependencies
 node_modules/
-
-# Frontend build/deps folders (vite)
 golfFrontend/node_modules/
 golfFrontend/node_modules/.vite/
 
@@ -14,4 +13,5 @@ golfBackend/venv/
 # Env files 
 golfBackend/.env
 
-
+# SQLite database
+golfBackend/instance/golf.db

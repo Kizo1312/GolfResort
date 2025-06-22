@@ -10,9 +10,10 @@ class ReservationModel(db.Model):
 
     date = db.Column(db.Date, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
     duration_minutes = db.Column(db.Integer, nullable=False)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
     user = db.relationship("UserModel", back_populates="reservations")
     reservation_items = db.relationship("ReservationItemModel", back_populates="reservation", cascade="all, delete") 
