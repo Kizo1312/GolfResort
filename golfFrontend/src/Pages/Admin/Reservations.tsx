@@ -9,13 +9,13 @@ type Item = {
 };
 
 const Reservations = () => {
-  const { data, loading, error } = useFetchData<Item[]>("/reservations");
+  const { data, loading, error, refetch } = useFetchData<Item[]>("/reservations");
 
   if (loading) return <p>Učitavanje...</p>;
   if (error) return <p>Greška: {error}</p>;
   if (!data) return <p>Nema podataka</p>;
 
-  return <ItemTable items={data} />;
+  return <ItemTable items={data} onUpdate={refetch} />;
 };
 
 export default Reservations;

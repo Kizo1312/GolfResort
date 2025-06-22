@@ -1,4 +1,5 @@
 import React from "react";
+import { useModal } from "@/components/Context/ModalContext"; // prilagodi put ako treba
 
 type Item = {
   id: number;
@@ -9,9 +10,12 @@ type Item = {
 
 type Props = {
   items: Item[];
+  onUpdate: () => void; // Dodano
 };
 
-const ItemTable = ({ items }: Props) => {
+const ItemTable = ({ items, onUpdate }: Props) => {
+  const { open } = useModal();
+
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden">
       <div className="px-6 py-4 border-b font-semibold text-gray-700 grid grid-cols-3">
@@ -34,7 +38,12 @@ const ItemTable = ({ items }: Props) => {
             </span>
 
             <div className="absolute right-6 opacity-0 group-hover:opacity-100 flex gap-2 transition">
-              <button className="text-blue-600 text-sm">Uredi</button>
+              <button
+                onClick={() => open("edit-item", { item, onUpdate })} // Dodano onUpdate
+                className="text-blue-600 text-sm"
+              >
+                Uredi
+              </button>
               <button className="text-red-500 text-sm">Obriši</button>
             </div>
           </li>
