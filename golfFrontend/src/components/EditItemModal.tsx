@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTerrains } from "./Context/TerrainsContext";
 
 type Item = {
   id: number;
@@ -20,6 +21,7 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
   const [description, setDesc]    = useState(item.description ?? "");
   const [inventory, setInventory] = useState(item.inventory ?? 0);
   const [loading, setLoading]     = useState(false);
+  const { refetch } = useTerrains();
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -38,6 +40,7 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
       if (!res.ok) throw new Error(await res.text());
       onClose();
       onUpdate();
+      refetch();  // refetch za onu nasu listu terena kod slicica
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Nepoznata greška";
       alert("Greška: " + msg);
@@ -46,7 +49,7 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
     }
   };
 
-  /* ------- UI ------- */
+  
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Uredi stavku</h2>
