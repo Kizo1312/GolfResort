@@ -13,6 +13,8 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 from models.user import UserModel
+from datetime import timedelta
+from models.blockedtokens import BlockedTokensModel
 
 blp = Blueprint("Users", __name__, description = "Operations on users")
 @blp.route('/login')
@@ -21,11 +23,13 @@ class UserLogin(MethodView):
   def post(self, user_data):
     user = UserModel.query.filter_by(email=user_data["email"]).first()
     if user and pbkdf2_sha256.verify(user_data["password"], user.password):
-            access_token = create_access_token(identity=str(user.id))
+            access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(hours=1))
+            refresh_token = create_refresh_token(identity=str(user.id))
            
             return {
                 "message": "Login successful",
                 "access_token": access_token,
+                "refresh_token": refresh_token,
                 "user": {
                     "id": user.id,
                     "name": user.name,
@@ -56,6 +60,31 @@ class UserRegister(MethodView):
         db.session.commit()
 
         return {"message": "User created"}, 201
+    
+@blp.route("/logout")
+class UserLogout(MethodView):
+    @jwt_required()
+    def post(self):
+        current_token = get_jwt()['jti']
+        blocked_token = BlockedTokensModel(token=current_token)
+        db.session.add(blocked_token)
+        db.session.commit()
+        return {"message": "User logged out."}, 200
+
+@blp.route("/refresh")
+class TokenRefresh(MethodView):
+    @jwt_required(refresh=True)
+    def post(self):
+        current_user = get_jwt_identity()
+        new_token = create_access_token(identity=current_user, fresh=False)
+        current_token = get_jwt()['jti']
+        blocked_token = BlockedTokensModel(token=current_token)
+        db.session.add(blocked_token)
+        db.session.commit()
+        return {"access_token":new_token}, 200
+    
+
+
 
 @blp.route("/users")
 class UserList(MethodView):
@@ -63,8 +92,6 @@ class UserList(MethodView):
     def get(self):
         return UserModel.query.all()
     
-
-
 
 @blp.route('/users/<int:user_id>')
 class User(MethodView):
