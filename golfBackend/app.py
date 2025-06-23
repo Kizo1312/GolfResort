@@ -6,6 +6,8 @@ import os
 from resources.users import blp as UserBlueprint
 from resources.services import blp as ServiceBlueprint
 from resources.reservations import blp as RegistrationBlueprint
+from dotenv import load_dotenv
+load_dotenv()
 
 from flask_cors import CORS
 
@@ -16,7 +18,11 @@ load_dotenv()
 def create_app(db_url=None):
     app = Flask(__name__)
     CORS(app)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///golf.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@"
+    f"{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+)
+
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
