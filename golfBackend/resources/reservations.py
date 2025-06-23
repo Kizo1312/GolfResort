@@ -10,6 +10,7 @@ from models.reservation import ReservationModel
 from models.reservation_item import ReservationItemModel
 from schemas import ReservationSchema
 from models.service import ServiceModel
+from models.user import UserModel
 
 blp = Blueprint("Reservations", __name__, description="Operations on reservations")
 
@@ -188,3 +189,40 @@ class ReservationByDate(MethodView):
             abort(404, message=f"No reservations found for date {date_str}.")
         
         return reservations
+    
+@blp.route("/reservations/by-user/<int:user_id>")
+class ReservationByUserId(MethodView):
+    @blp.response(200, ReservationSchema(many=True))
+    def get(self, user_id):
+        user= UserModel.query.get_or_404(user_id)
+
+        reservations = ReservationModel.query.options(
+            joinedload(ReservationModel.reservation_items).joinedload(ReservationItemModel.service)
+        ).filter(ReservationModel.user_id == user.id).all()
+
+        if not reservations: 
+            abort(404, message=f"No reservations found for user {user_id}.")
+        
+        return reservations
+
+@blp.route("/reservations/by-category/<service_category>")
+class ReservationByCategory(MethodView):
+    @blp.response(200, ReservationSchema(many=True))
+    def get(self, service_category):
+        reservations = (
+            ReservationModel.query
+            .join(ReservationModel.reservation_items)
+            .join(ReservationItemModel.service)
+            .filter(ServiceModel.category == service_category)
+            .options(
+                joinedload(ReservationModel.reservation_items)
+                .joinedload(ReservationItemModel.service)
+            )
+            .all()
+        )
+
+        if not reservations:
+            abort(404, message =f"No reservations found for category '{service_category}'.")
+        
+        return reservations
+       
