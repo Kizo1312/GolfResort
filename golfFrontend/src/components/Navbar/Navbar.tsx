@@ -31,7 +31,7 @@ const Navbar = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/golf-courses" className={linkStyle}>
+            <NavLink to="/golf-tereni" className={linkStyle}>
               Golf Courses
             </NavLink>
           </li>

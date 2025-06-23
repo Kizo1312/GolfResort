@@ -4,6 +4,7 @@ import Login from "../components/Login/Login";
 import Register from "../components/Register/Register";
 // import TerrainDetails from "../components/Terrain/TerrainDetails"; // nova komponenta
 import EditItemModal from "../components/EditItemModal";
+import TerrainDetails from "../components/TerrainDetails";
 
 const Modal = () => {
   const { isOpen, modalType, modalProps, close } = useModal();
@@ -59,10 +60,10 @@ const Modal = () => {
         />
       )}
 
-        {/* TERRAIN DETAILS MODAL */}
-        {/* {modalType === "terrain-details" && (
+        
+        {modalType === "terrain-details" && (
           <TerrainDetails {...modalProps} />
-        )} */}
+        )}
       </div>
     </div>
   );

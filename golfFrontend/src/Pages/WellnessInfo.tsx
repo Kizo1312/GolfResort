@@ -1,28 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const GolfCourses = () => {
+const WellnessInfo = () => {
   const navigate = useNavigate();
-  console.log("GolfCourses komponenta prikazana");
 
   return (
     <div className="max-w-5xl mx-auto mt-10 p-6 bg-white shadow rounded-lg">
       <div className="flex flex-col md:flex-row gap-6">
-       
+        {/* Slika */}
         <div className="w-full md:w-1/2">
           <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-            Slika golf terena
+            Slika wellness centra
           </div>
         </div>
 
-       
+        {/* Tekstualni dio */}
         <div className="w-full md:w-1/2 flex flex-col justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Golf Tereni</h2>
+            <h2 className="text-2xl font-bold mb-2">Wellness Centar</h2>
             <p className="text-gray-700 mb-4">
-              Doživite vrhunske golf terene uz prekrasan pogled na Jadran. Idealno za početnike i profesionalce.
+              Opuštanje za dušu i tijelo. Naši tretmani i sauna garantiraju potpuno resetiranje.
             </p>
-            <p className="text-lg font-semibold text-green-600 mb-4">Cijena od 40€ / sat</p>
+            <p className="text-lg font-semibold text-green-600 mb-4">Cijena od 60€ / sat</p>
           </div>
 
           <button
@@ -37,4 +36,4 @@ const GolfCourses = () => {
   );
 };
 
-export default GolfCourses;
+export default WellnessInfo;

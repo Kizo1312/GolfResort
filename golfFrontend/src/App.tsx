@@ -11,6 +11,8 @@ import HomePage from './Pages/Home';
 import ReservationCategory from './Pages/Reservations/ReservationCategory';
 import AdminLayout from './components/Layouts/AdminLayout';
 import UserLayout from './components/Layouts/UserLayout';
+import GolfCourses from "./Pages/GolfCourses";
+import WellnessInfo from "./Pages/WellnessInfo";
 // Admin Pages
 
 import Tereni from "@/Pages/Admin/Tereni";
@@ -24,7 +26,7 @@ import Dashboard from "@/Pages/Admin/Dashboard";
 import ProtectedRoute from "./components/Context/ProtectedRoute";
 
 const App = () => {
-  useEffect(() => {
+  useEffect(() => {   /// ovo je samo za testiranje, da vidimo da li backend radi? radi!!!! :)
   fetch("http://127.0.0.1:5000/services")
     .then((res) => {
       if (!res.ok) throw new Error("Greška prilikom dohvata podataka");
@@ -44,10 +46,8 @@ const App = () => {
           <Route path="/" element={<UserLayout />}>
             <Route path="home" element={<HomePage />} />
             <Route path="rezervacije" element={<ReservationCategory />} />
-            {/* Ostale korisničke rute mogu ići ovde */}
-            {/* <Route path="about" element={<About />} /> */}
-            {/* <Route path="contact" element={<Contact />} /> */}
-            {/* <Route path="profile" element={<UserProfile />} /> */}
+            <Route path="golf-tereni" element={<GolfCourses />} />
+            <Route path="wellness" element={<WellnessInfo />} />  
           </Route>
 
           {/* Admin Routes - ZAŠTIĆENO */}
