@@ -11,11 +11,42 @@ from models.reservation_item import ReservationItemModel
 from schemas import ReservationSchema
 from models.service import ServiceModel
 from models.user import UserModel
+from flask_mail import Message
+from flask import current_app
+
+from extensions import mail
+
+
+
+def confirmation_mail(to_mail, reservation):
+    msg = Message(
+        subject="Potvrda rezervacije -Golf Resort",
+        sender= current_app.config["MAIL_USERNAME"],
+        recipients=[to_mail],
+        body=f"""
+Poštovani,
+
+uspješno ste rezervirali termin u Golf Resortu.
+
+Datum: {reservation.date}
+Vrijeme: {reservation.start_time.strftime("%H:%M")}- {reservation.end_time.strftime('%H:%M')}
+Trajanje: {reservation.duration_minutes} minuta
+
+Zahvaljujemo na povjerenju!
+"""
+    )
+    try:
+        mail.send(msg)
+    except Exception as e:
+        print("❌ Email sending failed:", e)
+        abort(500, message="Reservation saved, but failed to send confirmation email.")
+
 
 blp = Blueprint("Reservations", __name__, description="Operations on reservations")
 
 @blp.route("/reservations")
 class CreateReservation(MethodView):
+    
     @blp.arguments(ReservationSchema(session=db.session))
     @blp.response(201, ReservationSchema)
     def post(self, reservation_data):
@@ -67,10 +98,15 @@ class CreateReservation(MethodView):
         try:
             db.session.add(reservation_data)
             db.session.commit()
+            user = db.session.get(UserModel,user_id)
+            confirmation_mail(user.email, reservation_data)
+
         except SQLAlchemyError as e:
             db.session.rollback()
             print("Error:", e)
             abort(500, message="An error occurred while creating the reservation.")
+
+        print(reservation_data)
 
         return reservation_data
 
