@@ -7,17 +7,20 @@ from resources.users import blp as UserBlueprint
 from resources.services import blp as ServiceBlueprint
 from resources.reservations import blp as RegistrationBlueprint
 from dotenv import load_dotenv
-load_dotenv()
-
+from flask_mail import Mail
+from extensions import mail
 from flask_cors import CORS
 
 from db import db
+load_dotenv()
+
 
 load_dotenv()
 
 def create_app(db_url=None):
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
+
     app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@"
     f"{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
@@ -32,6 +35,14 @@ def create_app(db_url=None):
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     app.config["SQLALCHEMY_SESSION"] = db.session
+
+    app.config["MAIL_SERVER"] = "smtp.gmail.com"
+    app.config["MAIL_PORT"] = 587
+    app.config["MAIL_USE_TLS"] = True
+    app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME") 
+    app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+
+    mail.init_app(app)
 
 
 
