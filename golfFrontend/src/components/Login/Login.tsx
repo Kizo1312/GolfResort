@@ -38,8 +38,11 @@ const Login = () => {
       login(data);  // postavi globalni context
       close();      // zatvori modal
 
-      // ➜ automatski redirect prema ulozi
-      navigate(data.user.role === "admin" ? "/admin/tereni" : "/user/home");
+      // ✅ Redirect samo ako je admin
+      if (data.user.role === "admin") {
+        navigate("/admin/tereni");
+      }
+      // korisnik ostaje gdje jest
     } catch (err) {
       toast.error("Greška pri prijavi.");
       console.error(err);
@@ -94,4 +97,3 @@ const Login = () => {
 };
 
 export default Login;
-

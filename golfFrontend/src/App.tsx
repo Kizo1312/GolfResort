@@ -8,16 +8,20 @@ import { useModal } from "./components/Context/ModalContext";
 
 // Layouts & Pages
 import HomePage from './Pages/Home';
+import RezervacijaUspjeh from "@/Pages/Reservations/RezervacijaUspjeh";
+import RezervacijaPregled from "@/Pages/Reservations/RezervacijaPregled";
+import RezervacijaTermin from "@/Pages/Reservations/RezervacijaTermin";
 import ReservationCategory from './Pages/Reservations/ReservationCategory';
 import AdminLayout from './components/Layouts/AdminLayout';
 import UserLayout from './components/Layouts/UserLayout';
 import GolfCourses from "./Pages/GolfCourses";
 import WellnessInfo from "./Pages/WellnessInfo";
+import MojeRezervacije from './Pages/MojeRezervacije';
 // Admin Pages
 
 import Tereni from "@/Pages/Admin/Tereni";
 import Addons from "@/Pages/Admin/Addons";
-import Reservations from "@/Pages/Admin/Reservations";
+import Reservations from "./Pages/Admin/Reservations";
 import Wellness from "@/Pages/Admin/Wellness";
 import Users from "@/Pages/Admin/Users";
 import Dashboard from "@/Pages/Admin/Dashboard";
@@ -27,7 +31,7 @@ import ProtectedRoute from "./components/Context/ProtectedRoute";
 
 const App = () => {
   useEffect(() => {   /// ovo je samo za testiranje, da vidimo da li backend radi? radi!!!! :)
-  fetch("http://127.0.0.1:5000/services")
+  fetch("http://127.0.0.1:5000/reservations")
     .then((res) => {
       if (!res.ok) throw new Error("Greška prilikom dohvata podataka");
       return res.json();
@@ -36,7 +40,6 @@ const App = () => {
     .catch((err) => console.error("Greška:", err));
 }, []);
   return (
-    <AuthProvider>
       <Router>
         <Toaster position="top-right" />
         <Modal />
@@ -44,10 +47,36 @@ const App = () => {
         <Routes>
           {/* User Routes */}
           <Route path="/" element={<UserLayout />}>
+            <Route index element={<HomePage />} />
             <Route path="home" element={<HomePage />} />
             <Route path="rezervacije" element={<ReservationCategory />} />
+            <Route path="/rezervacija/termin" element={<RezervacijaTermin />} />
+            <Route
+              path="/rezervacija/pregled"
+              element={
+                <ProtectedRoute requiredRole="user">
+                  <RezervacijaPregled />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rezervacija/uspjeh"
+              element={
+                <ProtectedRoute requiredRole="user">
+                  <RezervacijaUspjeh />
+                </ProtectedRoute>
+              }
+            />
             <Route path="golf-tereni" element={<GolfCourses />} />
             <Route path="wellness" element={<WellnessInfo />} />  
+            <Route
+              path="/moje-rezervacije"
+              element={
+                <ProtectedRoute>
+                  <MojeRezervacije />
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
           {/* Admin Routes - ZAŠTIĆENO */}
@@ -68,7 +97,6 @@ const App = () => {
           </Route>
         </Routes>
       </Router>
-    </AuthProvider>
   );
 };
 

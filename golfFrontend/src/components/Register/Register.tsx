@@ -14,8 +14,8 @@ type UserInfo = {
 
 const Register = () => {
   const { close } = useModal();
-  const { login } = useAuth(); // ✅ dodano
-  const navigate = useNavigate(); // ✅ dodano
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [user, setUser] = useState<UserInfo>({
     name: "",
@@ -25,6 +25,7 @@ const Register = () => {
     repeatPassword: "",
   });
 
+  // ▶️ login nakon uspješne registracije
   const autoLogin = async () => {
     try {
       const res = await fetch("http://127.0.0.1:5000/login", {
@@ -39,19 +40,22 @@ const Register = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.message || "Login failed after registration.");
+        toast.error(data.message || "Login neuspješan nakon registracije.");
         return;
       }
 
-      login(data); // ✅ postavi globalni context
+      login(data);      // spremi u AuthContext
       toast.success("Prijava uspješna!");
-      close(); // zatvori modal
+      close();          // zatvori modal
 
-      // ✅ redirect po ulozi
-      navigate(data.user.role === "admin" ? "/admin/tereni" : "/user/home");
+      // 👇 redirect samo za admina
+      if (data.user.role === "admin") {
+        navigate("/admin/tereni");
+      }
+      // user (role === 'user') ostaje gdje jest
     } catch (err) {
       console.error("Login error:", err);
-      toast.error("Login error after registration.");
+      toast.error("Greška pri automatskoj prijavi.");
     }
   };
 
@@ -68,26 +72,24 @@ const Register = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message || "Registration failed.");
+        toast.error(data.message || "Registracija neuspješna.");
         return;
       }
 
-      toast.success(data.message || "Registration successful!");
-      await autoLogin(); // ✅ auto login nakon registracije
+      toast.success(data.message || "Registracija uspješna!");
+      await autoLogin();   // automatska prijava
     } catch (error) {
       console.error("Error during registration:", error);
-      toast.error("An error occurred during registration.");
+      toast.error("Došlo je do greške pri registraciji.");
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (user.password !== user.repeatPassword) {
-      toast.error("Passwords do not match.");
+      toast.error("Lozinke se ne podudaraju.");
       return;
     }
-
     fetchUser();
   };
 
@@ -97,9 +99,7 @@ const Register = () => {
       <form onSubmit={handleSubmit}>
         <div className="flex gap-4">
           <div className="w-1/2">
-            <label htmlFor="name" className="block mb-1">
-              First Name
-            </label>
+            <label className="block mb-1">First Name</label>
             <input
               type="text"
               placeholder="First Name"
@@ -110,9 +110,7 @@ const Register = () => {
           </div>
 
           <div className="w-1/2">
-            <label htmlFor="last_name" className="block mb-1">
-              Last Name
-            </label>
+            <label className="block mb-1">Last Name</label>
             <input
               type="text"
               placeholder="Last Name"
@@ -123,7 +121,7 @@ const Register = () => {
           </div>
         </div>
 
-        <label htmlFor="email">Email</label>
+        <label className="block mb-1">Email</label>
         <input
           type="email"
           placeholder="Email"
@@ -132,7 +130,7 @@ const Register = () => {
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
-        <label htmlFor="password">Password</label>
+        <label className="block mb-1">Password</label>
         <input
           type="password"
           placeholder="Password"
@@ -141,14 +139,12 @@ const Register = () => {
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
-        <label htmlFor="repeatPassword">Repeat Password</label>
+        <label className="block mb-1">Repeat Password</label>
         <input
           type="password"
           placeholder="Repeat Password"
           value={user.repeatPassword}
-          onChange={(e) =>
-            setUser({ ...user, repeatPassword: e.target.value })
-          }
+          onChange={(e) => setUser({ ...user, repeatPassword: e.target.value })}
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
