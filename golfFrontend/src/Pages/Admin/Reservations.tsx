@@ -1,21 +1,32 @@
-import { useFetchData } from "@/hooks/useFetchData";
-import ItemTable from "@/components/Admin/ItemTable";
 
-type Item = {
+import { useFetchData } from "@/hooks/useFetchData";
+import ReservationTable from "@/components/Admin/ReservationTable";
+
+type ReservationItem = {
+  service: {
+    name: string;
+    price: string;
+  };
+  quantity: number;
+};
+
+type Reservation = {
   id: number;
-  name: string;
-  price: string;
-  description: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  duration_minutes: number;
+  reservation_items: ReservationItem[];
 };
 
 const Reservations = () => {
-  const { data, loading, error, refetch } = useFetchData<Item[]>("/reservations");
+  const { data, loading, error } = useFetchData<Reservation[]>("/reservations");
 
   if (loading) return <p>Učitavanje...</p>;
   if (error) return <p>Greška: {error}</p>;
   if (!data) return <p>Nema podataka</p>;
 
-  return <ItemTable items={data} onUpdate={refetch} />;
+  return <ReservationTable items={data} />;
 };
 
 export default Reservations;

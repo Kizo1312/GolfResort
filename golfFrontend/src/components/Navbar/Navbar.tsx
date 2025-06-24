@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useModal } from "../Context/ModalContext";
 import { useAuth } from "../Context/AuthContext";
 import { NavLink } from "react-router-dom";
@@ -25,28 +25,24 @@ const Navbar = () => {
 
         {/* Desktop Nav */}
         <ul className="hidden md:flex gap-4 text-sm font-medium">
+          <li><NavLink to="/home"        className={linkStyle}>Home</NavLink></li>
+          <li><NavLink to="/golf-tereni" className={linkStyle}>Golf Courses</NavLink></li>
+          <li><NavLink to="/wellness"    className={linkStyle}>Wellness</NavLink></li>
+          <li><NavLink to="/rezervacije" className={linkStyle}>Rezervacije</NavLink></li>
+
+          {user?.role === "user" && (
+            <li>
+              <NavLink to="/moje-rezervacije" className={linkStyle}>
+                Moje rezervacije
+              </NavLink>
+            </li>
+          )}
+
           <li>
-            <NavLink to="/home" className={linkStyle}>
-              Home
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/golf-tereni" className={linkStyle}>
-              Golf Courses
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/wellness" className={linkStyle}>
-              Wellness
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/rezervacije" className={linkStyle}>
-              Rezervacije
-            </NavLink>
-          </li>
-          <li>
-            <button onClick={handleAuthClick} className="hover:text-gray-500 font-semibold">
+            <button
+              onClick={handleAuthClick}
+              className="hover:text-gray-500 font-semibold"
+            >
               {user ? "Log out" : "Log in"}
             </button>
           </li>
@@ -57,18 +53,10 @@ const Navbar = () => {
           onClick={() => setIsOn(!isOn)}
           className="md:hidden text-black focus:outline-none"
         >
-          <svg
-            className="w-6 h-6 transition-transform duration-200"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d={isOn ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-            />
+          <svg className="w-6 h-6 transition-transform duration-200" fill="none" stroke="currentColor"
+               strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round"
+              d={isOn ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
           </svg>
         </button>
       </div>
@@ -76,55 +64,42 @@ const Navbar = () => {
       {/* Mobile Nav */}
       <div
         className={`md:hidden transition-all duration-300 overflow-hidden ${
-          isOn ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+          isOn ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <ul className="flex flex-col items-center gap-0">
-          <li className="w-full">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `block w-full px-4 py-2 text-sm font-medium flex items-center ${
-                  isActive
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700 hover:bg-green-100 hover:text-green-700"
-                }`
-              }
-            >
-              Home
-            </NavLink>
-          </li>
-          <li className="w-full">
-            <NavLink
-              to="/golf"
-              className={({ isActive }) =>
-                `block w-full px-4 py-2 text-sm font-medium flex items-center ${
-                  isActive
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700 hover:bg-green-100 hover:text-green-700"
-                }`
-              }
-            >
-              Golf Courses
-            </NavLink>
-          </li>
-          <li className="w-full">
-            <NavLink
-              to="/wellness"
-              className={({ isActive }) =>
-                `block w-full px-4 py-2 text-sm font-medium flex items-center ${
-                  isActive
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700 hover:bg-green-100 hover:text-green-700"
-                }`
-              }
-            >
-              Wellness
-            </NavLink>
-          </li>
+          {[
+            { to: "/home",          label: "Home" },
+            { to: "/golf-tereni",   label: "Golf Courses" },
+            { to: "/wellness",      label: "Wellness" },
+            { to: "/rezervacije",   label: "Rezervacije" },
+            ...(user?.role === "user"
+              ? [{ to: "/moje-rezervacije", label: "Moje rezervacije" }]
+              : []),
+          ].map(({ to, label }) => (
+            <li key={to} className="w-full">
+              <NavLink
+                to={to}
+                className={({ isActive }) =>
+                  `block w-full px-4 py-2 text-sm font-medium flex items-center ${
+                    isActive
+                      ? "bg-green-600 text-white"
+                      : "text-gray-700 hover:bg-green-100 hover:text-green-700"
+                  }`
+                }
+                onClick={() => setIsOn(false)}
+              >
+                {label}
+              </NavLink>
+            </li>
+          ))}
+
           <li className="w-full">
             <button
-              onClick={handleAuthClick}
+              onClick={() => {
+                handleAuthClick();
+                setIsOn(false);
+              }}
               className="w-full px-4 py-2 text-left text-sm font-medium flex items-center text-gray-700 hover:bg-green-100 hover:text-green-700"
             >
               {user ? "Log out" : "Log in"}
@@ -132,8 +107,6 @@ const Navbar = () => {
           </li>
         </ul>
       </div>
-
-
     </nav>
   );
 };

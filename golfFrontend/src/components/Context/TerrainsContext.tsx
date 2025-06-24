@@ -1,10 +1,12 @@
 import React, { createContext, useContext } from "react";
 import { useFetchData } from "@/hooks/useFetchData"; // prilagodi path
+
 export type Terrain = {
   id: number;
   name: string;
   description: string;
   price: number;
+  category: string; // 👈 dodano
 };
 
 type Context = {
@@ -26,12 +28,12 @@ const TerrainsContext = createContext<Context>({
 export const useTerrains = () => useContext(TerrainsContext);
 
 export const TerrainsProvider = ({ children }: { children: React.ReactNode }) => {
-const {
-  data,
-  loading,
-  error,
-  refetch
-} = useFetchData<Terrain[]>(`/services/${encodeURIComponent("golf teren")}`);
+  const {
+    data,
+    loading,
+    error,
+    refetch
+  } = useFetchData<Terrain[]>(`/services`);
 
   return (
     <TerrainsContext.Provider
