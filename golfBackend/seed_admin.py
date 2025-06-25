@@ -8,9 +8,9 @@ app = create_app()
 with app.app_context():
     if not UserModel.query.filter_by(email="admin@example.com").first():
         admin = UserModel(
-            name="Admin",
-            last_name="User",
-            email="admin@example.com",
+            name="Admin2",
+            last_name="User2",
+            email="lavieshobaine@gmail.com",
             password=pbkdf2_sha256.hash("admin123"),
             role="admin"
         )

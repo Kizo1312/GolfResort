@@ -105,14 +105,18 @@ class User(MethodView):
     def put(self, user_data, user_id):
         user = UserModel.query.get_or_404(user_id)
 
-        if user:
+        if user_data.get("name") is not None:
             user.name = user_data["name"]
+        if user_data.get("last_name") is not None:
             user.last_name = user_data["last_name"]
+        if user_data.get("email") is not None:
             user.email = user_data["email"]
+        if user_data.get("password") is not None:
             user.password = user_data["password"]
+        if user_data.get("role") is not None:
             user.role = user_data["role"]
-            db.session.add(user)
-            db.session.commit()
+        db.session.add(user)
+        db.session.commit()
         return user 
 
 
