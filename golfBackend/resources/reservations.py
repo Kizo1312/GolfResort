@@ -13,12 +13,14 @@ from models.service import ServiceModel
 from models.user import UserModel
 from flask_mail import Message
 from flask import current_app
-
+from utils import get_all_admin_mails
 from extensions import mail
 
 
 
-def confirmation_mail(to_mail, reservation):
+def confirmation_mail(to_mail,admin_mail, reservation, usluge):
+    usluge_str = ", ".join(usluge)
+
     msg = Message(
         subject="Potvrda rezervacije -Golf Resort",
         sender= current_app.config["MAIL_USERNAME"],
@@ -27,7 +29,7 @@ def confirmation_mail(to_mail, reservation):
 Poštovani,
 
 uspješno ste rezervirali termin u Golf Resortu.
-
+Usluge: {usluge_str}
 Datum: {reservation.date}
 Vrijeme: {reservation.start_time.strftime("%H:%M")}- {reservation.end_time.strftime('%H:%M')}
 Trajanje: {reservation.duration_minutes} minuta
@@ -35,8 +37,24 @@ Trajanje: {reservation.duration_minutes} minuta
 Zahvaljujemo na povjerenju!
 """
     )
+    admin_msg = Message(
+        subject="Obavijest o novoj rezervaciji - Golf Resort",
+        sender= current_app.config["MAIL_USERNAME"],
+        recipients= admin_mail,
+        body=f"""
+        Nova rezervacija je upravo izvršena.
+Usluge: {usluge_str}
+Datum: {reservation.date}
+Vrijeme: {reservation.start_time.strftime("%H:%M")}- {reservation.end_time.strftime('%H:%M')}
+Trajanje: {reservation.duration_minutes} minuta
+
+Provjerite sustav za dodatne informacije.
+"""
+    )
+    
     try:
         mail.send(msg)
+        mail.send(admin_msg)
     except Exception as e:
         print("❌ Email sending failed:", e)
         abort(500, message="Reservation saved, but failed to send confirmation email.")
@@ -46,6 +64,7 @@ blp = Blueprint("Reservations", __name__, description="Operations on reservation
 
 @blp.route("/reservations")
 class CreateReservation(MethodView):
+    @jwt_required()
     
     @blp.arguments(ReservationSchema(session=db.session))
     @blp.response(201, ReservationSchema)
@@ -58,12 +77,14 @@ class CreateReservation(MethodView):
         
         end_time = (datetime.combine(date, start_time) + timedelta(minutes=duration)).time()
         reservation_data.end_time = end_time
-
         
+
+        service_names = []
         for item in reservation_data.reservation_items:
             service_id = item.service_id
             requested_quantity = item.quantity
             service = db.session.get(ServiceModel, service_id)
+            service_names.append(service.name)
 
             
             overlapping_query = (
@@ -99,7 +120,8 @@ class CreateReservation(MethodView):
             db.session.add(reservation_data)
             db.session.commit()
             user = db.session.get(UserModel,user_id)
-            confirmation_mail(user.email, reservation_data)
+            admin_mails = get_all_admin_mails()
+            confirmation_mail(user.email, admin_mails, reservation_data, service_names)
 
         except SQLAlchemyError as e:
             db.session.rollback()

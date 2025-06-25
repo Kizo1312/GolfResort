@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 const RezervacijaPregled = () => {
   const { reservation, resetReservation } = useReservation();
   const { getById } = useTerrains();
-  const { user } = useAuth();
+  const { user , accessToken} = useAuth();
   const { open, isOpen, modalType } = useModal();
   const navigate = useNavigate();
 
@@ -71,8 +71,10 @@ const RezervacijaPregled = () => {
     try {
       const res = await fetch("http://localhost:5000/reservations", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+
         body: JSON.stringify(cleanedReservation),
+
       });
 
       if (!res.ok) {
