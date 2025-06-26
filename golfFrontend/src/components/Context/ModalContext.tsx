@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type ModalType = "auth" | "terrain-details" | "edit-item" | null;
+type ModalType = "auth" | "terrain-details" | "edit-item" | "edit-user" | null;
 
 interface ModalContextType {
   isOpen: boolean;
@@ -25,10 +25,10 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [modalProps, setModalProps] = useState<any>(null);
 
   const open = (type: ModalType, props?: any) => {
-  setModalType(type);
-  setModalProps(props || {});  // ← OVDJE
-  setIsOpen(true);
-};
+    setModalType(type);
+    setModalProps(props || {}); // ← OVDJE
+    setIsOpen(true);
+  };
 
   const close = () => {
     setIsOpen(false);
@@ -37,7 +37,9 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <ModalContext.Provider value={{ isOpen, open, close, modalType, modalProps }}>
+    <ModalContext.Provider
+      value={{ isOpen, open, close, modalType, modalProps }}
+    >
       {children}
     </ModalContext.Provider>
   );
