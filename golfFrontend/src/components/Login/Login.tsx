@@ -28,6 +28,8 @@ const Login = () => {
       });
 
       const data = await res.json();
+      
+
 
       if (!res.ok) {
         toast.error(data.message || "Login neuspješan.");
@@ -35,6 +37,8 @@ const Login = () => {
       }
 
       toast.success("Uspješna prijava!");
+      localStorage.setItem("token", data.access_token);
+
       login(data);  // postavi globalni context
       close();      // zatvori modal
 

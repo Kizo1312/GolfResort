@@ -15,49 +15,11 @@ from flask_mail import Message
 from flask import current_app
 from utils import get_all_admin_mails
 from extensions import mail
+from utils import admin_required
+from utils import confirmation_mail, cancelation_mail
 
 
 
-def confirmation_mail(to_mail,admin_mail, reservation, usluge):
-    usluge_str = ", ".join(usluge)
-
-    msg = Message(
-        subject="Potvrda rezervacije -Golf Resort",
-        sender= current_app.config["MAIL_USERNAME"],
-        recipients=[to_mail],
-        body=f"""
-Poštovani,
-
-uspješno ste rezervirali termin u Golf Resortu.
-Usluge: {usluge_str}
-Datum: {reservation.date}
-Vrijeme: {reservation.start_time.strftime("%H:%M")}- {reservation.end_time.strftime('%H:%M')}
-Trajanje: {reservation.duration_minutes} minuta
-
-Zahvaljujemo na povjerenju!
-"""
-    )
-    admin_msg = Message(
-        subject="Obavijest o novoj rezervaciji - Golf Resort",
-        sender= current_app.config["MAIL_USERNAME"],
-        recipients= admin_mail,
-        body=f"""
-        Nova rezervacija je upravo izvršena.
-Usluge: {usluge_str}
-Datum: {reservation.date}
-Vrijeme: {reservation.start_time.strftime("%H:%M")}- {reservation.end_time.strftime('%H:%M')}
-Trajanje: {reservation.duration_minutes} minuta
-
-Provjerite sustav za dodatne informacije.
-"""
-    )
-    
-    try:
-        mail.send(msg)
-        mail.send(admin_msg)
-    except Exception as e:
-        print("❌ Email sending failed:", e)
-        abort(500, message="Reservation saved, but failed to send confirmation email.")
 
 
 blp = Blueprint("Reservations", __name__, description="Operations on reservations")
@@ -151,14 +113,23 @@ class CreateReservation(MethodView):
 class ReservationOperations(MethodView):
     def delete(self, reservation_id):
         reservation = ReservationModel.query.get_or_404(reservation_id)
+        if not reservation.reservation_items:
+            abort (404, message="Nisu pronađene usluge za ovu rezervaciju.")
+        user_id=reservation.user_id
+        service_names=[]
+        for item in reservation.reservation_items:
+            service_id = item.service_id
+            service = db.session.get(ServiceModel, service_id)
+            service_names.append(service.name)
         try:
+            user= db.session.get(UserModel, user_id)
+            admin_mails= get_all_admin_mails()
+            cancelation_mail(user.email, admin_mails, reservation, service_names)
             db.session.delete(reservation)
             db.session.commit()
-            return {"message": "Reservation deleted successfully."}
+            return {"message": "Rezervacija uspješno otkazana."}
         except SQLAlchemyError:
-            abort(500, message="Failed to delete reservation.")
-    @blp.arguments(ReservationSchema(session=db.session))
-    @blp.response(201, ReservationSchema)
+            abort(500, message="Došlo je do greške prilikom otkazivanja rezervacije. Pokušajte ponovno.")
     def put(self,updated_data, reservation_id):
         reservation = ReservationModel.query.get_or_404(reservation_id)
         date = updated_data.date
@@ -231,6 +202,8 @@ from datetime import datetime
 
 @blp.route("/reservations/by-date/<string:date_str>")
 class ReservationByDate(MethodView):
+    @jwt_required()
+    @admin_required
     @blp.response(200, ReservationSchema(many=True))
     def get(self, date_str):
         try:
@@ -265,6 +238,8 @@ class ReservationByUserId(MethodView):
 
 @blp.route("/reservations/by-category/<service_category>")
 class ReservationByCategory(MethodView):
+    @jwt_required()
+    @admin_required
     @blp.response(200, ReservationSchema(many=True))
     def get(self, service_category):
         reservations = (
