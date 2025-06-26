@@ -3,7 +3,7 @@ from flask.views import MethodView
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 from flask_smorest import abort, Blueprint
-from schemas import UserSchema, UserLoginSchema, EditUserSchema
+from schemas import UserSchema, UserLoginSchema, EditUserSchema, UserPublicSchema
 from passlib.hash import pbkdf2_sha256
 from utils import admin_required
 from flask_jwt_extended import (
@@ -93,15 +93,17 @@ class TokenRefresh(MethodView):
 class UserList(MethodView):
     @jwt_required()
     @admin_required
-    @blp.response(200, UserSchema(many=True))
+    @blp.response(200, UserPublicSchema(many=True))
     def get(self):
+        
         return UserModel.query.all()
+
     
 
 @blp.route('/users/<int:user_id>')
 class User(MethodView):
     @jwt_required()
-    #@admin_reequired()
+    @admin_required
     @blp.response(200, UserSchema)
     def get(self, user_id):
         user= UserModel.query.get_or_404(user_id)
@@ -126,7 +128,7 @@ class User(MethodView):
         db.session.commit()
         return user 
 
-    #@admin_required()
+    @admin_required
     @jwt_required()   
     def delete(self, user_id):
         

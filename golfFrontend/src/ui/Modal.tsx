@@ -5,7 +5,7 @@ import Register from "../components/Register/Register";
 // import TerrainDetails from "../components/Terrain/TerrainDetails"; // nova komponenta
 import EditItemModal from "../components/EditItemModal";
 import TerrainDetails from "../components/TerrainDetails";
-
+import EditUserModal from "@/components/EditUserModal";
 const Modal = () => {
   const { isOpen, modalType, modalProps, close } = useModal();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
@@ -53,16 +53,21 @@ const Modal = () => {
           </>
         )}
         {modalType === "edit-item" && (
-        <EditItemModal
-          item={modalProps.item}
-          onClose={close}
-          onUpdate={modalProps.onUpdate} // ← dodaj
-        />
-      )}
+          <EditItemModal
+            item={modalProps.item}
+            onClose={close}
+            onUpdate={modalProps.onUpdate}
+          />
+        )}
 
-        
-        {modalType === "terrain-details" && (
-          <TerrainDetails {...modalProps} />
+        {modalType === "terrain-details" && <TerrainDetails {...modalProps} />}
+
+        {modalType === "edit-user" && (
+          <EditUserModal
+            user={modalProps.user}
+            onClose={close}
+            onUpdate={modalProps.onUpdate}
+          />
         )}
       </div>
     </div>

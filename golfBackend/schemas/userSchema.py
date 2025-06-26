@@ -21,3 +21,10 @@ class EditUserSchema(Schema):
   email = fields.Email(required=False, validate=Email())
   password = fields.Str(required=False)
   role = fields.Str(required=False)
+
+class UserPublicSchema(Schema):
+  id = fields.Int(dump_only=True)
+  name = fields.Str()
+  last_name = fields.Str()
+  email = fields.Email()
+  role = fields.Str() 
