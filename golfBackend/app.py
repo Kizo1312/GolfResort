@@ -63,4 +63,4 @@ def create_app(db_url=None):
 
 
 
-#source .venv/Scripts/activate
+#source venv/Scripts/activate
