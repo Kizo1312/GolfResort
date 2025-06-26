@@ -26,3 +26,7 @@ export function useFetchData<T>(endpoint: string) {
 
   return { data, loading, error, refetch: fetchData };
 }
+
+
+
+

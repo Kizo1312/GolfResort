@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTerrains } from "./Context/TerrainsContext";
+import { apiRequest } from "@/hooks/apiHookAsync";
 
 type Item = {
   id: number;
@@ -24,30 +25,26 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
   const { refetch } = useTerrains();
 
   const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`http://127.0.0.1:5000/services/${item.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          price: parseFloat(String(price)), // broj
-          inventory,                        // novi ključ
-          description,                      // po želji (backend mora podržati)
-        }),
-      });
+  setLoading(true);
+  try {
+    await apiRequest(`/services/${item.id}`, "PUT", {
+      name,
+      price: parseFloat(String(price)),
+      inventory,
+      description,
+    });
 
-      if (!res.ok) throw new Error(await res.text());
-      onClose();
-      onUpdate();
-      refetch();  // refetch za onu nasu listu terena kod slicica
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Nepoznata greška";
-      alert("Greška: " + msg);
-    } finally {
-      setLoading(false);
-    }
-  };
+    onClose();
+    onUpdate();
+    refetch();
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Nepoznata greška";
+    alert("Greška: " + msg);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   
   return (
