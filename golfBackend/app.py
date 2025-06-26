@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from flask_mail import Mail
 from extensions import mail
 from flask_cors import CORS
+from models.blockedtokens import BlockedTokensModel
 
 from db import db
 load_dotenv()
@@ -34,7 +35,9 @@ def create_app(db_url=None):
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     app.config["SQLALCHEMY_SESSION"] = db.session
-
+    app.config["JWT_BLACKLIST_ENABLED"] = True
+    app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
+ 
     app.config["MAIL_SERVER"] = "smtp.gmail.com"
     app.config["MAIL_PORT"] = 587
     app.config["MAIL_USE_TLS"] = True
@@ -52,6 +55,12 @@ def create_app(db_url=None):
 
 
     jwt = JWTManager(app)
+
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        jti = jwt_payload["jti"]
+        return BlockedTokensModel.query.filter_by(token=jti).first() is not None
+
     api = Api(app)
 
     with app.app_context():

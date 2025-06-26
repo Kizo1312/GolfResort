@@ -1,4 +1,5 @@
-import { useFetchData } from "@/hooks/useFetchData";
+import { useEffect, useState } from "react";
+import { apiRequest } from "@/hooks/apiHookAsync"; 
 
 type User = {
   id: number;
@@ -9,11 +10,30 @@ type User = {
 };
 
 const Users = () => {
-  const { data, loading, error, refetch } = useFetchData<User[]>("/users");
+  const [users, setUsers] = useState<User[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await apiRequest<User[]>("/users");
+      setUsers(data);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   if (loading) return <p>Učitavanje...</p>;
   if (error) return <p>Greška: {error}</p>;
-  if (!data) return <p>Nema korisnika</p>;
+  if (!users) return <p>Nema korisnika</p>;
 
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -24,8 +44,11 @@ const Users = () => {
         <span>Uloga</span>
       </div>
       <ul>
-        {data.map((user) => (
-          <li key={user.id} className="px-6 py-3 border-b grid grid-cols-4 items-center hover:bg-gray-50">
+        {users.map((user) => (
+          <li
+            key={user.id}
+            className="px-6 py-3 border-b grid grid-cols-4 items-center hover:bg-gray-50"
+          >
             <span className="text-gray-800">{user.name}</span>
             <span className="text-gray-800">{user.last_name}</span>
             <span className="text-blue-600">{user.email}</span>
