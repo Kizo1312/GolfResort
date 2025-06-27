@@ -108,11 +108,20 @@ class User(MethodView):
     def get(self, user_id):
         user= UserModel.query.get_or_404(user_id)
         return user
-
+    
+    @jwt_required()
     @blp.arguments(EditUserSchema)
     @blp.response(201, UserSchema)
     def put(self, user_data, user_id):
         user = UserModel.query.get_or_404(user_id)
+
+        claims = get_jwt()
+        current_user_id = int(get_jwt_identity())
+        if user_id != current_user_id and claims.get("role") != "admin":
+            abort(403, message="Možete raditi izmjene samo na svom profilu.")
+
+
+        
 
         if user_data.get("name") is not None:
             user.name = user_data["name"]
@@ -121,15 +130,20 @@ class User(MethodView):
         if user_data.get("email") is not None:
             user.email = user_data["email"]
         if user_data.get("password") is not None:
-            user.password = user_data["password"]
-        if user_data.get("role") is not None:
-            user.role = user_data["role"]
+            user.password = pbkdf2_sha256.hash(user_data["password"])
+        if "role" in user_data:
+            if claims.get("role") != "admin":
+                abort(403, message="Samo administratori mogu mijenjati uloge korisnika.")
+            user.role=user_data["role"]
+
+
         db.session.add(user)
         db.session.commit()
         return user 
 
-    @admin_required
-    @jwt_required()   
+    
+    @jwt_required()
+    @admin_required   
     def delete(self, user_id):
         
         user= UserModel.query.get_or_404(user_id)

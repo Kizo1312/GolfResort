@@ -11,6 +11,7 @@ class ReservationItemSchema(SQLAlchemyAutoSchema):
         include_fk = True
         sqla_session = db.session
 
-    
+
     reservation_id = auto_field(dump_only=True)
     service = fields.Nested(ServiceSchema, dump_only=True)
+    price_at_booking = auto_field(dump_only=True)

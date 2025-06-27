@@ -1,6 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
+import { apiRequest } from "@/hooks/apiHookAsync";
+
 
 type ReservationItem = {
   service: {
@@ -33,25 +34,21 @@ const ReservationTable = ({ items }: Props) => {
   }, [items, selectedDate]);
 
   const deleteReservation = async (id: number) => {
-    const confirm = window.confirm("Jeste li sigurni da želite obrisati ovu rezervaciju?");
-    if (!confirm) return;
+  const confirm = window.confirm("Jeste li sigurni da želite obrisati ovu rezervaciju?");
+  if (!confirm) return;
 
-    try {
-      const res = await fetch(`http://localhost:5000/reservations/${id}`, {
-        method: "DELETE",
-      });
+  try {
+    await apiRequest(`/reservations/${id}`, "DELETE");
 
-      if (res.ok) {
-        alert("Rezervacija obrisana.");
-        window.location.reload();
-      } else {
-        alert("Greška prilikom brisanja.");
-      }
-    } catch (err) {
-      console.error("Greška:", err);
-      alert("Neuspješno brisanje.");
-    }
-  };
+  
+    setFiltered((prev) => prev.filter((r) => r.id !== id));
+
+    alert("Rezervacija uspješno obrisana.");
+  } catch (err: any) {
+    alert("Greška: " + (err.message || "Neuspješno brisanje."));
+  }
+};
+
 
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden p-6 space-y-4">

@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import and_, or_, func
 from datetime import datetime, timedelta
@@ -31,6 +31,11 @@ class CreateReservation(MethodView):
     @blp.arguments(ReservationSchema(session=db.session))
     @blp.response(201, ReservationSchema)
     def post(self, reservation_data):
+        current_user_id = int(get_jwt_identity())
+        claims = get_jwt()
+
+        reservation_data.user_id = current_user_id
+
         user_id = reservation_data.user_id
         date = reservation_data.date
         start_time = reservation_data.start_time
@@ -47,6 +52,8 @@ class CreateReservation(MethodView):
             requested_quantity = item.quantity
             service = db.session.get(ServiceModel, service_id)
             service_names.append(service.name)
+
+            item.price_at_booking = service.price
 
             
             overlapping_query = (
@@ -90,10 +97,11 @@ class CreateReservation(MethodView):
             print("Error:", e)
             abort(500, message="An error occurred while creating the reservation.")
 
-        print(reservation_data)
-
+        
         return reservation_data
-
+    
+    @jwt_required()
+    @admin_required
     @blp.response(200, ReservationSchema(many=True))
     def get(self):
         print("🔍 Reservation GET endpoint triggered")
@@ -111,10 +119,18 @@ class CreateReservation(MethodView):
 
 @blp.route("/reservations/<int:reservation_id>")
 class ReservationOperations(MethodView):
+    @jwt_required()
     def delete(self, reservation_id):
         reservation = ReservationModel.query.get_or_404(reservation_id)
         if not reservation.reservation_items:
             abort (404, message="Nisu pronađene usluge za ovu rezervaciju.")
+
+        current_user_id = int(get_jwt_identity())
+        claims = get_jwt() 
+
+        if reservation.user_id != current_user_id and claims.get("role") != "admin":
+            abort(403, message="Možete otkazati samo vlastitu rezervaciju.")  
+
         user_id=reservation.user_id
         service_names=[]
         for item in reservation.reservation_items:
@@ -130,6 +146,9 @@ class ReservationOperations(MethodView):
             return {"message": "Rezervacija uspješno otkazana."}
         except SQLAlchemyError:
             abort(500, message="Došlo je do greške prilikom otkazivanja rezervacije. Pokušajte ponovno.")
+
+    @jwt_required()
+    @admin_required
     def put(self,updated_data, reservation_id):
         reservation = ReservationModel.query.get_or_404(reservation_id)
         date = updated_data.date
@@ -223,8 +242,20 @@ class ReservationByDate(MethodView):
     
 @blp.route("/reservations/by-user/<int:user_id>")
 class ReservationByUserId(MethodView):
+    @jwt_required()
     @blp.response(200, ReservationSchema(many=True))
     def get(self, user_id):
+        current_user_id = int(get_jwt_identity())
+        claims = get_jwt()
+
+        print("current_user_id:", current_user_id)
+        print("user_id from URL:", user_id)
+        print("claims:", claims)
+
+        if user_id != current_user_id and claims.get("role") != "admin":
+            abort(403, message="možete pristupiti samo svojim rezervacijama.")
+
+
         user= UserModel.query.get_or_404(user_id)
 
         reservations = ReservationModel.query.options(

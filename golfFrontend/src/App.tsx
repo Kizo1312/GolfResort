@@ -30,15 +30,6 @@ import Dashboard from "@/Pages/Admin/Dashboard";
 import ProtectedRoute from "./components/Context/ProtectedRoute";
 
 const App = () => {
-  useEffect(() => {   /// ovo je samo za testiranje, da vidimo da li backend radi? radi!!!! :)
-  fetch("http://127.0.0.1:5000/reservations")
-    .then((res) => {
-      if (!res.ok) throw new Error("Greška prilikom dohvata podataka");
-      return res.json();
-    })
-    .then((data) => console.log("SERVISI:", data))
-    .catch((err) => console.error("Greška:", err));
-}, []);
   return (
       <Router>
         <Toaster position="top-right" />

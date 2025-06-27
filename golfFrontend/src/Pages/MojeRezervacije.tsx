@@ -1,6 +1,9 @@
 import { useAuth } from "@/components/Context/AuthContext";
 import { useFetchData } from "@/hooks/useFetchData";
 import dayjs from "dayjs";
+import { apiRequest } from "@/hooks/apiHookAsync";
+import { useState } from "react";
+import { useEffect } from "react";
 
 type Service = {
   name: string;
@@ -12,6 +15,7 @@ type Service = {
 type ReservationItem = {
   service_id: number;
   quantity: number;
+  price_at_booking: number;
   service: Service;
 };
 
@@ -25,7 +29,32 @@ type Reservation = {
 
 const MojeRezervacije = () => {
   const { user } = useAuth();
-  const { data, loading, error } = useFetchData<Reservation[]>(`/reservations/by-user/${user?.id}`);
+  const [data, setData] = useState<Reservation[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchReservations = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const res = await apiRequest<Reservation[]>(`/reservations/by-user/${user.id}`);
+      setData(res);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || "Greška pri dohvatu rezervacija.");
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReservations();
+  }, [user]);
+
+
+
+
 
   if (!user) {
     return <p className="text-center text-red-600">Morate biti prijavljeni da biste vidjeli rezervacije.</p>;
@@ -48,7 +77,7 @@ const MojeRezervacije = () => {
             <ul className="list-disc list-inside text-sm">
               {rez.reservation_items.map((item, i) => (
                 <li key={i}>
-                  {item.service.name} ({item.service.category}) – {item.quantity} × {item.service.price} € = {(item.quantity * item.service.price).toFixed(2)} €
+                  {item.service.name} ({item.service.category}) – {item.quantity} × {item.price_at_booking} € = {(item.quantity * item.price_at_booking).toFixed(2)} €
                 </li>
               ))}
             </ul>
@@ -56,7 +85,7 @@ const MojeRezervacije = () => {
           <div className="font-semibold text-green-700 pt-2">
             Ukupno:{" "}
             {rez.reservation_items
-              .reduce((sum, i) => sum + i.quantity * i.service.price, 0)
+              .reduce((sum, i) => sum + i.quantity * i.price_at_booking, 0)
               .toFixed(2)}{" "}
             €
           </div>
