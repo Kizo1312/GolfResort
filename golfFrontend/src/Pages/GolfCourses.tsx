@@ -1,38 +1,86 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useFetchData } from "../hooks/useFetchData";
 import { useNavigate } from "react-router-dom";
 
+type GolfCourse = {
+  id: number;
+  name: string;
+  description: string;
+  images: string[];
+};
+
 const GolfCourses = () => {
-  const navigate = useNavigate();
-  console.log("GolfCourses komponenta prikazana");
+  const navigate = useNavigate(); // <-- Add this here
+
+  const { data: golfCourses, loading, error } = useFetchData<GolfCourse[]>("/services/golf teren");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (golfCourses && golfCourses.length > 0 && selectedId === null) {
+      setSelectedId(golfCourses[0].id);
+    }
+  }, [golfCourses, selectedId]);
+
+  if (loading) return <p>Loading golf courses...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!golfCourses || golfCourses.length === 0) return <p>No golf courses found.</p>;
+
+  const selectedCourse = golfCourses.find(c => c.id === selectedId);
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 p-6 bg-white shadow rounded-lg">
-      <div className="flex flex-col md:flex-row gap-6">
-       
-        <div className="w-full md:w-1/2">
-          <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-            Slika golf terena
-          </div>
-        </div>
+    <div className="max-w-6xl mx-auto p-6">
+      {/* Horizontal scrollable bar */}
+      <div className="flex overflow-x-auto border-b border-gray-300 mb-6">
+        {golfCourses.map(course => (
+          <button
+            key={course.id}
+            onClick={() => setSelectedId(course.id)}
+            className={`whitespace-nowrap px-4 py-2 border-b-2 ${
+              course.id === selectedId ? "border-green-600 text-green-600 font-bold" : "border-transparent text-gray-600"
+            } hover:text-green-700`}
+          >
+            {course.name}
+          </button>
+        ))}
+      </div>
 
-       
-        <div className="w-full md:w-1/2 flex flex-col justify-between">
-          <div>
-            <h2 className="text-2xl font-bold mb-2">Golf Tereni</h2>
-            <p className="text-gray-700 mb-4">
-              Doživite vrhunske golf terene uz prekrasan pogled na Jadran. Idealno za početnike i profesionalce.
-            </p>
-            <p className="text-lg font-semibold text-green-600 mb-4">Cijena od 40€ / sat</p>
+      {/* Selected course details */}
+      {selectedCourse && (
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-3xl font-semibold mb-4">{selectedCourse.name}</h2>
+          <p className="mb-6 text-gray-700">{selectedCourse.description}</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(selectedCourse.images && selectedCourse.images.length > 0
+              ? selectedCourse.images.slice(0, 2)
+              : [null, null]  // placeholders if no images
+            ).map((imgUrl, idx) => (
+              imgUrl ? (
+                <img
+                  key={idx}
+                  src={imgUrl}
+                  alt={`${selectedCourse.name} image ${idx + 1}`}
+                  className="rounded-lg object-cover w-full h-64"
+                />
+              ) : (
+                <div
+                  key={idx}
+                  className="rounded-lg bg-gray-300 flex items-center justify-center w-full h-64 text-gray-500"
+                >
+                  No image available
+                </div>
+              )
+            ))}
           </div>
 
           <button
             onClick={() => navigate("/rezervacije")}
-            className="self-start bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700"
+            className="mt-6 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
           >
-            Rezerviraj
+            Reserve
           </button>
         </div>
-      </div>
+      )}
     </div>
   );
 };
