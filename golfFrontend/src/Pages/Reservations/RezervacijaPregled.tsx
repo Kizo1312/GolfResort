@@ -6,9 +6,10 @@ import { useModal } from "@/components/Context/ModalContext";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
+import GolfLoader from "@/components/GolfLoader";
 
 const RezervacijaPregled = () => {
-  const { reservation, resetReservation } = useReservation();
+  const { reservation, resetReservation, isLoading, setIsLoading } = useReservation();
   const { getById } = useTerrains();
   const { user , accessToken} = useAuth();
   const { open, isOpen, modalType } = useModal();
@@ -57,6 +58,7 @@ const RezervacijaPregled = () => {
       return;
     }
 
+    setIsLoading(true);
     const cleanedReservation = {
       user_id: user.id,
       date: reservation.date,
@@ -87,11 +89,19 @@ const RezervacijaPregled = () => {
       navigate("/rezervacija/uspjeh");
     } catch (err: any) {
       toast.error(err.message || "Greška pri rezervaciji.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <GolfLoader/>
+          </div>
+      ) : (
+        <>
       <h2 className="text-3xl font-bold text-center">Pregled rezervacije</h2>
 
       <div className="bg-white shadow rounded p-6 space-y-4">
@@ -151,6 +161,8 @@ const RezervacijaPregled = () => {
           Potvrdi rezervaciju
         </button>
       </div>
+      </>
+      )}
     </div>
   );
 };
