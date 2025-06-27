@@ -29,6 +29,9 @@ type ReservationContextType = {
   resetReservation: () => void;
   currentStep: Step;
   goToStep: (step: Step) => void;
+
+  isLoading:boolean;
+  setIsLoading: (loading:boolean) => void;
 };
 
 const ReservationContext = createContext<ReservationContextType | undefined>(undefined);
@@ -68,6 +71,8 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     return (stored as Step) || "category";
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const setReservationData = (data: Partial<ReservationData>) => {
     setReservation((prev) => {
       const updated = { ...prev, ...data };
@@ -103,7 +108,7 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ReservationContext.Provider
-      value={{ reservation, setReservationData, resetReservation, currentStep, goToStep }}
+      value={{ reservation, setReservationData, resetReservation, currentStep, goToStep, isLoading, setIsLoading }}
     >
       {children}
     </ReservationContext.Provider>
