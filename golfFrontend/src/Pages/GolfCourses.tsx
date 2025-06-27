@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useFetchData } from "../hooks/useFetchData";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type GolfCourse = {
   id: number;
@@ -10,16 +10,24 @@ type GolfCourse = {
 };
 
 const GolfCourses = () => {
-  const navigate = useNavigate(); // <-- Add this here
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const { data: golfCourses, loading, error } = useFetchData<GolfCourse[]>("/services/golf teren");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (golfCourses && golfCourses.length > 0 && selectedId === null) {
-      setSelectedId(golfCourses[0].id);
+    const selectedFromUrl = searchParams.get("selectedId");
+    const parsedId = selectedFromUrl ? parseInt(selectedFromUrl) : null;
+
+    if (golfCourses && golfCourses.length > 0) {
+      if (parsedId && golfCourses.some(c => c.id === parsedId)) {
+        setSelectedId(parsedId);
+      } else if (selectedId === null) {
+        setSelectedId(golfCourses[0].id);
+      }
     }
-  }, [golfCourses, selectedId]);
+  }, [golfCourses, selectedId, searchParams]);
 
   if (loading) return <p>Loading golf courses...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -29,7 +37,6 @@ const GolfCourses = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      {/* Horizontal scrollable bar */}
       <div className="flex overflow-x-auto border-b border-gray-300 mb-6">
         {golfCourses.map(course => (
           <button
@@ -44,7 +51,6 @@ const GolfCourses = () => {
         ))}
       </div>
 
-      {/* Selected course details */}
       {selectedCourse && (
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-3xl font-semibold mb-4">{selectedCourse.name}</h2>
@@ -53,7 +59,7 @@ const GolfCourses = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {(selectedCourse.images && selectedCourse.images.length > 0
               ? selectedCourse.images.slice(0, 2)
-              : [null, null]  // placeholders if no images
+              : [null, null]
             ).map((imgUrl, idx) => (
               imgUrl ? (
                 <img
