@@ -28,8 +28,6 @@ const Login = () => {
       });
 
       const data = await res.json();
-      
-
 
       if (!res.ok) {
         toast.error(data.message || "Login neuspješan.");
@@ -39,8 +37,8 @@ const Login = () => {
       toast.success("Uspješna prijava!");
       localStorage.setItem("token", data.access_token);
 
-      login(data);  // postavi globalni context
-      close();      // zatvori modal
+      login(data); // postavi globalni context
+      close(); // zatvori modal
 
       // ✅ Redirect samo ako je admin
       if (data.user.role === "admin") {
@@ -54,8 +52,13 @@ const Login = () => {
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const { email, password } = credentials;
     e.preventDefault();
-    if (!credentials.email.trim() || !credentials.password.trim()) return;
+    if (!email || !password) {
+      toast.error("Ispunite sva polja");
+      return;
+    }
+
     fetchUser();
   };
 

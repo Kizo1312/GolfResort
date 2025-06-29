@@ -44,9 +44,9 @@ const Register = () => {
         return;
       }
 
-      login(data);      // spremi u AuthContext
+      login(data); // spremi u AuthContext
       toast.success("Prijava uspješna!");
-      close();          // zatvori modal
+      close(); // zatvori modal
 
       // 👇 redirect samo za admina
       if (data.user.role === "admin") {
@@ -77,7 +77,7 @@ const Register = () => {
       }
 
       toast.success(data.message || "Registracija uspješna!");
-      await autoLogin();   // automatska prijava
+      await autoLogin(); // automatska prijava
     } catch (error) {
       console.error("Error during registration:", error);
       toast.error("Došlo je do greške pri registraciji.");
@@ -86,10 +86,36 @@ const Register = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (user.password !== user.repeatPassword) {
+
+    const { name, last_name, email, password, repeatPassword } = user;
+
+    if (!name || !last_name || !email || !password || !repeatPassword) {
+      toast.error("Sva polja su obavezna.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Unesite ispravan email.");
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error("Lozinka mora imati najmanje 8 znakova.");
+      return;
+    }
+
+    const passwordStrength = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+    if (!passwordStrength.test(password)) {
+      toast.error("Lozinka mora sadržavati velika i mala slova te broj.");
+      return;
+    }
+
+    if (password !== repeatPassword) {
       toast.error("Lozinke se ne podudaraju.");
       return;
     }
+
     fetchUser();
   };
 

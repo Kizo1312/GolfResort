@@ -39,7 +39,7 @@ class UserLogin(MethodView):
                     "role": user.role
                 }
             }, 200
-    abort(401, message="Invalid credentials") 
+    abort(401, message="Neispravan email ili lozinka") 
 
 @blp.route("/register")
 class UserRegister(MethodView):
@@ -47,7 +47,7 @@ class UserRegister(MethodView):
     def post(self, user_data):
         existing = UserModel.query.filter_by(email=user_data["email"]).first()
         if existing:
-            abort(409, message="User already exists")
+            abort(409, message="Korisnik vec postoji")
 
         role = "user"
         new_user = UserModel(
@@ -61,7 +61,7 @@ class UserRegister(MethodView):
         db.session.add(new_user)
         db.session.commit()
 
-        return {"message": "User created"}, 201
+        return {"message": "Korisnik uspjesno kreiran"}, 201
     
 
 @blp.route("/logout")
