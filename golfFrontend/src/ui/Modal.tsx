@@ -6,6 +6,8 @@ import Register from "../components/Register/Register";
 import EditItemModal from "../components/EditItemModal";
 import TerrainDetails from "../components/TerrainDetails";
 import EditUserModal from "@/components/EditUserModal";
+import DeleteItemModal from "@/components/DeleteItemModal";
+import CreateItemModal from "@/components/CreateItemModal";
 const Modal = () => {
   const { isOpen, modalType, modalProps, close } = useModal();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
@@ -69,6 +71,18 @@ const Modal = () => {
             onUpdate={modalProps.onUpdate}
           />
         )}
+
+         {modalType === "delete-item" && (
+          <DeleteItemModal
+            item={modalProps.item}
+            onClose={close}
+            onUpdate={modalProps.onUpdate}
+          />
+        )}
+        {modalType === "create-item" && (
+  <CreateItemModal onUpdate={modalProps.onUpdate} />
+)}
+
       </div>
     </div>
   );
