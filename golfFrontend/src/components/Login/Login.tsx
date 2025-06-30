@@ -42,7 +42,7 @@ const Login = () => {
 
       // ✅ Redirect samo ako je admin
       if (data.user.role === "admin") {
-        navigate("/admin/tereni");
+        navigate("/admin");
       }
       // korisnik ostaje gdje jest
     } catch (err) {
