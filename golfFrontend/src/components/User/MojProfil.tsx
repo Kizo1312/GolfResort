@@ -36,7 +36,7 @@ const MojProfil = () => {
     const fetchUser = async () => {
       setLoading(true);
       try {
-        const data = await apiRequest<UserData>("/users/me");
+        const data = await apiRequest<UserData>(`/users/me`);
         setUserData(data);
         setForm({
           name: data.name,
@@ -95,13 +95,23 @@ const MojProfil = () => {
 }
 
     try {
-      const payload = { ...form };
-      if (!payload.password) delete payload.password;
+    const payload: Record<string, any> = {};
+    Object.entries(form).forEach(([key, value]) => {
+      if (value && value.trim() !== "") {
+        payload[key] = value;
+      }
+    });
+
+    // Makni currentPassword jer ga backend ne prihvaća
+    delete payload.currentPassword;
+
+      
 
       const updatedUser = await apiRequest<UserData>("/users/me", "PUT", payload);
       setUserData(updatedUser);
       setForm((prev) => ({ ...prev, password: "" }));
       setSuccessMsg("Podaci su uspješno ažurirani.");
+      setIsEditing(false);
     } catch (err: any) {
       toast.error(err.message || "Greška pri ažuriranju.");
     }

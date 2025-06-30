@@ -1,12 +1,13 @@
 import React from 'react';
 import { Tereni } from '../components/Tereni';
 
+
 const HomePage = () => {
   return (
     <div className="flex flex-col">
       {/* Hero Image */}
       <div className="w-full h-[400px] bg-gray-300 flex items-center justify-center">
-        <span className="text-4xl text-white">Hero Image Placeholder</span>
+        <span className="text-4xl text-white"><img src="../assets/HeroImage.jpg" alt="" /></span>
       </div>
 
       {/* Explore Golf Courses Section */}
