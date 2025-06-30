@@ -42,35 +42,31 @@ const RezervacijaTermin = () => {
   useEffect(() => {
     if (!mainServiceId) return;
 
-    const fetchReservations = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/reservations/by-date/${selectedDate}`);
-        if (!res.ok) {
-          if (res.status === 404) {
-            setBusyRanges([]);
-            return;
-          }
-          throw new Error("Greška u dohvatu rezervacija");
-        }
+     const fetchReservations = async () => {
+  if (!selectedDate || !mainServiceId) return;
 
-        const data = await res.json();
-        const sameService = data.filter((r: any) =>
-          r.reservation_items.some((it: any) => it.service_id === mainServiceId)
-        );
-
-        const busy = sameService.flatMap((r: any) => ({
-          start: r.start_time,
-          end: r.end_time,
-        }));
-
-        setBusyRanges(busy);
-      } catch (err) {
-        console.error("Greška pri dohvaćanju rezervacija:", err);
+  try {
+    const res = await fetch(`http://localhost:5000/availability/${selectedDate}/${mainServiceId}`);
+    
+    if (!res.ok) {
+      if (res.status === 404) {
         setBusyRanges([]);
+        return;
       }
-    };
+      throw new Error("Greška u dohvatu dostupnosti");
+    }
+
+    const busy = await res.json(); // Expected format: [{ start: "10:00", end: "11:00" }, ...]
+    setBusyRanges(busy);
+  } catch (err) {
+    console.error("Greška pri dohvaćanju dostupnosti:", err);
+    setBusyRanges([]);
+  }
+};
+    
 
     fetchReservations();
+    
   }, [selectedDate, mainServiceId]);
 
   useEffect(() => {
@@ -103,18 +99,26 @@ const RezervacijaTermin = () => {
   };
 
   const isSlotFree = (candidateStart: string, durMin: number) => {
-    const [h, m] = candidateStart.split(":").map(Number);
-    const cStart = h * 60 + m;
-    const cEnd = cStart + durMin;
-
-    return !busyRanges.some(({ start, end }) => {
-      const [sh, sm] = start.split(":").map(Number);
-      const [eh, em] = end.split(":").map(Number);
-      const sMin = sh * 60 + sm;
-      const eMin = eh * 60 + em;
-      return cStart < eMin && cEnd > sMin;
-    });
+  const parseTime = (t: string) => {
+    const [h, m] = t.split(":").map(Number).slice(0, 2);
+    return (h || 0) * 60 + (m || 0);
   };
+
+  const cStart = parseTime(candidateStart);
+  const cEnd = cStart + durMin;
+
+  
+  const isToday = selectedDate === dayjs().format("YYYY-MM-DD");
+  const nowMinutes = dayjs().hour() * 60 + dayjs().minute();
+  if (isToday && cStart < nowMinutes) return false;
+
+  return !busyRanges.some(({ start, end }) => {
+    const sMin = parseTime(start);
+    const eMin = parseTime(end);
+    return cStart < eMin && cEnd > sMin;
+  });
+};
+
 
   const ukupnaCijena = () => {
     const main = mainService?.quantity && getService(mainService.service_id)?.price
