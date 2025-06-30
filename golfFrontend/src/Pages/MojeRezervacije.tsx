@@ -37,7 +37,7 @@ const MojeRezervacije = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const res = await apiRequest<Reservation[]>(`/reservations/by-user/${user.id}`);
+      const res = await apiRequest<Reservation[]>(`/reservations/me`);
       setData(res);
       setError(null);
     } catch (err: any) {
@@ -61,7 +61,7 @@ const MojeRezervacije = () => {
   }
 
   if (loading) return <p className="text-center">Učitavanje rezervacija...</p>;
-  if (error) return <p className="text-center text-red-600">Greška: {error}</p>;
+  if (error) return <p className="text-center text-red-600">{error}</p>;
   if (!data || data.length === 0) return <p className="text-center">Nemate nijednu rezervaciju.</p>;
 
   return (

@@ -64,7 +64,7 @@ const Login = () => {
 
   return (
     <>
-      <h2 className="text-xl font-semibold mb-4">Login Form</h2>
+
       <form onSubmit={handleSubmit}>
         <label htmlFor="email-field">Email</label>
         <input
@@ -78,7 +78,7 @@ const Login = () => {
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
-        <label htmlFor="password-field">Password</label>
+        <label htmlFor="password-field">Lozinka</label>
         <input
           id="password-field"
           type="password"
@@ -95,7 +95,7 @@ const Login = () => {
             type="submit"
             className="ml-auto bg-blue-500 text-white px-4 py-2 rounded"
           >
-            Login
+            Prijavi se
           </button>
         </div>
       </form>

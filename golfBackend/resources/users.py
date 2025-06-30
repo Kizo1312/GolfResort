@@ -150,3 +150,33 @@ class User(MethodView):
         db.session.delete(user)
         db.session.commit()
         return {"message": "User deleted."}
+    
+
+@blp.route("/users/me")
+class UserMe(MethodView):
+    @jwt_required()
+    @blp.response(200, UserSchema)
+    def get(self):
+        user_id = get_jwt_identity()
+        user = UserModel.query.get_or_404(user_id)
+        return user
+
+    @jwt_required()
+    @blp.arguments(EditUserSchema)
+    @blp.response(200, UserSchema)
+    def put(self, user_data):
+        user_id = get_jwt_identity()
+        user = UserModel.query.get_or_404(user_id)
+
+        if user_data.get("name") is not None:
+            user.name = user_data["name"]
+        if user_data.get("last_name") is not None:
+            user.last_name = user_data["last_name"]
+        if user_data.get("email") is not None:
+            user.email = user_data["email"]
+        if user_data.get("password") is not None:
+            user.password = pbkdf2_sha256.hash(user_data["password"])
+
+        # Role se ovdje ignorira jer je ovo samo za običnog korisnika
+        db.session.commit()
+        return user
