@@ -24,6 +24,8 @@ from utils import confirmation_mail, cancelation_mail
 
 blp = Blueprint("Reservations", __name__, description="Operations on reservations")
 
+
+
 @blp.route("/reservations")
 class CreateReservation(MethodView):
     @jwt_required()
@@ -239,6 +241,30 @@ class ReservationByDate(MethodView):
             abort(404, message=f"No reservations found for date {date_str}.")
         
         return reservations
+    
+@blp.route("/availability/<string:date_str>/<int:service_id>")
+class ServiceAvailability(MethodView):
+    @blp.response(200)
+    def get(self, date_str, service_id):
+        try:
+            search_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            abort(400, message="Invalid date format. Use YYYY-MM-DD.")
+
+        reservations = ReservationModel.query.options(
+            joinedload(ReservationModel.reservation_items)
+        ).filter(ReservationModel.date == search_date).all()
+
+        busy_times = []
+        for r in reservations:
+            if any(item.service_id == service_id for item in r.reservation_items):
+                busy_times.append({
+                    "start": r.start_time.strftime("%H:%M"),
+                    "end": r.end_time.strftime("%H:%M")
+                })
+
+        return busy_times
+    
     
 @blp.route("/reservations/by-user/<int:user_id>")
 class ReservationByUserId(MethodView):

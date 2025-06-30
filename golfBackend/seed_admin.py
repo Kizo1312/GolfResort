@@ -11,7 +11,7 @@ with app.app_context():
             name="Admin2",
             last_name="User2",
             email="lavieshobaine@gmail.com",
-            password=pbkdf2_sha256.hash("admin123"),
+            password=pbkdf2_sha256.hash("Admin123"),
             role="admin"
         )
         db.session.add(admin)
