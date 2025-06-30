@@ -28,6 +28,7 @@ import Dashboard from "@/Pages/Admin/Dashboard";
 
 // Protected Route
 import ProtectedRoute from "./components/Context/ProtectedRoute";
+import UserDashboard from "./components/User/UserDashboard";
 
 const App = () => {
   return (
@@ -64,7 +65,7 @@ const App = () => {
               path="/moje-rezervacije"
               element={
                 <ProtectedRoute>
-                  <MojeRezervacije />
+                  <UserDashboard />
                 </ProtectedRoute>
               }
             />

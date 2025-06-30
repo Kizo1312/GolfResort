@@ -293,6 +293,24 @@ class ReservationByUserId(MethodView):
         
         return reservations
 
+@blp.route("/reservations/me")
+class MyReservations(MethodView):
+    @jwt_required()
+    @blp.response(200, ReservationSchema(many=True))
+    def get(self):
+        current_user_id = int(get_jwt_identity())
+
+        user = UserModel.query.get_or_404(current_user_id)
+
+        reservations = ReservationModel.query.options(
+            joinedload(ReservationModel.reservation_items).joinedload(ReservationItemModel.service)
+        ).filter(ReservationModel.user_id == user.id).all()
+
+        if not reservations:
+            abort(404, message="Nemate nijednu rezervaciju.")
+
+        return reservations
+
 @blp.route("/reservations/by-category/<service_category>")
 class ReservationByCategory(MethodView):
     @jwt_required()

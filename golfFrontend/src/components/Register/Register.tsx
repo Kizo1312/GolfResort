@@ -121,11 +121,10 @@ const Register = () => {
 
   return (
     <>
-      <h2 className="text-xl font-semibold mb-4">Register Form</h2>
       <form onSubmit={handleSubmit}>
         <div className="flex gap-4">
           <div className="w-1/2">
-            <label className="block mb-1">First Name</label>
+            <label className="block mb-1">Ime</label>
             <input
               type="text"
               placeholder="First Name"
@@ -136,7 +135,7 @@ const Register = () => {
           </div>
 
           <div className="w-1/2">
-            <label className="block mb-1">Last Name</label>
+            <label className="block mb-1">Prezime</label>
             <input
               type="text"
               placeholder="Last Name"
@@ -156,7 +155,7 @@ const Register = () => {
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
-        <label className="block mb-1">Password</label>
+        <label className="block mb-1">Lozinka</label>
         <input
           type="password"
           placeholder="Password"
@@ -164,8 +163,11 @@ const Register = () => {
           onChange={(e) => setUser({ ...user, password: e.target.value })}
           className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
+        <p className="text-sm text-gray-500 mt-1 mb-3">
+        Lozinka mora imati najmanje 8 znakova, uključujući veliko slovo, malo slovo i broj.
+      </p>
 
-        <label className="block mb-1">Repeat Password</label>
+        <label className="block mb-1">Ponovite lozinku</label>
         <input
           type="password"
           placeholder="Repeat Password"
@@ -179,7 +181,7 @@ const Register = () => {
             type="submit"
             className="ml-auto bg-blue-500 text-white px-4 py-2 rounded"
           >
-            Register
+            Potvrdi registraciju
           </button>
         </div>
       </form>
