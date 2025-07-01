@@ -14,7 +14,8 @@
     "react-big-calendar": "^1.19.4",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.5.2",
-    "react-router-dom": "^7.6.2"
+    "react-router-dom": "^7.6.2",
+    "swiper": "^11.2.10"
   },
   "devDependencies": {
     "@types/node": "^24.0.3",
