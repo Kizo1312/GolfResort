@@ -1,18 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tereni } from '../components/Tereni';
 
-
 const HomePage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col">
       {/* Hero Image */}
       <div className="w-full h-[400px] bg-gray-300 flex items-center justify-center">
-        <span className="text-4xl text-white"><img src="../assets/HeroImage.jpg" alt="" /></span>
+        <img src="../assets/HeroImage.jpg" alt="Hero" className="max-h-full" />
       </div>
 
       {/* Explore Golf Courses Section */}
       <section className="py-12 px-4 text-center">
-        <Tereni/>
+        <Tereni />
       </section>
 
       {/* Wellness Section */}
@@ -30,7 +32,10 @@ const HomePage = () => {
             <p className="mb-4 text-gray-700">
               Discover our wellness programs designed to rejuvenate your body and mind. Enjoy spa treatments, healthy cuisine, and peaceful surroundings.
             </p>
-            <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+            <button
+              onClick={() => navigate('/wellness')}
+              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
+            >
               Learn More
             </button>
           </div>
