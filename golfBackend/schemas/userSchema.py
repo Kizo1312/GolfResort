@@ -19,7 +19,7 @@ class EditUserSchema(Schema):
   name = fields.Str(required=False)
   last_name = fields.Str(required=False)
   email = fields.Email(required=False, validate=Email())
-  password = fields.Str(required=False)
+  password = fields.Str(required=False, load_only=True)
   role = fields.Str(required=False)
 
 class UserPublicSchema(Schema):

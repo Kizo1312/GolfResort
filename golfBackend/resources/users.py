@@ -155,7 +155,7 @@ class User(MethodView):
 @blp.route("/users/me")
 class UserMe(MethodView):
     @jwt_required()
-    @blp.response(200, UserSchema)
+    @blp.response(200, UserPublicSchema)
     def get(self):
         user_id = get_jwt_identity()
         user = UserModel.query.get_or_404(user_id)
@@ -163,7 +163,7 @@ class UserMe(MethodView):
 
     @jwt_required()
     @blp.arguments(EditUserSchema)
-    @blp.response(200, UserSchema)
+    @blp.response(200, UserPublicSchema)
     def put(self, user_data):
         user_id = get_jwt_identity()
         user = UserModel.query.get_or_404(user_id)
@@ -173,6 +173,9 @@ class UserMe(MethodView):
         if user_data.get("last_name") is not None:
             user.last_name = user_data["last_name"]
         if user_data.get("email") is not None:
+            existing_user = UserModel.query.filter_by(email=user_data["email"]).first()
+            if existing_user and existing_user.id != user.id:
+                abort(409, message="Ovaj email se već koristi.")
             user.email = user_data["email"]
         if user_data.get("password") is not None:
             user.password = pbkdf2_sha256.hash(user_data["password"])
@@ -180,3 +183,11 @@ class UserMe(MethodView):
         # Role se ovdje ignorira jer je ovo samo za običnog korisnika
         db.session.commit()
         return user
+    
+    @jwt_required()
+    def delete(self):
+        current_user_id = int(get_jwt_identity())
+        user= UserModel.query.get_or_404(current_user_id)
+        db.session.delete(user)
+        db.session.commit()
+        return{"message" : "Profil je uspješno obrisan."}

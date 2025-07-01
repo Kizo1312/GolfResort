@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/hooks/apiHookAsync";
 import toast from "react-hot-toast";
+import { useAuth } from "../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 type UserData = {
   id: number;
   name: string;
   last_name: string;
   email: string;
-  role: string;
 };
 
 type FormData = {
@@ -18,31 +19,49 @@ type FormData = {
   password?: string;
 };
 
-
 const MojProfil = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [form, setForm] = useState<FormData>({
     name: "",
     last_name: "",
     email: "",
-    currentPassword: "",  
+    currentPassword: "",
     password: "",
   });
   const [loading, setLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const {logout} = useAuth();
+
+  const { user, accessToken } = useAuth();
 
   useEffect(() => {
+    if (!user || !accessToken) {
+      // No logged-in user, clear form and data
+      setUserData(null);
+      setForm({
+        name: "",
+        last_name: "",
+        email: "",
+        currentPassword: "",
+        password: "",
+      });
+      setLoading(false);
+      return;
+    }
+
     const fetchUser = async () => {
       setLoading(true);
       try {
-        const data = await apiRequest<UserData>(`/users/me`);
+        const data = await apiRequest<UserData>("/users/me");
         setUserData(data);
         setForm({
           name: data.name,
           last_name: data.last_name,
           email: data.email,
-          currentPassword: "",  
+          currentPassword: "",
           password: "",
         });
       } catch (err: any) {
@@ -51,8 +70,9 @@ const MojProfil = () => {
         setLoading(false);
       }
     };
+
     fetchUser();
-  }, []);
+  }, [user, accessToken]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -75,37 +95,47 @@ const MojProfil = () => {
     return true;
   };
 
+  const handleDeleteProfile = async () => {
+    try {
+      await apiRequest("/users/me", "DELETE");
+      toast.success("Profil je uspješno obrisan.");
+      setShowConfirmDelete(false);
+      logout();
+      navigate("/home");
+    } catch (err: any) {
+      toast.error(err.message || "Greška pri brisanju profila.");
+      setShowConfirmDelete(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccessMsg(null);
 
-    // Validacija lozinke ako je unesena
     if (form.password) {
       if (!form.currentPassword) {
         toast.error("Za promjenu lozinke unesite trenutnu lozinku.");
         return;
       }
 
-  if (form.password === form.currentPassword) {
-    toast.error("Nova lozinka ne može biti ista kao trenutna.");
-    return;
-  }
+      if (form.password === form.currentPassword) {
+        toast.error("Nova lozinka ne može biti ista kao trenutna.");
+        return;
+      }
 
-  if (!validatePassword(form.password)) return;
-}
+      if (!validatePassword(form.password)) return;
+    }
 
     try {
-    const payload: Record<string, any> = {};
-    Object.entries(form).forEach(([key, value]) => {
-      if (value && value.trim() !== "") {
-        payload[key] = value;
-      }
-    });
+      const payload: Record<string, any> = {};
+      Object.entries(form).forEach(([key, value]) => {
+        if (value && value.trim() !== "") {
+          payload[key] = value;
+        }
+      });
 
-    // Makni currentPassword jer ga backend ne prihvaća
-    delete payload.currentPassword;
-
-      
+      // Remove currentPassword as backend does not accept it
+      delete payload.currentPassword;
 
       const updatedUser = await apiRequest<UserData>("/users/me", "PUT", payload);
       setUserData(updatedUser);
@@ -126,24 +156,22 @@ const MojProfil = () => {
         <button
           type="button"
           onClick={() => {
-            if (isEditing) {
-              // Ako korisnik klikne "Odustani", resetiraj formu na originalne podatke
-              if (userData) {
-                setForm({
-                  name: userData.name,
-                  last_name: userData.last_name,
-                  email: userData.email,
-                  currentPassword: "",
-                  password: "",
-                });
-              }
+            if (isEditing && userData) {
+              setForm({
+                name: userData.name,
+                last_name: userData.last_name,
+                email: userData.email,
+                currentPassword: "",
+                password: "",
+              });
             }
-            setIsEditing((prev) => !prev); // Okreće stanje editiranja
+            setIsEditing((prev) => !prev);
+            setSuccessMsg(null);
           }}
           className="text-blue-600 hover:underline text-sm"
         >
-  {isEditing ? "Odustani" : "Uredi profil"}
-</button>
+          {isEditing ? "Odustani" : "Uredi profil"}
+        </button>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -207,6 +235,7 @@ const MojProfil = () => {
             Lozinka mora imati barem 8 znakova, uključujući velika i mala slova te broj.
           </p>
         </div>
+
         {isEditing && (
           <button
             type="submit"
@@ -215,7 +244,43 @@ const MojProfil = () => {
             Spremi promjene
           </button>
         )}
+
+        <div className="flex justify-between items-center mt-4">
+          <button
+            type="button"
+            onClick={() => setShowConfirmDelete(true)}
+            className="text-red-600 hover:underline text-sm"
+          >
+            Obriši profil
+          </button>
+        </div>
       </form>
+
+      {/* Custom Confirm Modal */}
+      {showConfirmDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm mx-auto">
+            <p className="mb-4 text-gray-800">
+              Jeste li sigurni da želite obrisati svoj profil? Vaš profil bit će nepovratno izbrisan.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowConfirmDelete(false)}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
+                Odustani
+              </button>
+              <button
+                onClick={handleDeleteProfile}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Obriši
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {successMsg && <p className="mt-4 text-green-600">{successMsg}</p>}
     </div>
   );
