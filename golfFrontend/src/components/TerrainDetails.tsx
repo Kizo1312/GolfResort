@@ -2,6 +2,7 @@ import React from "react";
 import { useTerrains } from "./Context/TerrainsContext";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "./Context/ModalContext";
+import { useReservation } from "./Context/ReservationContext";
 
 type Props = {
   id: number;
@@ -9,6 +10,7 @@ type Props = {
 
 const TerrainDetails = ({ id }: Props) => {
   const { getById, loading, error } = useTerrains();
+  const { setReservationData, goToStep } = useReservation();
   const terrain = getById(id);
   const navigate = useNavigate();
   const { close } = useModal();
@@ -23,9 +25,13 @@ const TerrainDetails = ({ id }: Props) => {
     navigate(`/golf-tereni?selectedId=${id}`);
   };
 
-  const handleClickRezerviraj = () => {
-    close();
-    navigate('/rezervacije');
+  const handleRezerviraj = () => {
+    setReservationData({
+      category: "golf",
+      reservation_items: [{ service_id: terrain.id, quantity: 1 }],
+    });
+    goToStep("category"); // opcionalno, već se koristi
+    navigate("/rezervacije");
   };
 
   return (
@@ -34,7 +40,9 @@ const TerrainDetails = ({ id }: Props) => {
         {/* Left side: info */}
         <div className="flex-1">
           <h2 className="text-2xl font-bold mb-2">{terrain.name}</h2>
-          <p className="text-gray-700 mb-4">{terrain.description}</p>
+          <p className="text-gray-700 mb-4 max-h-32 overflow-y-auto">
+          {terrain.description}
+        </p>
           <p className="text-lg font-semibold text-green-600">Cijena: {terrain.price} €</p>
         </div>
 
@@ -54,7 +62,7 @@ const TerrainDetails = ({ id }: Props) => {
         </button>
         <button
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          onClick={handleClickRezerviraj}
+          onClick={handleRezerviraj}
         >
           Rezerviraj
         </button>

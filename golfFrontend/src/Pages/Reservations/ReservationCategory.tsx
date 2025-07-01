@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useReservation } from "@/components/Context/ReservationContext";
 import { useNavigate } from "react-router-dom";
+import { useTerrains } from "@/components/Context/TerrainsContext";
 
 type Terrain = {
   id: number;
@@ -12,23 +13,32 @@ type Terrain = {
 
 const ReservationCategory = () => {
   const navigate = useNavigate();
-  const { setReservationData, goToStep } = useReservation();  // ⬅️ dodano goToStep
+  const { reservation, setReservationData, goToStep } = useReservation();
   const [category, setCategory] = useState<"golf" | "wellness" | null>("golf");
-  const [terrain, setTerrain] = useState<Terrain | null>(null);
+  const { getById } = useTerrains();
+
   const [selectedWellness, setSelectedWellness] = useState<Terrain | null>(null);
 
   // ► Na ulazu: postavi currentStep = "category"
   useEffect(() => {
     goToStep("category");
-    setReservationData({ category: "golf" });
+    if (reservation.category) {
+      setCategory(reservation.category);
+    } else {
+      setReservationData({ category: "golf" });
+      setCategory("golf");
+    }
   }, []);
 
-  const { data: tereni }          = useFetchData<Terrain[]>("/services/golf%20teren");
-  const { data: wellnessUsluge }  = useFetchData<Terrain[]>("/services/wellness");
-  const { data: dodatneUsluge }   = useFetchData<Terrain[]>("/services/dodatna%20usluga");
+  const { data: tereni } = useFetchData<Terrain[]>("/services/golf%20teren");
+  const { data: wellnessUsluge } = useFetchData<Terrain[]>("/services/wellness");
+  const { data: dodatneUsluge } = useFetchData<Terrain[]>("/services/dodatna%20usluga");
+
+  const selectedTerrain = reservation.reservation_items?.[0]
+    ? getById(reservation.reservation_items[0].service_id)
+    : null;
 
   const handleOdaberiTeren = (t: Terrain) => {
-    setTerrain(t);
     setReservationData({
       category: "golf",
       reservation_items: [{ service_id: t.id, quantity: 1 }],
@@ -43,10 +53,6 @@ const ReservationCategory = () => {
     });
   };
 
-  /* -------------------------------------------------------------------------- */
-  /*                             RENDER                                          */
-  /* -------------------------------------------------------------------------- */
-
   return (
     <div className="space-y-8 max-w-4xl mx-auto p-6">
       <h2 className="text-3xl font-bold">Odaberite kategoriju</h2>
@@ -54,19 +60,33 @@ const ReservationCategory = () => {
       {/* Kategorije */}
       <div className="flex flex-col md:flex-row gap-6">
         {[
-          { key: "golf",     title: "Golf Courses", desc: "Rezervirajte vrhunske golf terene.", img: "https://source.unsplash.com/400x300/?golf" },
-          { key: "wellness", title: "Wellness",     desc: "Opustite se u wellness oazi.",      img: "https://source.unsplash.com/400x300/?spa"  },
+          {
+            key: "golf",
+            title: "Golf Courses",
+            desc: "Rezervirajte vrhunske golf terene.",
+            img: "https://source.unsplash.com/400x300/?golf",
+          },
+          {
+            key: "wellness",
+            title: "Wellness",
+            desc: "Opustite se u wellness oazi.",
+            img: "https://source.unsplash.com/400x300/?spa",
+          },
         ].map((c) => (
           <button
             key={c.key}
             onClick={() => {
               setCategory(c.key as "golf" | "wellness");
-              setTerrain(null);
+              setReservationData({
+                category: c.key as "golf" | "wellness",
+                reservation_items: [],
+              });
               setSelectedWellness(null);
-              setReservationData({ reservation_items: [], category: c.key as "golf" | "wellness" });
             }}
             className={`flex w-full md:w-1/2 rounded-xl overflow-hidden shadow transition ${
-              category === c.key ? "ring-2 ring-green-600" : "opacity-60 hover:opacity-100"
+              category === c.key
+                ? "ring-2 ring-green-600"
+                : "opacity-60 hover:opacity-100"
             }`}
           >
             <div className="w-36 h-28 md:w-48 md:h-36 flex-shrink-0">
@@ -81,7 +101,7 @@ const ReservationCategory = () => {
       </div>
 
       {/* Golf tereni */}
-      {category === "golf" && !terrain && (
+      {category === "golf" && !selectedTerrain && (
         <>
           <h3 className="text-xl font-medium mt-4">Odaberi teren</h3>
           <ul className="space-y-4">
@@ -103,6 +123,33 @@ const ReservationCategory = () => {
               </li>
             ))}
           </ul>
+        </>
+      )}
+
+      {/* Prikaz već izabranog terena */}
+      {category === "golf" && selectedTerrain && (
+        <>
+          <h3 className="text-xl font-medium mt-4">Odabrani teren</h3>
+          <div className="p-4 border rounded bg-white shadow">
+            <p><strong>{selectedTerrain.name}</strong></p>
+            <p className="text-gray-600">{selectedTerrain.description}</p>
+            <p className="text-green-600 font-semibold">{selectedTerrain.price} €</p>
+          </div>
+
+          <h3 className="text-xl font-medium mt-4">Dodatne usluge</h3>
+          {dodatneUsluge?.map((u) => (
+            <ExtraRow key={u.id} label={u.name} id={u.id} />
+          ))}
+
+          <button
+            onClick={() => {
+              goToStep("termin");
+              navigate("/rezervacija/termin");
+            }}
+            className="mt-6 bg-green-600 text-white px-6 py-2 rounded"
+          >
+            Nastavi
+          </button>
         </>
       )}
 
@@ -129,26 +176,6 @@ const ReservationCategory = () => {
               </li>
             ))}
           </ul>
-        </>
-      )}
-
-      {/* Dodatne usluge za golf */}
-      {category === "golf" && terrain && (
-        <>
-          <h3 className="text-xl font-medium">Dodatne usluge</h3>
-          {dodatneUsluge?.map((u) => (
-            <ExtraRow key={u.id} label={u.name} id={u.id} />
-          ))}
-
-          <button
-            onClick={() => {
-              goToStep("termin");                // ⬅️ prebacujemo korak
-              navigate("/rezervacija/termin");   // ➜ ruta step-2
-            }}
-            className="mt-6 bg-green-600 text-white px-6 py-2 rounded"
-          >
-            Nastavi
-          </button>
         </>
       )}
 
