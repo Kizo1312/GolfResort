@@ -71,7 +71,7 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
     };
   });
 
-  // 🔥 Decide which events to show
+  
   const events = view === "month" ? monthEvents : detailedEvents;
 
   return (

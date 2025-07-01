@@ -12,3 +12,13 @@ class ReservationSchema(SQLAlchemyAutoSchema):
 
     reservation_items = fields.Nested(ReservationItemSchema, many=True, required=True)
     end_time = fields.Time(dump_only=True)
+
+class EditReservationSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = ReservationModel
+        load_instance = True
+        include_fk = True
+        sqla_session = db.session
+
+    reservation_items = fields.Nested(ReservationItemSchema, many=True, required=False)
+    end_time = fields.Time(dump_only=True)
