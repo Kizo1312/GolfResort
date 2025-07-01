@@ -5,7 +5,7 @@ import { apiRequest } from "@/hooks/apiHookAsync";
 type Item = {
   id: number;
   name: string;
-  price?: number;          // promijenjeno na number
+  price?: number;          
   description?: string;
   inventory?: number;      
 };

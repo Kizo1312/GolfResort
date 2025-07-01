@@ -55,6 +55,7 @@ class Service(MethodView):
             service.name = service_data["name"]
             service.price = service_data["price"]
             service.inventory = service_data["inventory"]
+            service.description = service_data ["description"]
             db.session.add(service)
             db.session.commit()
         return service
