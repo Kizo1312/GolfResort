@@ -7,7 +7,7 @@ type Wellness = {
   name: string;
   description: string;
   images: string[];
-  pricePerHour: number;
+  price: number;
 };
 
 const WellnessComponents = () => {
@@ -59,7 +59,7 @@ const WellnessComponents = () => {
           <h2 className="text-3xl font-semibold mb-4">{selectedWellness.name}</h2>
           <p className="mb-4 text-gray-700">{selectedWellness.description}</p>
           <p className="text-lg font-semibold text-green-600 mb-6">
-            Cijena od {selectedWellness.pricePerHour}€ / sat
+            Cijena od {selectedWellness.price}€ / sat
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
