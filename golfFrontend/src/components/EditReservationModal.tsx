@@ -1,27 +1,6 @@
 import React, { useState } from "react";
 import { apiRequest } from "@/hooks/apiHookAsync";
 
-type ReservationItem = {
-  service_id: number;
-  quantity: number;
-  service?: {
-    id: number;
-    name: string;
-    price: string;
-  };
-};
-
-type Reservation = {
-  id: number;
-  user_id: number;
-  date: string;
-  start_time: string;
-  end_time: string;
-  duration_minutes: number;
-  reservation_items: ReservationItem[];
-};
-
-
 type Props = {
   isOpen: boolean;
   onClose: () => void;
@@ -38,6 +17,11 @@ const EditReservationModal = ({
   const [date, setDate] = useState(reservation.date);
   const [startTime, setStartTime] = useState(reservation.start_time);
   const [duration, setDuration] = useState(reservation.duration_minutes);
+  const timeOptions = [];
+  for (let hour = 8; hour <= 20; hour++) {
+    const hourStr = hour.toString().padStart(2, "0") + ":00";
+    timeOptions.push(hourStr);
+  }
 
   const handleSubmit = async () => {
     try {
@@ -65,9 +49,7 @@ const EditReservationModal = ({
       onClose();
       alert("Rezervacija uspješno ažurirana!");
     } catch (err: any) {
-      alert(
-        "Greška: " + (err.message || "Neuspješna promjena rezervacije.")
-      );
+      alert("Greška: " + (err.message || "Neuspješna promjena rezervacije."));
     }
   };
 
@@ -91,12 +73,17 @@ const EditReservationModal = ({
 
           <label className="block">
             Početak:
-            <input
-              type="time"
+            <select
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               className="border rounded p-2 w-full"
-            />
+            >
+              {timeOptions.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label className="block">

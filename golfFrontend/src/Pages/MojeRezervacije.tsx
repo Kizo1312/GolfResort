@@ -28,6 +28,7 @@ type Reservation = {
   id: number;
   date: string;
   start_time: string;
+  duration_minutes: number;
   end_time: string;
   reservation_items: ReservationItem[];
 };
@@ -93,47 +94,52 @@ const MojeRezervacije = () => {
       );
     }
     return reservations.map((rez) => (
-  <div key={rez.id} className="relative bg-white shadow rounded p-6 space-y-2 mb-6">
-    
-    {activeTab === "active" && (
-      cancelingId === rez.id ? (
-        <div className="absolute top-2 right-2 flex items-center space-x-2 text-gray-600 text-sm font-medium">
-          <svg
-            className="animate-spin h-5 w-5 text-gray-500"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
-          </svg>
-          <span>Otkazivanje u tijeku...</span>
-        </div>
-      ) : (
-        <button
-          onClick={() => {
-            if (confirm("Jeste li sigurni da želite otkazati ovu rezervaciju?")) {
-              cancelReservation(rez.id);
-            }
-          }}
-          className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm font-normal underline cursor-pointer"
-          aria-label="Otkaži rezervaciju"
-        >
-          otkaži rezervaciju
-        </button>
-      )
-    )}
+      <div
+        key={rez.id}
+        className="relative bg-white shadow rounded p-6 space-y-2 mb-6"
+      >
+        {activeTab === "active" &&
+          (cancelingId === rez.id ? (
+            <div className="absolute top-2 right-2 flex items-center space-x-2 text-gray-600 text-sm font-medium">
+              <svg
+                className="animate-spin h-5 w-5 text-gray-500"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+              <span>Otkazivanje u tijeku...</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                if (
+                  confirm(
+                    "Jeste li sigurni da želite otkazati ovu rezervaciju?"
+                  )
+                ) {
+                  cancelReservation(rez.id);
+                }
+              }}
+              className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm font-normal underline cursor-pointer"
+              aria-label="Otkaži rezervaciju"
+            >
+              otkaži rezervaciju
+            </button>
+          ))}
         <p>
           <strong>Datum:</strong> {dayjs(rez.date).format("DD. MM. YYYY.")}
         </p>
@@ -145,9 +151,15 @@ const MojeRezervacije = () => {
           <ul className="list-disc list-inside text-sm">
             {rez.reservation_items.map((item, i) => (
               <li key={i}>
-                {item.service.name} ({item.service.category}) – {item.quantity} ×{" "}
-                {item.price_at_booking} € ={" "}
-                {(item.quantity * item.price_at_booking).toFixed(2)} €
+                {item.service.name} ({item.service.category}) – {item.quantity}{" "}
+                × {item.price_at_booking} € ={" "}
+                {item.service.category === "golf teren"
+                  ? (
+                      item.price_at_booking *
+                      (rez.duration_minutes / 60)
+                    ).toFixed(2)
+                  : (item.quantity * item.price_at_booking).toFixed(2)}{" "}
+                €
               </li>
             ))}
           </ul>
@@ -155,7 +167,14 @@ const MojeRezervacije = () => {
         <div className="font-semibold text-green-700 pt-2">
           Ukupno:{" "}
           {rez.reservation_items
-            .reduce((sum, i) => sum + i.quantity * i.price_at_booking, 0)
+            .reduce((sum, item) => {
+              if (item.service.category === "golf teren") {
+                return (
+                  sum + item.price_at_booking * (rez.duration_minutes / 60)
+                );
+              }
+              return sum + item.quantity * item.price_at_booking;
+            }, 0)
             .toFixed(2)}{" "}
           €
         </div>
@@ -163,19 +182,19 @@ const MojeRezervacije = () => {
     ));
   };
 
-const cancelReservation = async (id: number) => {
-  setCancelingId(id);
-  try {
-    await apiRequest(`/reservations/${id}`, "DELETE");
-    // nakon uspjeha, izbriši iz lokalnog state-a
-    setData((prev) => prev ? prev.filter(r => r.id !== id) : null);
-    alert("Rezervacija uspješno otkazana.");
-  } catch (error: any) {
-    alert(error.message || "Greška pri otkazivanju rezervacije.");
-  } finally {
-    setCancelingId(null);
-  }
-};
+  const cancelReservation = async (id: number) => {
+    setCancelingId(id);
+    try {
+      await apiRequest(`/reservations/${id}`, "DELETE");
+      // nakon uspjeha, izbriši iz lokalnog state-a
+      setData((prev) => (prev ? prev.filter((r) => r.id !== id) : null));
+      alert("Rezervacija uspješno otkazana.");
+    } catch (error: any) {
+      alert(error.message || "Greška pri otkazivanju rezervacije.");
+    } finally {
+      setCancelingId(null);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 space-y-6">
@@ -183,7 +202,7 @@ const cancelReservation = async (id: number) => {
 
       {/* Tabovi */}
       <div className="flex justify-center space-x-4 mb-6">
-         <button
+        <button
           onClick={() => setActiveTab("past")}
           className={`px-4 py-2 rounded ${
             activeTab === "past"
@@ -214,5 +233,3 @@ const cancelReservation = async (id: number) => {
 };
 
 export default MojeRezervacije;
-
-
