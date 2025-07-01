@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useFetchData } from "../hooks/useFetchData";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useReservation } from "@/components/Context/ReservationContext";
 
 type GolfCourse = {
   id: number;
@@ -12,6 +13,7 @@ type GolfCourse = {
 const GolfCourses = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { setReservationData, goToStep } = useReservation();
 
   const { data: golfCourses, loading, error } = useFetchData<GolfCourse[]>("/services/golf teren");
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -27,7 +29,8 @@ const GolfCourses = () => {
         setSelectedId(golfCourses[0].id);
       }
     }
-  }, [golfCourses, selectedId, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [golfCourses]);
 
   if (loading) return <p>Loading golf courses...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -43,7 +46,9 @@ const GolfCourses = () => {
             key={course.id}
             onClick={() => setSelectedId(course.id)}
             className={`whitespace-nowrap px-4 py-2 border-b-2 ${
-              course.id === selectedId ? "border-green-600 text-green-600 font-bold" : "border-transparent text-gray-600"
+              course.id === selectedId
+                ? "border-green-600 text-green-600 font-bold"
+                : "border-transparent text-gray-600"
             } hover:text-green-700`}
           >
             {course.name}
@@ -60,7 +65,7 @@ const GolfCourses = () => {
             {(selectedCourse.images && selectedCourse.images.length > 0
               ? selectedCourse.images.slice(0, 2)
               : [null, null]
-            ).map((imgUrl, idx) => (
+            ).map((imgUrl, idx) =>
               imgUrl ? (
                 <img
                   key={idx}
@@ -76,11 +81,20 @@ const GolfCourses = () => {
                   No image available
                 </div>
               )
-            ))}
+            )}
           </div>
 
           <button
-            onClick={() => navigate("/rezervacije")}
+            onClick={() => {
+              if (selectedCourse) {
+                setReservationData({
+                  category: "golf",
+                  reservation_items: [{ service_id: selectedCourse.id, quantity: 1 }],
+                });
+                goToStep("category");
+                navigate("/rezervacije");
+              }
+            }}
             className="mt-6 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
           >
             Reserve
