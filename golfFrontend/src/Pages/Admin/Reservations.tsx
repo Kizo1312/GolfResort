@@ -2,22 +2,32 @@ import { useEffect, useState } from "react";
 import ReservationTable from "@/components/Admin/ReservationTable";
 import { apiRequest } from "@/hooks/apiHookAsync";
 
+type Service = {
+  id: number;
+  name: string;
+  price: string;
+  category: string;
+};
+
 type ReservationItem = {
-  service: {
-    name: string;
-    price: string;
-  };
+  id?: number;
+  service_id: number;
+  service?: Service;
   quantity: number;
+  price_at_booking?: number;
 };
 
 type Reservation = {
   id: number;
+  user_id: number;
   date: string;
   start_time: string;
   end_time: string;
   duration_minutes: number;
   reservation_items: ReservationItem[];
+  created_at?: string;
 };
+
 
 const Reservations = () => {
   const [data, setData] = useState<Reservation[] | null>(null);
