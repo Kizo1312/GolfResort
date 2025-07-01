@@ -32,6 +32,7 @@ const TerrainDetails = ({ id }: Props) => {
     });
     goToStep("category"); // opcionalno, već se koristi
     navigate("/rezervacije");
+    close();
   };
 
   return (
