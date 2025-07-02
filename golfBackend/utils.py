@@ -6,6 +6,13 @@ from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from functools import wraps
 from extensions import mail
 
+import threading
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+
 #Funkcija za uzimanje svih mailova od admina
 def get_all_admin_mails():
     admins = UserModel.query.filter_by(role ="admin").all()
@@ -48,8 +55,12 @@ Provjerite sustav za dodatne informacije.
     )
     
     try:
-        mail.send(msg)
-        mail.send(admin_msg)
+        for message in [msg,admin_msg]:
+            thread = threading.Thread(
+                target=send_async_email,
+                args=(current_app._get_current_object(), message)
+            )
+            thread.start()
     except Exception as e:
         print("❌ Email sending failed:", e)
         abort(500, message="Reservation saved, but failed to send confirmation email.")
@@ -88,8 +99,12 @@ Provjerite sustav za dodatne informacije.
     )
     
     try:
-        mail.send(msg)
-        mail.send(admin_msg)
+        for message in [msg, admin_msg]:
+            thread = threading.Thread(
+                target=send_async_email,
+                args=(current_app._get_current_object(), message)
+            )
+            thread.start()
         
     except Exception as e:
         print("❌ Email sending failed:", e)

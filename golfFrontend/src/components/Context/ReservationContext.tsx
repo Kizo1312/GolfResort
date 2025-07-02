@@ -38,6 +38,8 @@ const ReservationContext = createContext<ReservationContextType | undefined>(und
 
 export const ReservationProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const prevUser = React.useRef(user);
+
   const EXPIRY_TIME = 30 * 60 * 1000;
 
   const defaultState = (): Partial<ReservationData> => ({
@@ -97,14 +99,26 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (!user) resetReservation();
-  }, [user]);
+  if (prevUser.current && !user) {
+    resetReservation();
+  }
+  prevUser.current = user;
+}, [user]);
+
 
   useEffect(() => {
     if (user?.id && reservation.user_id !== user.id) {
       setReservationData({ user_id: user.id });
     }
   }, [user]);
+
+  useEffect(() => {
+  localStorage.setItem(
+    "reservationData",
+    JSON.stringify({ data: reservation, timestamp: Date.now() })
+  );
+}, [reservation]);
+
 
   return (
     <ReservationContext.Provider

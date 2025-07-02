@@ -90,9 +90,13 @@ class CreateReservation(MethodView):
         try:
             db.session.add(reservation_data)
             db.session.commit()
+
+            reservation_with_items = db.session.query(ReservationModel).options(
+                joinedload(ReservationModel.reservation_items)
+                ).get(reservation_data.id)
             user = db.session.get(UserModel,user_id)
             admin_mails = get_all_admin_mails()
-            confirmation_mail(user.email, admin_mails, reservation_data, service_names)
+            confirmation_mail(user.email, admin_mails, reservation_with_items, service_names)
 
         except SQLAlchemyError as e:
             db.session.rollback()
@@ -100,7 +104,7 @@ class CreateReservation(MethodView):
             abort(500, message="An error occurred while creating the reservation.")
 
         
-        return reservation_data
+        return reservation_with_items
     
     @jwt_required()
     @admin_required
