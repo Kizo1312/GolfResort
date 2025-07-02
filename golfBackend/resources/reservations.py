@@ -54,6 +54,8 @@ class CreateReservation(MethodView):
             requested_quantity = item.quantity
             service = db.session.get(ServiceModel, service_id)
             service_names.append(service.name)
+            if service.inventory == 0: 
+                abort (409, message="Usluga trenutno nije dostupna.")
 
             item.price_at_booking = service.price
 
