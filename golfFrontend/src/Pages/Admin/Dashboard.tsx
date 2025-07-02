@@ -35,19 +35,6 @@ const Dashboard = () => {
     <div>
       <h2 className="text-2xl font-bold mb-6">Pregled</h2>
 
-      <div className="flex items-center gap-4 mb-6">
-        <label htmlFor="date" className="font-medium">
-          Odaberi datum:
-        </label>
-        <input
-          id="date"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="border px-3 py-2 rounded shadow-sm focus:outline-none focus:ring focus:ring-green-300"
-        />
-      </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         <div
           onClick={() => navigate("/admin/rezervacije")}

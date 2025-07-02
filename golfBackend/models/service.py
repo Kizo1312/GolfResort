@@ -18,5 +18,9 @@ class ServiceModel(db.Model):
             "category IN ('golf teren', 'wellness', 'dodatna usluga')",
             name='check_services_category'
         ),
+        CheckConstraint(
+            "price >= 0",
+            name='check_services_price_positive'
+        ),
     )
   

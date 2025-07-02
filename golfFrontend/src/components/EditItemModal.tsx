@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTerrains } from "./Context/TerrainsContext";
 import { apiRequest } from "@/hooks/apiHookAsync";
+import toast from "react-hot-toast";
 
 type Item = {
   id: number;
@@ -22,9 +23,24 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
   const [description, setDesc]    = useState(item.description ?? "");
   const [inventory, setInventory] = useState(item.inventory ?? 0);
   const [loading, setLoading]     = useState(false);
+  const [priceError, setPriceError] = useState<string | null>(null);
   const { refetch } = useTerrains();
 
+  const handlePricechange = (value: number) => {
+    setPrice(value);
+    if (value <0) {
+      setPriceError("Cijena mora biti pozitivan broj");
+    } else {
+      setPriceError(null);
+    }
+  };
+
   const handleSubmit = async () => {
+    if (price < 0) {
+      setPriceError("Cijena mora biti pozitivan broj");
+      return;
+    }
+
   setLoading(true);
   try {
     await apiRequest(`/services/${item.id}`, "PUT", {
@@ -36,6 +52,7 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
 
     onClose();
     onUpdate();
+    toast.success("Uspješno spremljeno");
     refetch();
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Nepoznata greška";
@@ -64,11 +81,16 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
         <span className="text-sm">Cijena (€)</span>
         <input
           type="number"
-          step="0.01"
+          step="0.10"
           value={price}
-          onChange={(e) => setPrice(Number(e.target.value))}
-          className="mt-1 block w-full border rounded px-3 py-1"
+          onChange={(e) => handlePricechange(Number(e.target.value))}
+          className={`mt-1 block w-full border rounded px-3 py-1 ${
+            priceError ? "border-red-500" : ""
+          }`}
         />
+          {priceError && (
+            <p className="text-red-500 text-sm mt-1">{priceError}</p>
+          )}
       </label>
 
       <label className="block">
