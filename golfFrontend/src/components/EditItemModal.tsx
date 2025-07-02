@@ -8,7 +8,8 @@ type Item = {
   name: string;
   price?: number;          
   description?: string;
-  inventory?: number;      
+  inventory?: number;
+  category?: string;      
 };
 
 type Props = {
@@ -26,6 +27,8 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
   const [priceError, setPriceError] = useState<string | null>(null);
   const { refetch } = useTerrains();
 
+  const isGolf = item.category === "golf teren"
+
   const handlePricechange = (value: number) => {
     setPrice(value);
     if (value <0) {
@@ -33,6 +36,10 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
     } else {
       setPriceError(null);
     }
+  };
+
+  const handleToggleAvailability = () => {
+    setInventory((prev) => (prev > 0 ? 0 :1));
   };
 
   const handleSubmit = async () => {
@@ -46,8 +53,8 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
     await apiRequest(`/services/${item.id}`, "PUT", {
       name,
       price: parseFloat(String(price)),
-      inventory,
       description,
+      inventory,
     });
 
     onClose();
@@ -103,6 +110,22 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
         />
       </label>
 
+      {isGolf ? (
+        <div className="flex items-center gap-3 mt-2">
+          <span className="text-sm">Dostupnost:</span>
+          <button
+            onClick={handleToggleAvailability}
+            className={`px-4 py-1 rounded text-sm font-medium transition ${
+              inventory > 0
+                ? "bg-green-500 text-white hover:bg-green-600"
+                : "bg-red-500 text-white hover:bg-red-600"
+            }`}
+          >
+            {inventory > 0 ? "Dostupan" : "Nedostupan"}
+          </button>
+        </div>
+      ) : (
+
       <label className="block">
         <span className="text-sm">Inventar (količina)</span>
         <input
@@ -112,6 +135,7 @@ const EditItemModal = ({ item, onClose, onUpdate }: Props) => {
           className="mt-1 block w-full border rounded px-3 py-1"
         />
       </label>
+    )}
 
       <div className="pt-3 flex justify-end gap-2">
         <button onClick={onClose} className="px-4 py-2 rounded bg-gray-300">

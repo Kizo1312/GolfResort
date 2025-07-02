@@ -23,7 +23,6 @@ type Reservation = {
   reservation_items: ReservationItem[];
 };
 
-
 type Props = {
   items: Reservation[];
 };
@@ -61,9 +60,7 @@ const ReservationTable = ({ items }: Props) => {
 
     try {
       await apiRequest(`/reservations/${id}`, "DELETE");
-
       setFiltered((prev) => prev.filter((r) => r.id !== id));
-
       alert("Rezervacija uspješno obrisana.");
     } catch (err: any) {
       alert("Greška: " + (err.message || "Neuspješno brisanje."));
@@ -82,14 +79,16 @@ const ReservationTable = ({ items }: Props) => {
         />
       </div>
 
-      <div className="grid grid-cols-5 font-semibold text-gray-700 px-6 py-3 border-b">
+      {/* Header */}
+      <div className="grid grid-cols-5 gap-4 px-6 py-3 border-b font-semibold text-gray-700">
         <span>ID</span>
         <span>Datum</span>
         <span>Vrijeme</span>
         <span>Usluge</span>
-        <span>Akcije</span>
+        <span className="text-right">Akcije</span>
       </div>
 
+      {/* Rezervacije */}
       {filtered.length === 0 ? (
         <p className="text-gray-600 px-6">Nema rezervacija za ovaj dan.</p>
       ) : (
@@ -97,7 +96,7 @@ const ReservationTable = ({ items }: Props) => {
           {filtered.map((res) => (
             <li
               key={res.id}
-              className="grid grid-cols-5 items-start px-6 py-4 border-b text-sm hover:bg-gray-50"
+              className="grid grid-cols-5 gap-4 items-start px-6 py-4 border-b text-sm hover:bg-gray-50"
             >
               <span>{res.id}</span>
               <span>{res.date}</span>
@@ -105,7 +104,7 @@ const ReservationTable = ({ items }: Props) => {
                 {res.start_time} - {res.end_time}
               </span>
               <span>
-                <ul className="list-disc list-inside">
+                <ul className="list-disc list-inside space-y-1">
                   {res.reservation_items.map((item, i) => (
                     <li key={i}>
                       {item.service?.name || "Nepoznata usluga"} ({item.quantity}
@@ -114,20 +113,20 @@ const ReservationTable = ({ items }: Props) => {
                   ))}
                 </ul>
               </span>
-              <span className="space-y-1">
+              <div className="flex justify-end gap-4">
                 <button
                   onClick={() => deleteReservation(res.id)}
-                  className="text-red-600 hover:underline text-sm block"
+                  className="text-red-600 hover:underline text-sm"
                 >
                   Obriši
                 </button>
                 <button
                   onClick={() => openEditModal(res)}
-                  className="text-blue-600 hover:underline text-sm block"
+                  className="text-blue-600 hover:underline text-sm"
                 >
                   Promijeni
                 </button>
-              </span>
+              </div>
             </li>
           ))}
         </ul>

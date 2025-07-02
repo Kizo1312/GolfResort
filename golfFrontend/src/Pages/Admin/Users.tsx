@@ -39,7 +39,6 @@ const Users = () => {
 
   const sortedUsers = () => {
     if (!users) return [];
-
     const sorted = [...users].sort((a, b) => {
       let aField = a[sortField];
       let bField = b[sortField];
@@ -73,7 +72,6 @@ const Users = () => {
 
   const handleDelete = async (userId: number) => {
     if (!confirm("Jeste li sigurni da želite obrisati korisnika?")) return;
-
     try {
       await apiRequest(`/users/${userId}`, "DELETE");
       fetchUsers();
@@ -112,7 +110,7 @@ const Users = () => {
           >
             Sortiraj po:{" "}
             <span className="font-normal lowercase ml-1">
-              {sortField === "last_name" ? "prezimenu" : "roli"}
+              {sortField === "last_name" ? "prezimenu" : "ulozi"}
             </span>
             <svg
               className={`w-4 h-4 transition-transform ${
@@ -124,7 +122,11 @@ const Users = () => {
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
@@ -132,7 +134,9 @@ const Users = () => {
             <div className="absolute right-0 mt-1 bg-white border border-gray-300 rounded shadow-md w-48 z-10">
               <button
                 className={`block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
-                  sortField === "last_name" ? "font-semibold bg-gray-100" : "font-normal"
+                  sortField === "last_name"
+                    ? "font-semibold bg-gray-100"
+                    : "font-normal"
                 }`}
                 onClick={() => {
                   setSortField("last_name");
@@ -144,7 +148,9 @@ const Users = () => {
               </button>
               <button
                 className={`block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
-                  sortField === "role" ? "font-semibold bg-gray-100" : "font-normal"
+                  sortField === "role"
+                    ? "font-semibold bg-gray-100"
+                    : "font-normal"
                 }`}
                 onClick={() => {
                   setSortField("role");
@@ -159,33 +165,44 @@ const Users = () => {
         </div>
       </div>
 
-      <div className="px-6 py-4 border-b font-semibold text-gray-700 grid grid-cols-4">
+      {/* Header */}
+      <div
+        className="grid gap-4 px-6 py-3 border-b font-semibold text-gray-700"
+        style={{
+          gridTemplateColumns: "1.5fr 1.5fr 4fr 1fr minmax(100px, auto)",
+        }}
+      >
         <span>Ime</span>
         <span>Prezime</span>
         <span>Email</span>
         <span>Uloga</span>
+        <span className="text-right">Akcije</span>
       </div>
 
+      {/* List of users */}
       <ul>
         {displayedUsers.map((user) => (
           <li
             key={user.id}
-            className="group px-6 py-3 border-b grid grid-cols-4 items-center hover:bg-gray-50 relative"
+            className="grid gap-4 items-center px-6 py-3 border-b hover:bg-gray-50"
+            style={{
+              gridTemplateColumns: "1.5fr 1.5fr 4fr 1fr minmax(100px, auto)",
+            }}
           >
             <span className="text-gray-800">{user.name}</span>
             <span className="text-gray-800">{user.last_name}</span>
-            <span className="text-blue-600">{user.email}</span>
+            <span className="text-blue-600 truncate">{user.email}</span>
             <span className="text-sm text-gray-600">{user.role}</span>
-            <div className="absolute right-6 opacity-0 group-hover:opacity-100 flex gap-2 transition">
+            <div className="flex justify-end gap-4">
               <button
                 onClick={() => handleEdit(user)}
-                className="text-blue-600 text-sm"
+                className="text-blue-600 hover:underline text-sm"
               >
                 Uredi
               </button>
               <button
                 onClick={() => handleDelete(user.id)}
-                className="text-red-500 text-sm"
+                className="text-red-500 hover:underline text-sm"
               >
                 Obriši
               </button>
