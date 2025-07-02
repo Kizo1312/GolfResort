@@ -31,7 +31,7 @@ const RezervacijaPregled = () => {
 
     if (!valid) {
       toast.error("Molimo dovršite prethodne korake rezervacije.");
-      navigate("/rezervacija");
+      navigate("/rezervacija/pregled");
     }
   }, []);
 
