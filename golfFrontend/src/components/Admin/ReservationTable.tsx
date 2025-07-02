@@ -28,13 +28,10 @@ type Props = {
 };
 
 const ReservationTable = ({ items }: Props) => {
-  const [selectedDate, setSelectedDate] = useState(
-    dayjs().format("YYYY-MM-DD")
-  );
+  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [filtered, setFiltered] = useState<Reservation[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedReservation, setSelectedReservation] =
-    useState<Reservation | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
   const openEditModal = (reservation: Reservation) => {
     setSelectedReservation(reservation);
@@ -53,9 +50,7 @@ const ReservationTable = ({ items }: Props) => {
   }, [items, selectedDate]);
 
   const deleteReservation = async (id: number) => {
-    const confirm = window.confirm(
-      "Jeste li sigurni da želite obrisati ovu rezervaciju?"
-    );
+    const confirm = window.confirm("Jeste li sigurni da želite obrisati ovu rezervaciju?");
     if (!confirm) return;
 
     try {
@@ -80,7 +75,7 @@ const ReservationTable = ({ items }: Props) => {
       </div>
 
       {/* Header */}
-      <div className="grid grid-cols-5 gap-4 px-6 py-3 border-b font-semibold text-gray-700">
+      <div className="grid grid-cols-[60px_1fr_1fr_2fr_100px] gap-4 px-6 py-3 border-b font-semibold text-gray-700">
         <span>ID</span>
         <span>Datum</span>
         <span>Vrijeme</span>
@@ -96,7 +91,7 @@ const ReservationTable = ({ items }: Props) => {
           {filtered.map((res) => (
             <li
               key={res.id}
-              className="grid grid-cols-5 gap-4 items-start px-6 py-4 border-b text-sm hover:bg-gray-50"
+              className="grid grid-cols-[60px_1fr_1fr_2fr_100px] gap-4 items-start px-6 py-4 border-b text-sm hover:bg-gray-50"
             >
               <span>{res.id}</span>
               <span>{res.date}</span>
@@ -107,8 +102,7 @@ const ReservationTable = ({ items }: Props) => {
                 <ul className="list-disc list-inside space-y-1">
                   {res.reservation_items.map((item, i) => (
                     <li key={i}>
-                      {item.service?.name || "Nepoznata usluga"} ({item.quantity}
-                      × {item.service?.price} €)
+                      {item.service?.name || "Nepoznata usluga"} ({item.quantity} × {item.service?.price} €)
                     </li>
                   ))}
                 </ul>
