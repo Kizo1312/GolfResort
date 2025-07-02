@@ -20,7 +20,7 @@ class ServiceList(MethodView):
     def post(self, service_data):
         new_service = ServiceModel(
             name=service_data["name"],
-            price=service_data["price"],
+            price=abs(service_data["price"]),
             category=service_data["category"],
             description = service_data.get("description"),
             inventory=service_data["inventory"]
@@ -53,7 +53,7 @@ class Service(MethodView):
 
         if service: 
             service.name = service_data["name"]
-            service.price = service_data["price"]
+            service.price = abs(service_data["price"])
             service.inventory = service_data["inventory"]
             service.description = service_data ["description"]
             db.session.add(service)
@@ -69,7 +69,7 @@ class Service(MethodView):
         return {"message": "Service deleted."}
 
 @blp.route("/services/<service_category>")
-class Service(MethodView):
+class ServiceByCategory(MethodView):
     @blp.response(200, ServiceSchema(many=True))
     def get(self, service_category):
         services= ServiceModel.query.filter_by(category=service_category).all()
