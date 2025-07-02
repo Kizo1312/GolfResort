@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useFetchData } from "../hooks/useFetchData";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useReservation } from "@/components/Context/ReservationContext";
+
 
 type Wellness = {
   id: number;
@@ -35,6 +37,7 @@ const WellnessComponents = () => {
   if (!wellnessList || wellnessList.length === 0) return <p>No wellness options found.</p>;
 
   const selectedWellness = wellnessList.find(w => w.id === selectedId);
+  const { setReservationData, goToStep } = useReservation();
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -86,12 +89,20 @@ const WellnessComponents = () => {
           </div>
 
           <button
-          onClick={() => navigate(`/rezervacije?category=wellness&serviceId=${selectedId}`)}
-
-          className="mt-6 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
-            >
-          Rezerviraj
-          </button>
+  onClick={() => {
+    if (selectedWellness) {
+      setReservationData({
+        category: "wellness",
+        reservation_items: [{ service_id: selectedWellness.id, quantity: 1 }],
+      });
+      goToStep("category");
+      navigate("/rezervacije");
+    }
+  }}
+  className="mt-6 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
+>
+  Rezerviraj
+</button>
         </div>
       )}
     </div>

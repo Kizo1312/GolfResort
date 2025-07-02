@@ -14,19 +14,18 @@ type Terrain = {
 const ReservationCategory = () => {
   const navigate = useNavigate();
   const { reservation, setReservationData, goToStep } = useReservation();
-  const [category, setCategory] = useState<"golf" | "wellness" | null>("golf");
+  const category = reservation.category || null;
   const { getById } = useTerrains();
 
-  const [selectedWellness, setSelectedWellness] = useState<Terrain | null>(null);
+  const selectedWellness =
+    category === "wellness" && reservation.reservation_items?.[0]
+      ? getById(reservation.reservation_items[0].service_id)
+      : null;
 
-  // ► Na ulazu: postavi currentStep = "category"
   useEffect(() => {
     goToStep("category");
-    if (reservation.category) {
-      setCategory(reservation.category);
-    } else {
+    if (!reservation.category) {
       setReservationData({ category: "golf" });
-      setCategory("golf");
     }
   }, []);
 
@@ -46,7 +45,6 @@ const ReservationCategory = () => {
   };
 
   const handleOdaberiWellness = (w: Terrain) => {
-    setSelectedWellness(w);
     setReservationData({
       category: "wellness",
       reservation_items: [{ service_id: w.id, quantity: 1 }],
@@ -55,50 +53,51 @@ const ReservationCategory = () => {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto p-6">
-      <h2 className="text-3xl font-bold">Odaberite kategoriju</h2>
-
-      {/* Kategorije */}
-      <div className="flex flex-col md:flex-row gap-6">
-        {[
-          {
-            key: "golf",
-            title: "Golf Courses",
-            desc: "Rezervirajte vrhunske golf terene.",
-            img: "https://source.unsplash.com/400x300/?golf",
-          },
-          {
-            key: "wellness",
-            title: "Wellness",
-            desc: "Opustite se u wellness oazi.",
-            img: "https://source.unsplash.com/400x300/?spa",
-          },
-        ].map((c) => (
-          <button
-            key={c.key}
-            onClick={() => {
-              setCategory(c.key as "golf" | "wellness");
-              setReservationData({
-                category: c.key as "golf" | "wellness",
-                reservation_items: [],
-              });
-              setSelectedWellness(null);
-            }}
-            className={`flex w-full md:w-1/2 rounded-xl overflow-hidden shadow transition ${
-              category === c.key
-                ? "ring-2 ring-green-600"
-                : "opacity-60 hover:opacity-100"
-            }`}
-          >
-            <div className="w-36 h-28 md:w-48 md:h-36 flex-shrink-0">
-              <img src={c.img} alt={c.title} className="w-full h-full object-cover" />
-            </div>
-            <div className="flex-1 p-4 text-left">
-              <h3 className="text-lg font-semibold">{c.title}</h3>
-              <p className="text-sm text-gray-600">{c.desc}</p>
-            </div>
-          </button>
-        ))}
-      </div>
+      {/* Prikaz odabira kategorije samo ako još ništa nije odabrano */}
+      {!selectedTerrain && !selectedWellness && (
+        <>
+          <h2 className="text-3xl font-bold">Odaberite kategoriju</h2>
+          <div className="flex flex-col md:flex-row gap-6">
+            {[
+              {
+                key: "golf",
+                title: "Golf Courses",
+                desc: "Rezervirajte vrhunske golf terene.",
+                img: "https://source.unsplash.com/400x300/?golf",
+              },
+              {
+                key: "wellness",
+                title: "Wellness",
+                desc: "Opustite se u wellness oazi.",
+                img: "https://source.unsplash.com/400x300/?spa",
+              },
+            ].map((c) => (
+              <button
+                key={c.key}
+                onClick={() => {
+                  setReservationData({
+                    category: c.key as "golf" | "wellness",
+                    reservation_items: [],
+                  });
+                }}
+                className={`flex w-full md:w-1/2 rounded-xl overflow-hidden shadow transition ${
+                  category === c.key
+                    ? "ring-2 ring-green-600"
+                    : "opacity-60 hover:opacity-100"
+                }`}
+              >
+                <div className="w-36 h-28 md:w-48 md:h-36 flex-shrink-0">
+                  <img src={c.img} alt={c.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 p-4 text-left">
+                  <h3 className="text-lg font-semibold">{c.title}</h3>
+                  <p className="text-sm text-gray-600">{c.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Golf tereni */}
       {category === "golf" && !selectedTerrain && (
@@ -126,7 +125,7 @@ const ReservationCategory = () => {
         </>
       )}
 
-      {/* Prikaz već izabranog terena */}
+      {/* Prikaz već izabranog terena + dodatne usluge */}
       {category === "golf" && selectedTerrain && (
         <>
           <h3 className="text-xl font-medium mt-4">Odabrani teren</h3>
@@ -200,8 +199,6 @@ const ReservationCategory = () => {
   );
 };
 
-/* ────────────────────────────────────────────────────────── */
-/* Dodatne golf-usluge (brojač)                              */
 const ExtraRow = ({ label, id }: { label: string; id: number }) => {
   const [q, setQ] = useState(0);
   const { setReservationData, reservation } = useReservation();
