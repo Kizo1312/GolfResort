@@ -9,6 +9,7 @@ type Terrain = {
   name: string;
   description: string;
   price: string;
+  inventory: number;
 };
 
 const ReservationCategory = () => {
@@ -30,8 +31,11 @@ const ReservationCategory = () => {
   }, []);
 
   const { data: tereni } = useFetchData<Terrain[]>("/services/golf%20teren");
-  const { data: wellnessUsluge } = useFetchData<Terrain[]>("/services/wellness");
-  const { data: dodatneUsluge } = useFetchData<Terrain[]>("/services/dodatna%20usluga");
+  const { data: wellnessUsluge } =
+    useFetchData<Terrain[]>("/services/wellness");
+  const { data: dodatneUsluge } = useFetchData<Terrain[]>(
+    "/services/dodatna%20usluga"
+  );
 
   const selectedTerrain = reservation.reservation_items?.[0]
     ? getById(reservation.reservation_items[0].service_id)
@@ -87,7 +91,11 @@ const ReservationCategory = () => {
                 }`}
               >
                 <div className="w-36 h-28 md:w-48 md:h-36 flex-shrink-0">
-                  <img src={c.img} alt={c.title} className="w-full h-full object-cover" />
+                  <img
+                    src={c.img}
+                    alt={c.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1 p-4 text-left">
                   <h3 className="text-lg font-semibold">{c.title}</h3>
@@ -105,17 +113,29 @@ const ReservationCategory = () => {
           <h3 className="text-xl font-medium mt-4">Odaberi teren</h3>
           <ul className="space-y-4">
             {tereni?.map((t) => (
-              <li key={t.id} className="flex bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition">
+              <li
+                key={t.id}
+                className="flex bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition"
+              >
                 <div className="w-32 h-24 bg-gray-200 flex-shrink-0">
-                  <img src="https://source.unsplash.com/128x96/?golfcourse" alt={t.name} className="w-full h-full object-cover" />
+                  <img
+                    src="https://source.unsplash.com/128x96/?golfcourse"
+                    alt={t.name}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <h4 className="font-semibold">{t.name}</h4>
                     <p className="text-sm text-gray-600">{t.description}</p>
-                    <p className="text-sm text-green-700 font-medium mt-1">{t.price} €</p>
+                    <p className="text-sm text-green-700 font-medium mt-1">
+                      {t.price} €
+                    </p>
                   </div>
-                  <button onClick={() => handleOdaberiTeren(t)} className="mt-2 bg-green-600 text-white px-4 py-1 rounded text-sm self-start">
+                  <button
+                    onClick={() => handleOdaberiTeren(t)}
+                    className="mt-2 bg-green-600 text-white px-4 py-1 rounded text-sm self-start"
+                  >
                     Odaberi
                   </button>
                 </div>
@@ -130,25 +150,53 @@ const ReservationCategory = () => {
         <>
           <h3 className="text-xl font-medium mt-4">Odabrani teren</h3>
           <div className="p-4 border rounded bg-white shadow">
-            <p><strong>{selectedTerrain.name}</strong></p>
+            <p>
+              <strong>{selectedTerrain.name}</strong>
+            </p>
             <p className="text-gray-600">{selectedTerrain.description}</p>
-            <p className="text-green-600 font-semibold">{selectedTerrain.price} €</p>
+            <p className="text-green-600 font-semibold">
+              {selectedTerrain.price} €
+            </p>
           </div>
 
           <h3 className="text-xl font-medium mt-4">Dodatne usluge</h3>
           {dodatneUsluge?.map((u) => (
-            <ExtraRow key={u.id} label={u.name} id={u.id} />
+            <ExtraRow
+              key={u.id}
+              label={u.name}
+              id={u.id}
+              inventory={u.inventory}
+            />
           ))}
 
-          <button
-            onClick={() => {
-              goToStep("termin");
-              navigate("/rezervacija/termin");
-            }}
-            className="mt-6 bg-green-600 text-white px-6 py-2 rounded"
-          >
-            Nastavi
-          </button>
+          <div className="mt-6 flex justify-between">
+            <button
+              onClick={() => {
+                setReservationData({
+                  category: category,
+                  reservation_items: [],
+                  date: undefined,
+                  start_time: undefined,
+                  duration_minutes: undefined,
+                  user_id: undefined,
+                });
+                navigate("/rezervacije");
+              }}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded"
+            >
+              Otkaži
+            </button>
+
+            <button
+              onClick={() => {
+                goToStep("termin");
+                navigate("/rezervacija/termin");
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded"
+            >
+              Nastavi
+            </button>
+          </div>
         </>
       )}
 
@@ -158,17 +206,29 @@ const ReservationCategory = () => {
           <h3 className="text-xl font-medium mt-4">Odaberi wellness uslugu</h3>
           <ul className="space-y-4">
             {wellnessUsluge?.map((w) => (
-              <li key={w.id} className="flex bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition">
+              <li
+                key={w.id}
+                className="flex bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition"
+              >
                 <div className="w-32 h-24 bg-gray-200 flex-shrink-0">
-                  <img src="https://source.unsplash.com/128x96/?spa" alt={w.name} className="w-full h-full object-cover" />
+                  <img
+                    src="https://source.unsplash.com/128x96/?spa"
+                    alt={w.name}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <h4 className="font-semibold">{w.name}</h4>
                     <p className="text-sm text-gray-600">{w.description}</p>
-                    <p className="text-sm text-green-700 font-medium mt-1">{w.price} €</p>
+                    <p className="text-sm text-green-700 font-medium mt-1">
+                      {w.price} €
+                    </p>
                   </div>
-                  <button onClick={() => handleOdaberiWellness(w)} className="mt-2 bg-green-600 text-white px-4 py-1 rounded text-sm self-start">
+                  <button
+                    onClick={() => handleOdaberiWellness(w)}
+                    className="mt-2 bg-green-600 text-white px-4 py-1 rounded text-sm self-start"
+                  >
                     Odaberi
                   </button>
                 </div>
@@ -181,41 +241,96 @@ const ReservationCategory = () => {
       {/* Potvrda wellness usluge */}
       {category === "wellness" && selectedWellness && (
         <>
-          <h3 className="text-xl font-medium">Odabrali ste: {selectedWellness.name}</h3>
+          <h3 className="text-xl font-medium">
+            Odabrali ste: {selectedWellness.name}
+          </h3>
           <p className="text-gray-700">{selectedWellness.description}</p>
-          <p className="text-green-700 font-semibold pt-1">{selectedWellness.price} €</p>
-          <button
-            onClick={() => {
-              goToStep("termin");
-              navigate("/rezervacija/termin");
-            }}
-            className="mt-6 bg-green-600 text-white px-6 py-2 rounded"
-          >
-            Nastavi
-          </button>
+          <p className="text-green-700 font-semibold pt-1">
+            {selectedWellness.price} €
+          </p>
+          <div className="mt-6 flex justify-between">
+            <button
+              onClick={() => {
+                // Clear reservation
+                setReservationData({
+                  category: category,
+                  reservation_items: [],
+                  date: undefined,
+                  start_time: undefined,
+                  duration_minutes: undefined,
+                  user_id: undefined,
+                });
+                navigate("/rezervacije"); 
+              }}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded"
+            >
+              Otkaži
+            </button>
+
+            <button
+              onClick={() => {
+                goToStep("termin");
+                navigate("/rezervacija/termin");
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded"
+            >
+              Nastavi
+            </button>
+          </div>
         </>
       )}
     </div>
   );
 };
 
-const ExtraRow = ({ label, id }: { label: string; id: number }) => {
-  const [q, setQ] = useState(0);
+const ExtraRow = ({
+  label,
+  id,
+  inventory,
+}: {
+  label: string;
+  id: number;
+  inventory: number;
+}) => {
   const { setReservationData, reservation } = useReservation();
+  const existingItem = reservation.reservation_items?.find(
+    (item) => item.service_id === id
+  );
+  const [q, setQ] = useState(existingItem?.quantity || 0);
 
   useEffect(() => {
-    const filtered = reservation.reservation_items?.filter((item) => item.service_id !== id) || [];
-    const updated = q > 0 ? [...filtered, { service_id: id, quantity: q }] : filtered;
+    const filtered =
+      reservation.reservation_items?.filter((item) => item.service_id !== id) ||
+      [];
+    const updated =
+      q > 0 ? [...filtered, { service_id: id, quantity: q }] : filtered;
     setReservationData({ reservation_items: updated });
   }, [q]);
 
   return (
     <div className="flex justify-between items-center border-b py-2">
-      <span>{label}</span>
+      <span>
+        {label} <span className="text-sm text-gray-500">(max {inventory})</span>
+      </span>
       <div className="flex items-center gap-2">
-        <button onClick={() => setQ(Math.max(0, q - 1))} className="px-2 bg-gray-300 rounded">−</button>
+        <button
+          onClick={() => setQ(Math.max(0, q - 1))}
+          className="px-2 bg-gray-300 rounded"
+        >
+          −
+        </button>
         <span>{q}</span>
-        <button onClick={() => setQ(q + 1)} className="px-2 bg-gray-300 rounded">+</button>
+        <button
+          onClick={() => q < inventory && setQ(q + 1)}
+          disabled={q >= inventory}
+          className={`px-2 rounded ${
+            q >= inventory
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-gray-300"
+          }`}
+        >
+          +
+        </button>
       </div>
     </div>
   );
