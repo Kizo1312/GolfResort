@@ -39,23 +39,13 @@ const localizer = dateFnsLocalizer({
 const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
   const [view, setView] = useState<View>("month");
 
-  
-  const reservationsPerDay = reservations.reduce((acc, res) => {
-    acc.set(res.date, (acc.get(res.date) || 0) + 1);
-    return acc;
-  }, new Map<string, number>());
+  const monthEvents: Event[] = reservations.map((res) => ({
+    title: "", // No visible text for month cells
+    start: new Date(`${res.date}T00:00:00`),
+    end: new Date(`${res.date}T23:59:59`),
+    allDay: true,
+  }));
 
-
-  const monthEvents: Event[] = Array.from(reservationsPerDay.entries()).map(
-    ([dateStr, count]) => ({
-      title: `${count} rezervacij${count > 1 ? "e" : "a"}`,
-      start: new Date(`${dateStr}T00:00:00`),
-      end: new Date(`${dateStr}T23:59:59`),
-      allDay: true,
-    })
-  );
-
-  
   const detailedEvents: Event[] = reservations.map((r) => {
     const itemsStr = r.reservation_items
       .map((item) => `${item.service?.name} (${item.quantity}x)`)
@@ -71,7 +61,6 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
     };
   });
 
-  
   const events = view === "month" ? monthEvents : detailedEvents;
 
   return (
@@ -84,8 +73,30 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
         startAccessor="start"
         endAccessor="end"
         style={{ height: 500 }}
-        onView={(newView) => setView(newView)}
+        selectable={true}
         view={view}
+        onView={(newView) => setView(newView)}
+        onSelectSlot={(slotInfo) => {
+          if (view === "month" && slotInfo.start) {
+            const clickedDate = slotInfo.start.toISOString().split("T")[0];
+            console.log("Kliknut datum (slot):", clickedDate);
+          }
+        }}
+        onSelectEvent={(event) => {
+          if (view === "month" && event.start) {
+            const clickedDate = event.start.toISOString().split("T")[0];
+            console.log("Kliknut datum (event):", clickedDate);
+          }
+        }}
+        eventPropGetter={() => {
+          if (view === "month") {
+            return {
+              className: "cursor-pointer bg-blue-50 hover:bg-blue-100",
+            };
+          }
+          return {};
+        }}
+        
         messages={{
           next: "Sljedeći",
           previous: "Prethodni",
@@ -98,6 +109,7 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
           time: "Vrijeme",
           event: "Događaj",
           noEventsInRange: "Nema događaja u ovom rasponu.",
+          showMore: (total) => `Broj rezervacija: ${total}  `,
         }}
         tooltipAccessor={(event) => String(event.title)}
       />
