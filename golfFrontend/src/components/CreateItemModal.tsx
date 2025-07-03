@@ -18,6 +18,13 @@ const CreateItemModal = ({ onUpdate }: Props) => {
     inventory: "",
   });
 
+  const [errors, setErrors] = useState({
+    name: "",
+    price: "",
+    category: "",
+    inventory: "",
+  })
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -25,6 +32,18 @@ const CreateItemModal = ({ onUpdate }: Props) => {
       toast.error("Ne možete dodati teren ovdje.");
       return;
     }
+
+    const newErrors = {
+      name: form.name.trim() ? "" : "Morate unijeti naziv.",
+      price: form.price ? "" : "Morate unijeti cijenu.",
+      category: form.category ? "" : "Morate odabrati kategoriju.",
+      inventory: form.inventory ? "" : "Morate unijeti broj dostupnih komada."
+    };
+
+    setErrors(newErrors);
+
+    const hasErrors = Object.values(newErrors).some((msg) => msg !== "");
+    if (hasErrors) return;
 
     try {
       await apiRequest("/services", "POST", {
@@ -55,9 +74,9 @@ const CreateItemModal = ({ onUpdate }: Props) => {
             type="text"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
             className="border p-2 w-full rounded"
           />
+          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
         </div>
 
         <div>
@@ -67,9 +86,9 @@ const CreateItemModal = ({ onUpdate }: Props) => {
             step="0.01"
             value={form.price}
             onChange={(e) => setForm({ ...form, price: e.target.value })}
-            required
             className="border p-2 w-full rounded"
           />
+          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
         </div>
 
         <div>
@@ -87,17 +106,17 @@ const CreateItemModal = ({ onUpdate }: Props) => {
           <select
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
-            required
             className="border p-2 w-full rounded"
           >
             <option value="">-- Odaberi kategoriju --</option>
             <option value="wellness">Wellness</option>
             <option value="dodatna usluga">Dodatna usluga</option>
           </select>
+          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
         </div>
 
         <div>
-          <label className="block mb-1">Inventar (opcionalno)</label>
+          <label className="block mb-1">Inventar</label>
           <input
             type="number"
             min="0"
@@ -106,6 +125,7 @@ const CreateItemModal = ({ onUpdate }: Props) => {
             className="border p-2 w-full rounded"
             placeholder="Broj dostupnih komada"
           />
+          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.inventory}</p>}
         </div>
 
         <div className="flex justify-end gap-2">

@@ -33,7 +33,7 @@ import UserDashboard from "./components/User/UserDashboard";
 const App = () => {
   return (
       <Router>
-        <Toaster position="top-right" />
+        <Toaster position="top-center" />
         <Modal />
 
         <Routes>

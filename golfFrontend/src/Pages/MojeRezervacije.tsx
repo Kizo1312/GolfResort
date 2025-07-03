@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import "dayjs/locale/hr";
+import {toast} from "react-hot-toast";
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -40,6 +41,8 @@ const MojeRezervacije = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"active" | "past">("active");
   const [cancelingId, setCancelingId] = useState<number | null>(null);
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
+  const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -126,13 +129,8 @@ const MojeRezervacije = () => {
           ) : (
             <button
               onClick={() => {
-                if (
-                  confirm(
-                    "Jeste li sigurni da želite otkazati ovu rezervaciju?"
-                  )
-                ) {
-                  cancelReservation(rez.id);
-                }
+                setReservationToCancel(rez);
+                setShowConfirmCancel(true);
               }}
               className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm font-normal underline cursor-pointer"
               aria-label="Otkaži rezervaciju"
@@ -188,7 +186,14 @@ const MojeRezervacije = () => {
       await apiRequest(`/reservations/${id}`, "DELETE");
       // nakon uspjeha, izbriši iz lokalnog state-a
       setData((prev) => (prev ? prev.filter((r) => r.id !== id) : null));
-      alert("Rezervacija uspješno otkazana.");
+      toast.success("Rezervacija je uspješno otkazana!", {
+        duration: 4000,
+        style: {
+          background: "#2E7D32",
+          color: "white",
+          fontWeight: "500",
+        }
+      });
     } catch (error: any) {
       alert(error.message || "Greška pri otkazivanju rezervacije.");
     } finally {
@@ -223,6 +228,43 @@ const MojeRezervacije = () => {
           Aktivne
         </button>
       </div>
+      
+      {showConfirmCancel && reservationToCancel && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <p className="mb-4 text-gray-800">
+              Jeste li sigurni da želite otkazati ovu rezervaciju za{" "}
+              <strong>{dayjs(reservationToCancel.date).format("DD. MM. YYYY.")}</strong>{" "}
+              u <strong>{reservationToCancel.start_time}</strong>?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => {
+                  setShowConfirmCancel(false);
+                  setReservationToCancel(null);
+                }}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
+                Odustani
+              </button>
+              <button
+                onClick={() => {
+                  setShowConfirmCancel(false);
+                  if (reservationToCancel) {
+                    cancelReservation(reservationToCancel.id);
+                  }
+                  setReservationToCancel(null);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Otkaži rezervaciju
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
 
       {/* Prikaz rezervacija prema aktivnom tabu */}
       {activeTab === "active"
