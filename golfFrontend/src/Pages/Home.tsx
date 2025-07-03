@@ -9,14 +9,14 @@ import { Tereni } from '../components/Tereni';
 import aromaterapija from '../assets/wellness/aromaterapija.webp';
 import masaza from '../assets/wellness/masaza.webp';
 import sauna from '../assets/wellness/sauna.webp';
-import hero1 from '../assets/hero/HeroImage.jpg';
-import hero2 from '../assets/hero/HeroImage2.jpg';
-import hero3 from '../assets/hero/HeroImage3.jpg';
+import hero1 from '../assets/hero/HeroImage.webp';
+import hero2 from '../assets/hero/HeroImage2.webp';
+import hero3 from '../assets/hero/HeroImage3.webp'
 
 
 const wellnessServices = [
   {
-    id: 9,
+    id: 12,
     title: 'Masaža cijelog tijela',
     description: `Prepustite se čarima potpune opuštenosti uz masažu cijelog tijela od 60 minuta.
 Uživajte u nježnim dodirom naših stručnih terapeuta koji će vas osloboditi stresa i napetosti, vraćajući vam unutarnju ravnotežu i energiju. Savršen trenutak za obnovu tijela i duha, u oazi mira našeg resorta.`,
@@ -24,7 +24,7 @@ Uživajte u nježnim dodirom naših stručnih terapeuta koji će vas osloboditi 
     image: masaza
   },
   {
-    id: 10,
+    id: 14,
     title: 'Aromaterapija',
     description: `Aromaterapija – mirisi prirode za savršenu ravnotežu tijela i uma.
 Doživite blagodat eteričnih ulja koja umiruju, opuštaju i obnavljaju vašu energiju. Naš tretman aromaterapije vodi vas na putovanje duboke relaksacije i unutarnjeg sklada.`,
@@ -32,7 +32,7 @@ Doživite blagodat eteričnih ulja koja umiruju, opuštaju i obnavljaju vašu en
     image: aromaterapija
   },
   {
-    id: 11,
+    id: 13,
     title: 'Sauna',
     description: `Uživajte u privatnoj finskoj sauni za dvoje – 45 minuta potpune relaksacije.
 Iskusite toplinu i blagodati saune u intimnoj atmosferi, idealnoj za opuštanje i detoksikaciju tijela, u društvu najbliže osobe.`,
@@ -44,23 +44,23 @@ Iskusite toplinu i blagodati saune u intimnoj atmosferi, idealnoj za opuštanje 
 const heroSlides = [
   {
     image: hero1,
-    title: 'Tvoj golf vikend počinje ovdje',
-    description: 'Rezerviraj svoj termin i osjeti razliku luksuznog odmora.',
-    ctaText: 'Rezerviraj sada',
+    title: 'Vaš golf vikend počinje ovdje',
+    description: 'Rezervirajte svoj termin i osjetite razliku luksuznog odmora.',
+    ctaText: 'Rezervirajte sada',
     ctaLink: '/rezervacije',
   },
   {
     image: hero2,
-    title: 'Igraj na najprestižnijem golf terenu',
-    description: 'Doživi izazov i užitak igre uz vrhunsku prirodu i sadržaje.',
-    ctaText: 'Pogledaj terene',
+    title: 'Igrajte na najprestižnijem golf terenu',
+    description: 'Doživite izazov i užitak igre uz vrhunsku prirodu i sadržaje.',
+    ctaText: 'Pogledajte terene',
     ctaLink: '/golf-tereni',
   },
   {
     image: hero3,
     title: 'Luksuz i priroda u savršenom balansu',
-    description: 'Smješteni u srcu prirode, naši tereni nude više od igre.',
-    ctaText: 'Saznaj više',
+    description: 'Uz vrhunske golf terene, otkrijte i svijet wellnessa – mjesto gdje tijelo i um dolaze u ravnotežu.',
+    ctaText: 'Otkrijte wellness doživljaj',
     ctaLink: '/wellness',
   },
 ];
@@ -139,7 +139,7 @@ const HomePage = () => {
                   onClick={() => navigate(`/wellness?selectedId=${service.id}`)}
                   className="mt-4 px-4 py-2 rounded border border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-600 transition"
                 >
-                  Saznaj više
+                  Saznajte više
                 </button>
               </div>
             </div>
