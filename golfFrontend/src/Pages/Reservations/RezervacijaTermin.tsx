@@ -12,14 +12,10 @@ const RezervacijaTermin = () => {
   const { getById } = useTerrains();
   const { user } = useAuth();
   const { open } = useModal();
-  const [selectedDate, setSelectedDate] = useState(
-    dayjs().format("YYYY-MM-DD")
-  );
-  const [selectedDuration, setSelectedDuration] = useState(1);
+  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedDuration, setSelectedDuration] = useState<number | "">("");
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
-  const [busyRanges, setBusyRanges] = useState<
-    { start: string; end: string }[]
-  >([]);
+  const [busyRanges, setBusyRanges] = useState<{ start: string; end: string }[]>([]);
   const navigate = useNavigate();
 
   const mainService = reservation.reservation_items?.[0];
@@ -49,10 +45,7 @@ const RezervacijaTermin = () => {
       if (!selectedDate || !mainServiceId) return;
 
       try {
-        const res = await fetch(
-          `http://localhost:5000/availability/${selectedDate}/${mainServiceId}`
-        );
-
+        const res = await fetch(`http://localhost:5000/availability/${selectedDate}/${mainServiceId}`);
         if (!res.ok) {
           if (res.status === 404) {
             setBusyRanges([]);
@@ -60,8 +53,7 @@ const RezervacijaTermin = () => {
           }
           throw new Error("Greška u dohvatu dostupnosti");
         }
-
-        const busy = await res.json(); // Expected format: [{ start: "10:00", end: "11:00" }, ...]
+        const busy = await res.json();
         setBusyRanges(busy);
       } catch (err) {
         console.error("Greška pri dohvaćanju dostupnosti:", err);
@@ -75,21 +67,26 @@ const RezervacijaTermin = () => {
   useEffect(() => {
     if (!mainServiceId) return;
 
-    const allSlots = isGolf
-      ? generateGolfSlots(selectedDuration)
-      : generateWellnessSlots();
-
-    const filtered = allSlots.filter((slot) =>
-      isSlotFree(slot, isGolf ? selectedDuration * 60 : 30)
-    );
-
-    setAvailableSlots(filtered);
+    if (isGolf) {
+      if (typeof selectedDuration !== "number") {
+        setAvailableSlots([]);
+        return;
+      }
+      const allSlots = generateGolfSlots(selectedDuration);
+      const filtered = allSlots.filter((slot) => isSlotFree(slot, selectedDuration * 60));
+      setAvailableSlots(filtered);
+    } else {
+      const allSlots = generateWellnessSlots();
+      const filtered = allSlots.filter((slot) => isSlotFree(slot, 30));
+      setAvailableSlots(filtered);
+    }
   }, [selectedDate, selectedDuration, busyRanges, isGolf, mainServiceId]);
 
   const generateGolfSlots = (dur: number) => {
     const arr: string[] = [];
-    for (let h = 8; h <= 20 - dur; h++)
+    for (let h = 8; h <= 20 - dur; h++) {
       arr.push(`${h.toString().padStart(2, "0")}:00`);
+    }
     return arr;
   };
 
@@ -104,7 +101,7 @@ const RezervacijaTermin = () => {
 
   const isSlotFree = (candidateStart: string, durMin: number) => {
     const parseTime = (t: string) => {
-      const [h, m] = t.split(":").map(Number).slice(0, 2);
+      const [h, m] = t.split(":").map(Number);
       return (h || 0) * 60 + (m || 0);
     };
 
@@ -125,23 +122,18 @@ const RezervacijaTermin = () => {
   const ukupnaCijena = () => {
     const main =
       mainService?.quantity && getService(mainService.service_id)?.price
-        ? isGolf
+        ? isGolf && typeof selectedDuration === "number"
           ? mainService.quantity *
             selectedDuration *
-            parseFloat(
-              getService(mainService.service_id)?.price.toString() || "0"
-            )
+            parseFloat(getService(mainService.service_id)?.price.toString() || "0")
           : mainService.quantity *
-            parseFloat(
-              getService(mainService.service_id)?.price.toString() || "0"
-            )
+            parseFloat(getService(mainService.service_id)?.price.toString() || "0")
         : 0;
 
     const extras = dodatne.reduce((sum, d) => {
       const cijena =
         d.quantity && getService(d.service_id)?.price
-          ? d.quantity *
-            parseFloat(getService(d.service_id)?.price.toString() || "0")
+          ? d.quantity * parseFloat(getService(d.service_id)?.price.toString() || "0")
           : 0;
       return sum + cijena;
     }, 0);
@@ -153,7 +145,7 @@ const RezervacijaTermin = () => {
     setReservationData({
       start_time: value,
       date: selectedDate,
-      duration_minutes: isGolf ? selectedDuration * 60 : 30,
+      duration_minutes: isGolf && typeof selectedDuration === "number" ? selectedDuration * 60 : 30,
       user_id: user?.id || 0,
     });
   };
@@ -163,59 +155,30 @@ const RezervacijaTermin = () => {
       <h2 className="text-3xl font-bold text-center">Odaberite termin</h2>
 
       {!mainServiceId ? (
-        <p className="text-center text-red-600">
-          Najprije odaberite teren ili wellness uslugu.
-        </p>
+        <p className="text-center text-red-600">Najprije odaberite teren ili wellness uslugu.</p>
       ) : (
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/2 bg-white rounded-xl shadow p-4 space-y-4">
             <h3 className="text-xl font-semibold">Odabrano:</h3>
-
+            {/* Display selected service and extras */}
             {mainService && (
-              <div>
-                <p className="font-medium">
-                  {getService(mainService.service_id)?.name || "Glavna usluga"}{" "}
-                  – {mainService.quantity} kom ×{" "}
-                  {getService(mainService.service_id)?.price || "-"} € ×{" "}
-                  {isGolf ? `${selectedDuration} h × ` : ""}={" "}
-                  {(isGolf
-                    ? mainService.quantity *
-                      selectedDuration *
-                      parseFloat(
-                        getService(mainService.service_id)?.price.toString() ||
-                          "0"
-                      )
-                    : mainService.quantity *
-                      parseFloat(
-                        getService(mainService.service_id)?.price.toString() ||
-                          "0"
-                      )
-                  ).toFixed(2)}{" "}
-                  €
-                </p>
-              </div>
+              <p className="font-medium">
+                {getService(mainService.service_id)?.name} – {mainService.quantity} kom ×{" "}
+                {getService(mainService.service_id)?.price} €{" "}
+                {isGolf && typeof selectedDuration === "number" && `× ${selectedDuration} h`} ={" "}
+                <strong>{ukupnaCijena()} €</strong>
+              </p>
             )}
 
             {dodatne.length > 0 && (
-              <div>
-                <h4 className="font-medium mt-4">Dodatne usluge:</h4>
-                <ul className="list-disc list-inside text-sm text-gray-700">
-                  {dodatne.map((d, i) => (
-                    <li key={i}>
-                      {getService(d.service_id)?.name || "Usluga"} –{" "}
-                      {d.quantity} kom ×{" "}
-                      {getService(d.service_id)?.price || "-"} € ={" "}
-                      {(
-                        d.quantity *
-                        parseFloat(
-                          getService(d.service_id)?.price.toString() || "0"
-                        )
-                      ).toFixed(2)}{" "}
-                      €
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="list-disc list-inside text-sm text-gray-700">
+                {dodatne.map((d, i) => (
+                  <li key={i}>
+                    {getService(d.service_id)?.name} – {d.quantity} kom × {getService(d.service_id)?.price} € ={" "}
+                    {(d.quantity * parseFloat(getService(d.service_id)?.price.toString() || "0")).toFixed(2)} €
+                  </li>
+                ))}
+              </ul>
             )}
 
             <div className="pt-4 border-t font-semibold text-green-700">
@@ -224,6 +187,7 @@ const RezervacijaTermin = () => {
           </div>
 
           <div className="md:w-1/2 space-y-4">
+            {/* Date selector */}
             <div>
               <label className="block mb-1 font-medium">Datum</label>
               <input
@@ -233,10 +197,7 @@ const RezervacijaTermin = () => {
                 onChange={(e) => {
                   const newDate = e.target.value;
                   setSelectedDate(newDate);
-                  setReservationData({
-                    date: newDate,
-                    start_time: undefined,
-                  });
+                  setReservationData({ date: newDate, start_time: undefined });
                 }}
                 onKeyDown={(e) => e.preventDefault()}
                 min={dayjs().format("YYYY-MM-DD")}
@@ -246,18 +207,23 @@ const RezervacijaTermin = () => {
 
             {isGolf && (
               <div>
-                <label className="block mb-1 font-medium">
-                  Trajanje (sati)
-                </label>
+                <label className="block mb-1 font-medium">Trajanje (sati)</label>
                 <select
                   value={selectedDuration}
                   onChange={(e) => {
-                    const newDur = parseInt(e.target.value);
-                    setSelectedDuration(newDur);
-                    setReservationData({ duration_minutes: newDur * 60 });
+                    const val = e.target.value;
+                    if (val === "") {
+                      setSelectedDuration("");
+                      setReservationData({ duration_minutes: undefined, start_time: undefined });
+                    } else {
+                      const dur = parseInt(val);
+                      setSelectedDuration(dur);
+                      setReservationData({ duration_minutes: dur * 60, start_time: undefined });
+                    }
                   }}
                   className="border rounded p-2 w-full"
                 >
+                  <option value="">-- Odaberite trajanje --</option>
                   {[1, 2, 3, 4].map((h) => (
                     <option key={h} value={h}>
                       {h} sat
@@ -267,11 +233,12 @@ const RezervacijaTermin = () => {
               </div>
             )}
 
+            {/* Slot selector */}
             <div>
               <label className="block mb-1 font-medium">Dostupni termini</label>
               <select
                 value={reservation.start_time || ""}
-                disabled={availableSlots.length === 0}
+                disabled={availableSlots.length === 0 || (isGolf && typeof selectedDuration !== "number")}
                 className="border rounded p-2 w-full disabled:opacity-50"
                 onChange={(e) => handleStartTimeChange(e.target.value)}
               >
@@ -287,12 +254,18 @@ const RezervacijaTermin = () => {
                 ))}
               </select>
 
+              {isGolf && selectedDuration === "" && (
+                <p className="text-sm text-red-500 mt-1">
+                  Odaberite trajanje da biste vidjeli termine.
+                </p>
+              )}
+
               {reservation.start_time &&
                 reservation.date &&
                 reservation.duration_minutes && (
                   <div className="mt-4 text-sm text-gray-700">
-                    <strong>Rezervacija termina:</strong> {reservation.date},
-                    vrijeme {reservation.start_time} –{" "}
+                    <strong>Rezervacija termina:</strong> {reservation.date}, vrijeme{" "}
+                    {reservation.start_time} –{" "}
                     {dayjs(`${reservation.date}T${reservation.start_time}`)
                       .add(reservation.duration_minutes, "minute")
                       .format("HH:mm")}
@@ -306,9 +279,7 @@ const RezervacijaTermin = () => {
       {mainServiceId && (
         <div className="flex justify-between pt-10">
           <button
-            onClick={() => {
-              navigate("/rezervacije"); // or whatever your route is
-            }}
+            onClick={() => navigate("/rezervacije")}
             className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded"
           >
             Natrag
@@ -319,12 +290,10 @@ const RezervacijaTermin = () => {
                 open("auth");
                 return;
               }
-
               if (!reservation.start_time || !reservation.date) {
                 alert("Molimo odaberite termin prije potvrde.");
                 return;
               }
-
               navigate("/rezervacija/pregled");
             }}
             className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded"

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useReservation } from "@/components/Context/ReservationContext";
 import { useTerrains } from "@/components/Context/TerrainsContext";
 import { useAuth } from "@/components/Context/AuthContext";
@@ -9,11 +9,13 @@ import toast from "react-hot-toast";
 import GolfLoader from "@/components/GolfLoader";
 
 const RezervacijaPregled = () => {
-  const { reservation, resetReservation, isLoading, setIsLoading } = useReservation();
+  const { reservation, resetReservation, isLoading, setIsLoading } =
+    useReservation();
   const { getById } = useTerrains();
-  const { user , accessToken} = useAuth();
+  const { user, accessToken } = useAuth();
   const { open, isOpen, modalType } = useModal();
   const navigate = useNavigate();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const mainService = reservation.reservation_items?.[0];
   const dodatne = reservation.reservation_items?.slice(1) || [];
@@ -36,16 +38,22 @@ const RezervacijaPregled = () => {
   }, []);
 
   const ukupnaCijena = () => {
-    const main = mainService?.quantity && getById(mainService.service_id)?.price
-      ? isGolf
-        ? mainService.quantity * (reservation.duration_minutes! / 60) * parseFloat(getById(mainService.service_id)?.price.toString() || "0")
-        : mainService.quantity * parseFloat(getById(mainService.service_id)?.price.toString() || "0")
-      : 0;
+    const main =
+      mainService?.quantity && getById(mainService.service_id)?.price
+        ? isGolf
+          ? mainService.quantity *
+            (reservation.duration_minutes! / 60) *
+            parseFloat(getById(mainService.service_id)?.price.toString() || "0")
+          : mainService.quantity *
+            parseFloat(getById(mainService.service_id)?.price.toString() || "0")
+        : 0;
 
     const extras = dodatne.reduce((sum, d) => {
-      const cijena = d.quantity && getById(d.service_id)?.price
-        ? d.quantity * parseFloat(getById(d.service_id)?.price.toString() || "0")
-        : 0;
+      const cijena =
+        d.quantity && getById(d.service_id)?.price
+          ? d.quantity *
+            parseFloat(getById(d.service_id)?.price.toString() || "0")
+          : 0;
       return sum + cijena;
     }, 0);
 
@@ -64,24 +72,30 @@ const RezervacijaPregled = () => {
       date: reservation.date,
       start_time: reservation.start_time,
       duration_minutes: reservation.duration_minutes,
-      reservation_items: reservation.reservation_items?.map(({ service_id, quantity }) => ({
-        service_id,
-        quantity,
-      })),
+      reservation_items: reservation.reservation_items?.map(
+        ({ service_id, quantity }) => ({
+          service_id,
+          quantity,
+        })
+      ),
     };
 
     try {
       const res = await fetch("http://localhost:5000/reservations", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
 
         body: JSON.stringify(cleanedReservation),
-
       });
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || "Neuspješno.");
+        setSubmitError(data.message);
+        return
+        
       }
 
       toast.success("Rezervacija uspješno kreirana!");
@@ -98,70 +112,109 @@ const RezervacijaPregled = () => {
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <GolfLoader/>
-          </div>
+          <GolfLoader />
+        </div>
       ) : (
         <>
-      <h2 className="text-3xl font-bold text-center">Pregled rezervacije</h2>
+          <h2 className="text-3xl font-bold text-center">
+            Pregled rezervacije
+          </h2>
 
-      <div className="bg-white shadow rounded p-6 space-y-4">
-        <p><strong>Kategorija:</strong> {reservation.category}</p>
-        <p><strong>Datum:</strong> {reservation.date}</p>
-        <p><strong>Vrijeme:</strong> {reservation.start_time} – {dayjs(`${reservation.date}T${reservation.start_time}`).add(reservation.duration_minutes || 30, "minute").format("HH:mm")}</p>
-
-        <div>
-          <p className="font-medium">Glavna usluga:</p>
-          {mainService && (
+          <div className="bg-white shadow rounded p-6 space-y-4">
             <p>
-              {getById(mainService.service_id)?.name} – {mainService.quantity} kom × {getById(mainService.service_id)?.price} € × {isGolf ? `${reservation.duration_minutes! / 60}h` : ""} = <strong>{
-                isGolf
-                  ? (mainService.quantity * (reservation.duration_minutes! / 60) * parseFloat(getById(mainService.service_id)?.price.toString() || "0")).toFixed(2)
-                  : (mainService.quantity * parseFloat(getById(mainService.service_id)?.price.toString() || "0")).toFixed(2)
-              } €</strong>
+              <strong>Kategorija:</strong> {reservation.category}
             </p>
-          )}
-        </div>
+            <p>
+              <strong>Datum:</strong> {reservation.date}
+            </p>
+            <p>
+              <strong>Vrijeme:</strong> {reservation.start_time} –{" "}
+              {dayjs(`${reservation.date}T${reservation.start_time}`)
+                .add(reservation.duration_minutes || 30, "minute")
+                .format("HH:mm")}
+            </p>
 
-        {dodatne.length > 0 && (
-          <div>
-            <p className="font-medium">Dodatne usluge:</p>
-            <ul className="list-disc list-inside text-sm text-gray-700">
-              {dodatne.map((d, i) => (
-                <li key={i}>
-                  {getById(d.service_id)?.name} – {d.quantity} kom × {getById(d.service_id)?.price} € ={" "}
-                  {(d.quantity * parseFloat(getById(d.service_id)?.price.toString() || "0")).toFixed(2)} €
-                </li>
-              ))}
-            </ul>
+            <div>
+              <p className="font-medium">Glavna usluga:</p>
+              {mainService && (
+                <p>
+                  {getById(mainService.service_id)?.name} –{" "}
+                  {mainService.quantity} kom ×{" "}
+                  {getById(mainService.service_id)?.price} € ×{" "}
+                  {isGolf ? `${reservation.duration_minutes! / 60}h` : ""} ={" "}
+                  <strong>
+                    {isGolf
+                      ? (
+                          mainService.quantity *
+                          (reservation.duration_minutes! / 60) *
+                          parseFloat(
+                            getById(mainService.service_id)?.price.toString() ||
+                              "0"
+                          )
+                        ).toFixed(2)
+                      : (
+                          mainService.quantity *
+                          parseFloat(
+                            getById(mainService.service_id)?.price.toString() ||
+                              "0"
+                          )
+                        ).toFixed(2)}{" "}
+                    €
+                  </strong>
+                </p>
+              )}
+            </div>
+
+            {dodatne.length > 0 && (
+              <div>
+                <p className="font-medium">Dodatne usluge:</p>
+                <ul className="list-disc list-inside text-sm text-gray-700">
+                  {dodatne.map((d, i) => (
+                    <li key={i}>
+                      {getById(d.service_id)?.name} – {d.quantity} kom ×{" "}
+                      {getById(d.service_id)?.price} € ={" "}
+                      {(
+                        d.quantity *
+                        parseFloat(
+                          getById(d.service_id)?.price.toString() || "0"
+                        )
+                      ).toFixed(2)}{" "}
+                      €
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="pt-4 border-t font-semibold text-green-700 text-lg">
+              Ukupno za platiti: {ukupnaCijena()} €
+              {submitError && (
+                <p className="text-red-600 text-sm pt-2">{submitError}</p>
+              )}
+            </div>
           </div>
-        )}
 
-        <div className="pt-4 border-t font-semibold text-green-700 text-lg">
-          Ukupno za platiti: {ukupnaCijena()} €
-        </div>
-      </div>
-
-      <div className="flex justify-between pt-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded"
-        >
-          Natrag
-        </button>
-        <button
-          onClick={handleSubmit}
-          disabled={!user}
-          title={!user ? "Prijavite se da biste dovršili rezervaciju" : ""}
-          className={`py-2 px-6 font-semibold rounded ${
-            !user
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
-          }`}
-        >
-          Potvrdi rezervaciju
-        </button>
-      </div>
-      </>
+          <div className="flex justify-between pt-6">
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded"
+            >
+              Natrag
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={!user}
+              title={!user ? "Prijavite se da biste dovršili rezervaciju" : ""}
+              className={`py-2 px-6 font-semibold rounded ${
+                !user
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
+            >
+              Potvrdi rezervaciju
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

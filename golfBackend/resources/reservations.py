@@ -52,6 +52,7 @@ class CreateReservation(MethodView):
         for item in reservation_data.reservation_items:
             service_id = item.service_id
             requested_quantity = item.quantity
+            
             service = db.session.get(ServiceModel, service_id)
             service_names.append(service.name)
             if service.inventory == 0: 
@@ -74,7 +75,7 @@ class CreateReservation(MethodView):
             if service.category in ["golf teren", "wellness"]:
                 
                 if overlapping_query.first():
-                    abort(409, message=f"Service ID {service_id} is already reserved during this time.")
+                    abort(409, message=f"Usluga {service.name} trenutno nije dostupna.")
             else:
                 
                 overlapping_reservations = overlapping_query.all()
@@ -86,7 +87,7 @@ class CreateReservation(MethodView):
                             total_reserved += res_item.quantity
 
                 if total_reserved + requested_quantity > service.inventory:
-                    abort(409, message=f"Not enough inventory for service ID {service_id} at the selected time.")
+                    abort(409, message=f"Usluga {service.name} nije dostupna u odabranoj količini")
 
        
         try:
