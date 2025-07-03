@@ -21,14 +21,33 @@ const Navbar = () => {
   return (
     <nav className="text-black px-6 py-4 shadow-md">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <NavLink to="/home">
+        
         <div className="text-xl font-bold">Golf resort</div>
+        </NavLink>
 
         {/* Desktop Nav */}
         <ul className="hidden md:flex gap-4 text-sm font-medium">
-          <li><NavLink to="/home"        className={linkStyle}>Home</NavLink></li>
-          <li><NavLink to="/golf-tereni" className={linkStyle}>Golf Courses</NavLink></li>
-          <li><NavLink to="/wellness"    className={linkStyle}>Wellness</NavLink></li>
-          <li><NavLink to="/rezervacije" className={linkStyle}>Rezervacije</NavLink></li>
+          <li>
+            <NavLink to="/home" className={linkStyle}>
+              Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/golf-tereni" className={linkStyle}>
+              Golf Courses
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/wellness" className={linkStyle}>
+              Wellness
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/rezervacije" className={linkStyle}>
+              Rezervacije
+            </NavLink>
+          </li>
 
           {user?.role === "user" && (
             <li>
@@ -39,12 +58,12 @@ const Navbar = () => {
           )}
 
           <li>
-            <button
+            <div
+              className="block px-4 py-2 rounded-lg text-gray-700 hover:bg-green-100 hover:text-green-700 font-semibold cursor-pointer"
               onClick={handleAuthClick}
-              className="hover:text-gray-500 font-semibold"
             >
               {user ? "Log out" : "Log in"}
-            </button>
+            </div>
           </li>
         </ul>
 
@@ -53,10 +72,18 @@ const Navbar = () => {
           onClick={() => setIsOn(!isOn)}
           className="md:hidden text-black focus:outline-none"
         >
-          <svg className="w-6 h-6 transition-transform duration-200" fill="none" stroke="currentColor"
-               strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round"
-              d={isOn ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+          <svg
+            className="w-6 h-6 transition-transform duration-200"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={isOn ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+            />
           </svg>
         </button>
       </div>
@@ -69,10 +96,10 @@ const Navbar = () => {
       >
         <ul className="flex flex-col items-center gap-0">
           {[
-            { to: "/home",          label: "Home" },
-            { to: "/golf-tereni",   label: "Golf Courses" },
-            { to: "/wellness",      label: "Wellness" },
-            { to: "/rezervacije",   label: "Rezervacije" },
+            { to: "/home", label: "Home" },
+            { to: "/golf-tereni", label: "Golf Courses" },
+            { to: "/wellness", label: "Wellness" },
+            { to: "/rezervacije", label: "Rezervacije" },
             ...(user?.role === "user"
               ? [{ to: "/moje-rezervacije", label: "Moje rezervacije" }]
               : []),
