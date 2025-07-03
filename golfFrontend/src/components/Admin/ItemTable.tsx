@@ -1,5 +1,6 @@
 import React from "react";
 import { useModal } from "@/components/Context/ModalContext";
+import CreateItemModal from "../CreateItemModal";
 
 type Item = {
   id: number;
@@ -18,8 +19,25 @@ type Props = {
 const ItemTable = ({ items, onUpdate }: Props) => {
   const { open } = useModal();
 
+  const isGolfCategory = items.length > 0 && items[0].category === "golf teren";
+
+  const sortedItems = [...items].sort((a,b) => a.id - b.id);
+
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden">
+       <div className="flex justify-between items-center px-6 py-4 border-b">
+        <h3 className="font-semibold text-gray-700">Popis usluga</h3>
+
+        {!isGolfCategory && (
+          <button
+            onClick={() => open("create-item", { onUpdate })}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+          >
+            + Dodaj novu uslugu
+          </button>
+        )}
+      </div>
+
       {/* Header */}
       <div
         className="grid px-6 py-3 border-b font-semibold text-gray-700"
@@ -37,7 +55,7 @@ const ItemTable = ({ items, onUpdate }: Props) => {
 
       {/* Rows */}
       <ul>
-        {items.map((item) => {
+        {sortedItems.map((item) => {
           const isGolf = item.category === "golf teren";
           return (
             <li

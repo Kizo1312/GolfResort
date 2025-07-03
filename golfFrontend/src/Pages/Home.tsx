@@ -6,12 +6,12 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { Tereni } from '../components/Tereni';
-import aromaterapija from '../assets/wellness/aromaterapija.jpg';
+import aromaterapija from '../assets/wellness/aromaterapija.webp';
 import masaza from '../assets/wellness/masaza.webp';
-import sauna from '../assets/wellness/sauna.jpg';
-import hero1 from '../assets/hero/HeroImage.jpg';
-import hero2 from '../assets/hero/HeroImage2.jpg';
-import hero3 from '../assets/hero/HeroImage3.jpg'
+import sauna from '../assets/wellness/sauna.webp';
+import hero1 from '../assets/hero/HeroImage.webp';
+import hero2 from '../assets/hero/HeroImage2.webp';
+import hero3 from '../assets/hero/HeroImage3.webp'
 
 
 const wellnessServices = [
@@ -44,23 +44,23 @@ Iskusite toplinu i blagodati saune u intimnoj atmosferi, idealnoj za opuštanje 
 const heroSlides = [
   {
     image: hero1,
-    title: 'Tvoj golf vikend počinje ovdje',
-    description: 'Rezerviraj svoj termin i osjeti razliku luksuznog odmora.',
-    ctaText: 'Rezerviraj sada',
+    title: 'Vaš golf vikend počinje ovdje',
+    description: 'Rezervirajte svoj termin i osjetite razliku luksuznog odmora.',
+    ctaText: 'Rezervirajte sada',
     ctaLink: '/rezervacije',
   },
   {
     image: hero2,
-    title: 'Igraj na najprestižnijem golf terenu',
-    description: 'Doživi izazov i užitak igre uz vrhunsku prirodu i sadržaje.',
-    ctaText: 'Pogledaj terene',
+    title: 'Igrajte na najprestižnijem golf terenu',
+    description: 'Doživite izazov i užitak igre uz vrhunsku prirodu i sadržaje.',
+    ctaText: 'Pogledajte terene',
     ctaLink: '/golf-tereni',
   },
   {
     image: hero3,
     title: 'Luksuz i priroda u savršenom balansu',
-    description: 'Smješteni u srcu prirode, naši tereni nude više od igre.',
-    ctaText: 'Saznaj više',
+    description: 'Uz vrhunske golf terene, otkrijte i svijet wellnessa – mjesto gdje tijelo i um dolaze u ravnotežu.',
+    ctaText: 'Otkrijte wellness doživljaj',
     ctaLink: '/wellness',
   },
 ];
@@ -139,7 +139,7 @@ const HomePage = () => {
                   onClick={() => navigate(`/wellness?selectedId=${service.id}`)}
                   className="mt-4 px-4 py-2 rounded border border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-600 transition"
                 >
-                  Saznaj više
+                  Saznajte više
                 </button>
               </div>
             </div>
