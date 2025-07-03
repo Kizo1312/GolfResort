@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { apiRequest } from "@/hooks/apiHookAsync";
 import { useModal } from "./Context/ModalContext";
 import toast from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 
 type Props = {
   onUpdate: () => void;
@@ -10,20 +11,22 @@ type Props = {
 const CreateItemModal = ({ onUpdate }: Props) => {
   const { close } = useModal();
 
+  const location = useLocation();
+  const path = location.pathname;
+
+  const inferredCategory = path.includes("wellness")
+    ? "wellness"
+    : path.includes("dodatne") || path.includes("dodatna")
+    ? "dodatna usluga"
+    : "";
+
   const [form, setForm] = useState({
     name: "",
     price: "",
     description: "",
-    category: "",
+    category: inferredCategory,
     inventory: "",
   });
-
-  const [errors, setErrors] = useState({
-    name: "",
-    price: "",
-    category: "",
-    inventory: "",
-  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,18 +35,6 @@ const CreateItemModal = ({ onUpdate }: Props) => {
       toast.error("Ne možete dodati teren ovdje.");
       return;
     }
-
-    const newErrors = {
-      name: form.name.trim() ? "" : "Morate unijeti naziv.",
-      price: form.price ? "" : "Morate unijeti cijenu.",
-      category: form.category ? "" : "Morate odabrati kategoriju.",
-      inventory: form.inventory ? "" : "Morate unijeti broj dostupnih komada."
-    };
-
-    setErrors(newErrors);
-
-    const hasErrors = Object.values(newErrors).some((msg) => msg !== "");
-    if (hasErrors) return;
 
     try {
       await apiRequest("/services", "POST", {
@@ -59,7 +50,7 @@ const CreateItemModal = ({ onUpdate }: Props) => {
       close();
     } catch (error) {
       console.error("Error creating item:", error);
-      toast.error("Greška prilikom dodavanja.");
+      return;
     }
   };
 
@@ -76,7 +67,9 @@ const CreateItemModal = ({ onUpdate }: Props) => {
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="border p-2 w-full rounded"
           />
-          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+          {!form.name && (
+            <div className="text-red-500 text-sm mt-1">Naziv je obavezan</div>
+          )}
         </div>
 
         <div>
@@ -88,7 +81,9 @@ const CreateItemModal = ({ onUpdate }: Props) => {
             onChange={(e) => setForm({ ...form, price: e.target.value })}
             className="border p-2 w-full rounded"
           />
-          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+          {!form.price && (
+            <div className="text-red-500 text-sm mt-1">Cijena je obavezna</div>
+          )}
         </div>
 
         <div>
@@ -103,18 +98,10 @@ const CreateItemModal = ({ onUpdate }: Props) => {
 
         <div>
           <label className="block mb-1">Kategorija</label>
-          <select
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className="border p-2 w-full rounded"
-          >
-            <option value="">-- Odaberi kategoriju --</option>
-            <option value="wellness">Wellness</option>
-            <option value="dodatna usluga">Dodatna usluga</option>
-          </select>
-          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
+          <div className="p-2 w-full border rounded bg-gray-100 text-gray-700">
+            {form.category || "Nepoznata kategorija"}
+          </div>
         </div>
-
         <div>
           <label className="block mb-1">Inventar</label>
           <input
@@ -125,7 +112,11 @@ const CreateItemModal = ({ onUpdate }: Props) => {
             className="border p-2 w-full rounded"
             placeholder="Broj dostupnih komada"
           />
-          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.inventory}</p>}
+          {!form.inventory && (
+            <div className="text-red-500 text-sm mt-1">
+              Količina je obavezna
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-2">

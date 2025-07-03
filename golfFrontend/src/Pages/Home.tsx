@@ -16,7 +16,7 @@ import hero3 from '../assets/hero/HeroImage3.webp'
 
 const wellnessServices = [
   {
-    id: 9,
+    id: 12,
     title: 'Masaža cijelog tijela',
     description: `Prepustite se čarima potpune opuštenosti uz masažu cijelog tijela od 60 minuta.
 Uživajte u nježnim dodirom naših stručnih terapeuta koji će vas osloboditi stresa i napetosti, vraćajući vam unutarnju ravnotežu i energiju. Savršen trenutak za obnovu tijela i duha, u oazi mira našeg resorta.`,
@@ -24,7 +24,7 @@ Uživajte u nježnim dodirom naših stručnih terapeuta koji će vas osloboditi 
     image: masaza
   },
   {
-    id: 10,
+    id: 14,
     title: 'Aromaterapija',
     description: `Aromaterapija – mirisi prirode za savršenu ravnotežu tijela i uma.
 Doživite blagodat eteričnih ulja koja umiruju, opuštaju i obnavljaju vašu energiju. Naš tretman aromaterapije vodi vas na putovanje duboke relaksacije i unutarnjeg sklada.`,
@@ -32,7 +32,7 @@ Doživite blagodat eteričnih ulja koja umiruju, opuštaju i obnavljaju vašu en
     image: aromaterapija
   },
   {
-    id: 11,
+    id: 13,
     title: 'Sauna',
     description: `Uživajte u privatnoj finskoj sauni za dvoje – 45 minuta potpune relaksacije.
 Iskusite toplinu i blagodati saune u intimnoj atmosferi, idealnoj za opuštanje i detoksikaciju tijela, u društvu najbliže osobe.`,
