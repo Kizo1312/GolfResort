@@ -12,61 +12,64 @@ const RezervacijaTermin = () => {
   const { getById } = useTerrains();
   const { user } = useAuth();
   const { open } = useModal();
-  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs().format("YYYY-MM-DD")
+  );
   const [selectedDuration, setSelectedDuration] = useState(1);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
-  const [busyRanges, setBusyRanges] = useState<{ start: string; end: string }[]>([]);
+  const [busyRanges, setBusyRanges] = useState<
+    { start: string; end: string }[]
+  >([]);
   const navigate = useNavigate();
-  
-  
+
   const mainService = reservation.reservation_items?.[0];
   const mainServiceId = mainService?.service_id;
   const dodatne = reservation.reservation_items?.slice(1) || [];
   const isGolf = reservation.category === "golf";
 
   const getService = (id: number) => getById(id);
-  
-  useEffect(() => {
-  const isValid =
-    reservation.category &&
-    reservation.reservation_items &&
-    reservation.reservation_items.length > 0 &&
-    reservation.reservation_items[0].service_id;
 
-  if (!isValid) {
-    toast.error("Molimo započnite rezervaciju ispočetka.");
-    navigate("/rezervacija");
-  }
-}, []);
+  useEffect(() => {
+    const isValid =
+      reservation.category &&
+      reservation.reservation_items &&
+      reservation.reservation_items.length > 0 &&
+      reservation.reservation_items[0].service_id;
+
+    if (!isValid) {
+      toast.error("Molimo započnite rezervaciju ispočetka.");
+      navigate("/rezervacija");
+    }
+  }, []);
 
   useEffect(() => {
     if (!mainServiceId) return;
 
-     const fetchReservations = async () => {
-  if (!selectedDate || !mainServiceId) return;
+    const fetchReservations = async () => {
+      if (!selectedDate || !mainServiceId) return;
 
-  try {
-    const res = await fetch(`http://localhost:5000/availability/${selectedDate}/${mainServiceId}`);
-    
-    if (!res.ok) {
-      if (res.status === 404) {
+      try {
+        const res = await fetch(
+          `http://localhost:5000/availability/${selectedDate}/${mainServiceId}`
+        );
+
+        if (!res.ok) {
+          if (res.status === 404) {
+            setBusyRanges([]);
+            return;
+          }
+          throw new Error("Greška u dohvatu dostupnosti");
+        }
+
+        const busy = await res.json(); // Expected format: [{ start: "10:00", end: "11:00" }, ...]
+        setBusyRanges(busy);
+      } catch (err) {
+        console.error("Greška pri dohvaćanju dostupnosti:", err);
         setBusyRanges([]);
-        return;
       }
-      throw new Error("Greška u dohvatu dostupnosti");
-    }
-
-    const busy = await res.json(); // Expected format: [{ start: "10:00", end: "11:00" }, ...]
-    setBusyRanges(busy);
-  } catch (err) {
-    console.error("Greška pri dohvaćanju dostupnosti:", err);
-    setBusyRanges([]);
-  }
-};
-    
+    };
 
     fetchReservations();
-    
   }, [selectedDate, mainServiceId]);
 
   useEffect(() => {
@@ -85,7 +88,8 @@ const RezervacijaTermin = () => {
 
   const generateGolfSlots = (dur: number) => {
     const arr: string[] = [];
-    for (let h = 8; h <= 20 - dur; h++) arr.push(`${h.toString().padStart(2, "0")}:00`);
+    for (let h = 8; h <= 20 - dur; h++)
+      arr.push(`${h.toString().padStart(2, "0")}:00`);
     return arr;
   };
 
@@ -99,38 +103,46 @@ const RezervacijaTermin = () => {
   };
 
   const isSlotFree = (candidateStart: string, durMin: number) => {
-  const parseTime = (t: string) => {
-    const [h, m] = t.split(":").map(Number).slice(0, 2);
-    return (h || 0) * 60 + (m || 0);
+    const parseTime = (t: string) => {
+      const [h, m] = t.split(":").map(Number).slice(0, 2);
+      return (h || 0) * 60 + (m || 0);
+    };
+
+    const cStart = parseTime(candidateStart);
+    const cEnd = cStart + durMin;
+
+    const isToday = selectedDate === dayjs().format("YYYY-MM-DD");
+    const nowMinutes = dayjs().hour() * 60 + dayjs().minute();
+    if (isToday && cStart < nowMinutes) return false;
+
+    return !busyRanges.some(({ start, end }) => {
+      const sMin = parseTime(start);
+      const eMin = parseTime(end);
+      return cStart < eMin && cEnd > sMin;
+    });
   };
 
-  const cStart = parseTime(candidateStart);
-  const cEnd = cStart + durMin;
-
-  
-  const isToday = selectedDate === dayjs().format("YYYY-MM-DD");
-  const nowMinutes = dayjs().hour() * 60 + dayjs().minute();
-  if (isToday && cStart < nowMinutes) return false;
-
-  return !busyRanges.some(({ start, end }) => {
-    const sMin = parseTime(start);
-    const eMin = parseTime(end);
-    return cStart < eMin && cEnd > sMin;
-  });
-};
-
-
   const ukupnaCijena = () => {
-    const main = mainService?.quantity && getService(mainService.service_id)?.price
-      ? isGolf
-        ? mainService.quantity * selectedDuration * parseFloat(getService(mainService.service_id)?.price.toString() || "0")
-        : mainService.quantity * parseFloat(getService(mainService.service_id)?.price.toString() || "0")
-      : 0;
+    const main =
+      mainService?.quantity && getService(mainService.service_id)?.price
+        ? isGolf
+          ? mainService.quantity *
+            selectedDuration *
+            parseFloat(
+              getService(mainService.service_id)?.price.toString() || "0"
+            )
+          : mainService.quantity *
+            parseFloat(
+              getService(mainService.service_id)?.price.toString() || "0"
+            )
+        : 0;
 
     const extras = dodatne.reduce((sum, d) => {
-      const cijena = d.quantity && getService(d.service_id)?.price
-        ? d.quantity * parseFloat(getService(d.service_id)?.price.toString() || "0")
-        : 0;
+      const cijena =
+        d.quantity && getService(d.service_id)?.price
+          ? d.quantity *
+            parseFloat(getService(d.service_id)?.price.toString() || "0")
+          : 0;
       return sum + cijena;
     }, 0);
 
@@ -151,7 +163,9 @@ const RezervacijaTermin = () => {
       <h2 className="text-3xl font-bold text-center">Odaberite termin</h2>
 
       {!mainServiceId ? (
-        <p className="text-center text-red-600">Najprije odaberite teren ili wellness uslugu.</p>
+        <p className="text-center text-red-600">
+          Najprije odaberite teren ili wellness uslugu.
+        </p>
       ) : (
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/2 bg-white rounded-xl shadow p-4 space-y-4">
@@ -160,14 +174,24 @@ const RezervacijaTermin = () => {
             {mainService && (
               <div>
                 <p className="font-medium">
-                  {getService(mainService.service_id)?.name || "Glavna usluga"} – {mainService.quantity} kom ×{" "}
-                  {getService(mainService.service_id)?.price || "-"} € × {isGolf ? `${selectedDuration} h × ` : ""}
-                  ={" "}
-                  {(
-                    isGolf
-                      ? mainService.quantity * selectedDuration * parseFloat(getService(mainService.service_id)?.price.toString() || "0")
-                      : mainService.quantity * parseFloat(getService(mainService.service_id)?.price.toString() || "0")
-                  ).toFixed(2)} €
+                  {getService(mainService.service_id)?.name || "Glavna usluga"}{" "}
+                  – {mainService.quantity} kom ×{" "}
+                  {getService(mainService.service_id)?.price || "-"} € ×{" "}
+                  {isGolf ? `${selectedDuration} h × ` : ""}={" "}
+                  {(isGolf
+                    ? mainService.quantity *
+                      selectedDuration *
+                      parseFloat(
+                        getService(mainService.service_id)?.price.toString() ||
+                          "0"
+                      )
+                    : mainService.quantity *
+                      parseFloat(
+                        getService(mainService.service_id)?.price.toString() ||
+                          "0"
+                      )
+                  ).toFixed(2)}{" "}
+                  €
                 </p>
               </div>
             )}
@@ -178,8 +202,16 @@ const RezervacijaTermin = () => {
                 <ul className="list-disc list-inside text-sm text-gray-700">
                   {dodatne.map((d, i) => (
                     <li key={i}>
-                      {getService(d.service_id)?.name || "Usluga"} – {d.quantity} kom × {getService(d.service_id)?.price || "-"} € ={" "}
-                      {(d.quantity * parseFloat(getService(d.service_id)?.price.toString() || "0")).toFixed(2)} €
+                      {getService(d.service_id)?.name || "Usluga"} –{" "}
+                      {d.quantity} kom ×{" "}
+                      {getService(d.service_id)?.price || "-"} € ={" "}
+                      {(
+                        d.quantity *
+                        parseFloat(
+                          getService(d.service_id)?.price.toString() || "0"
+                        )
+                      ).toFixed(2)}{" "}
+                      €
                     </li>
                   ))}
                 </ul>
@@ -214,7 +246,9 @@ const RezervacijaTermin = () => {
 
             {isGolf && (
               <div>
-                <label className="block mb-1 font-medium">Trajanje (sati)</label>
+                <label className="block mb-1 font-medium">
+                  Trajanje (sati)
+                </label>
                 <select
                   value={selectedDuration}
                   onChange={(e) => {
@@ -253,15 +287,17 @@ const RezervacijaTermin = () => {
                 ))}
               </select>
 
-              {reservation.start_time && reservation.date && reservation.duration_minutes && (
-                <div className="mt-4 text-sm text-gray-700">
-                  <strong>Rezervacija termina:</strong>{" "}
-                  {reservation.date}, vrijeme {reservation.start_time} –{" "}
-                  {dayjs(`${reservation.date}T${reservation.start_time}`)
-                    .add(reservation.duration_minutes, "minute")
-                    .format("HH:mm")}
-                </div>
-              )}
+              {reservation.start_time &&
+                reservation.date &&
+                reservation.duration_minutes && (
+                  <div className="mt-4 text-sm text-gray-700">
+                    <strong>Rezervacija termina:</strong> {reservation.date},
+                    vrijeme {reservation.start_time} –{" "}
+                    {dayjs(`${reservation.date}T${reservation.start_time}`)
+                      .add(reservation.duration_minutes, "minute")
+                      .format("HH:mm")}
+                  </div>
+                )}
             </div>
           </div>
         </div>
@@ -270,7 +306,9 @@ const RezervacijaTermin = () => {
       {mainServiceId && (
         <div className="flex justify-between pt-10">
           <button
-            onClick={() => window.history.back()}
+            onClick={() => {
+              navigate("/rezervacije"); // or whatever your route is
+            }}
             className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded"
           >
             Natrag
