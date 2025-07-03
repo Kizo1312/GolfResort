@@ -3,11 +3,30 @@ import { useFetchData } from "../hooks/useFetchData";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useReservation } from "@/components/Context/ReservationContext";
 
+import photo1 from "@/assets/tereni/1-photo.webp";
+import photo2 from "@/assets/tereni/2-photo.webp";
+import photo3 from "@/assets/tereni/3-photo.webp";
+import photo4 from "@/assets/tereni/4-photo.webp";
+import photo5 from "@/assets/tereni/5-photo.webp";
+import photo6 from "@/assets/tereni/6-photo.webp";
+import photo7 from "@/assets/tereni/7-photo.webp";
+import photo8 from "@/assets/tereni/8-photo.webp";
+
+const imageMap: Record<number, { photo: string }> = {
+  1: { photo: photo1 },
+  2: { photo: photo2 },
+  3: { photo: photo3 },
+  4: { photo: photo4 },
+  5: { photo: photo5 },
+  6: { photo: photo6 },
+  7: { photo: photo7 },
+  8: { photo: photo8 },
+};
+
 type GolfCourse = {
   id: number;
   name: string;
   description: string;
-  images: string[];
 };
 
 const GolfCourses = () => {
@@ -23,7 +42,7 @@ const GolfCourses = () => {
     const parsedId = selectedFromUrl ? parseInt(selectedFromUrl) : null;
 
     if (golfCourses && golfCourses.length > 0) {
-      if (parsedId && golfCourses.some(c => c.id === parsedId)) {
+      if (parsedId && golfCourses.some((c) => c.id === parsedId)) {
         setSelectedId(parsedId);
       } else if (selectedId === null) {
         setSelectedId(golfCourses[0].id);
@@ -36,71 +55,86 @@ const GolfCourses = () => {
   if (error) return <p>Error: {error}</p>;
   if (!golfCourses || golfCourses.length === 0) return <p>No golf courses found.</p>;
 
-  const selectedCourse = golfCourses.find(c => c.id === selectedId);
+  const selectedCourse = golfCourses.find((c) => c.id === selectedId);
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="flex overflow-x-auto border-b border-gray-300 mb-6">
-        {golfCourses.map(course => (
+    <div className="max-w-7xl mx-auto mt-10 shadow rounded overflow-hidden min-h-[600px]">
+      {/* Mobile tab navigation */}
+      <nav className="md:hidden flex overflow-x-auto space-x-4 p-4 bg-gray-100">
+        {golfCourses.map(c => (
           <button
-            key={course.id}
-            onClick={() => setSelectedId(course.id)}
-            className={`whitespace-nowrap px-4 py-2 border-b-2 ${
-              course.id === selectedId
-                ? "border-green-600 text-green-600 font-bold"
-                : "border-transparent text-gray-600"
-            } hover:text-green-700`}
+            key={c.id}
+            onClick={() => setSelectedId(c.id)}
+            className={`px-4 py-2 rounded ${
+              c.id === selectedId ? "bg-green-600 text-white font-semibold" : "bg-white text-gray-800 border border-gray-300"
+            }`}
           >
-            {course.name}
+            {c.name}
           </button>
         ))}
-      </div>
+      </nav>
 
-      {selectedCourse && (
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-3xl font-semibold mb-4">{selectedCourse.name}</h2>
-          <p className="mb-6 text-gray-700">{selectedCourse.description}</p>
+      <div className="flex flex-col md:flex-row">
+        {/* Sidebar for desktop */}
+        <aside className="hidden md:block w-[320px] flex-none bg-gray-100 p-6 overflow-y-auto">
+          <nav className="flex flex-col space-y-2">
+            {golfCourses.map((course) => (
+              <button
+                key={course.id}
+                onClick={() => setSelectedId(course.id)}
+                className={`p-3 rounded text-left w-full truncate ${
+                  course.id === selectedId
+                    ? "bg-green-600 text-white font-semibold"
+                    : "hover:bg-green-200 text-gray-700"
+                }`}
+              >
+                {course.name}
+              </button>
+            ))}
+          </nav>
+        </aside>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(selectedCourse.images && selectedCourse.images.length > 0
-              ? selectedCourse.images.slice(0, 2)
-              : [null, null]
-            ).map((imgUrl, idx) =>
-              imgUrl ? (
-                <img
-                  key={idx}
-                  src={imgUrl}
-                  alt={`${selectedCourse.name} image ${idx + 1}`}
-                  className="rounded-lg object-cover w-full h-64"
-                />
-              ) : (
-                <div
-                  key={idx}
-                  className="rounded-lg bg-gray-300 flex items-center justify-center w-full h-64 text-gray-500"
+        {/* Main content */}
+        <main className="flex-grow bg-white p-8 flex flex-col">
+          {selectedCourse ? (
+            <>
+              <h2 className="text-3xl font-semibold mb-4">{selectedCourse.name}</h2>
+              <div className="flex justify-center mb-8">
+                {imageMap[selectedCourse.id]?.photo ? (
+                  <img
+                    src={imageMap[selectedCourse.id].photo}
+                    alt={`${selectedCourse.name} photo`}
+                    className="rounded-lg object-cover max-h-[400px] w-auto"
+                  />
+                ) : (
+                  <div className="rounded-lg bg-gray-300 w-full max-w-lg h-[400px] flex items-center justify-center text-gray-500">
+                    No photo available
+                  </div>
+                )}
+              </div>
+              <p className="mb-6 text-gray-700">{selectedCourse.description}</p>
+
+              <div className="mt-auto flex justify-end">
+                <button
+                  onClick={() => {
+                    setReservationData({
+                      category: "golf",
+                      reservation_items: [{ service_id: selectedCourse.id, quantity: 1 }],
+                    });
+                    goToStep("category");
+                    navigate("/rezervacije");
+                  }}
+                  className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
                 >
-                  No image available
-                </div>
-              )
-            )}
-          </div>
-
-          <button
-            onClick={() => {
-              if (selectedCourse) {
-                setReservationData({
-                  category: "golf",
-                  reservation_items: [{ service_id: selectedCourse.id, quantity: 1 }],
-                });
-                goToStep("category");
-                navigate("/rezervacije");
-              }
-            }}
-            className="mt-6 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
-          >
-            Reserve
-          </button>
-        </div>
-      )}
+                  Rezerviraj
+                </button>
+              </div>
+            </>
+          ) : (
+            <p>Odaberite teren sa liste.</p>
+          )}
+        </main>
+      </div>
     </div>
   );
 };
