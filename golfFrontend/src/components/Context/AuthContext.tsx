@@ -9,24 +9,24 @@ type User = {
 };
 
 type AuthData = {
-  user:      User | null;
+  user: User | null;
   accessToken: string | null;
-  login:     (d: { user: User; access_token: string }) => void;
-  logout:    () => void;
+  login: (d: { user: User; access_token: string }) => void;
+  logout: () => void;
   isLoading: boolean;
 };
 
 const AuthContext = createContext<AuthData | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user,        setUser]        = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isLoading,   setIsLoading]   = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
-  /* 🔄  učitaj localStorage samo JEDNOM */
+  // Load sessionStorage once
   useEffect(() => {
-    const storedUser  = localStorage.getItem("authUser");
-    const storedToken = localStorage.getItem("authToken");
+    const storedUser = sessionStorage.getItem("authUser");
+    const storedToken = sessionStorage.getItem("authToken");
 
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
@@ -35,20 +35,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  /* 🔐  postavi nakon uspješnog logina */
+  // Set after login
   const login = (d: { user: User; access_token: string }) => {
     setUser(d.user);
     setAccessToken(d.access_token);
-    localStorage.setItem("authUser",  JSON.stringify(d.user));
-    localStorage.setItem("authToken", d.access_token);
+    sessionStorage.setItem("authUser", JSON.stringify(d.user));
+    sessionStorage.setItem("authToken", d.access_token);
   };
 
-  /* 🚪  logout */
+  // Clear on logout
   const logout = () => {
     setUser(null);
     setAccessToken(null);
-    localStorage.removeItem("authUser");
-    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authUser");
+    sessionStorage.removeItem("authToken");
   };
 
   return (
@@ -60,6 +60,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth mora biti korišten unutar <AuthProvider>");
+  if (!ctx) throw new Error("useAuth must be used within <AuthProvider>");
   return ctx;
 };
