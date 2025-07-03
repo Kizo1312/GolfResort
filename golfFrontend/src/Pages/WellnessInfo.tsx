@@ -3,18 +3,26 @@ import { useFetchData } from "../hooks/useFetchData";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useReservation } from "@/components/Context/ReservationContext";
 
+import photo1 from "@/assets/wellnessinfo/1-wellness.webp";
+import photo2 from "@/assets/wellnessinfo/2-wellness.webp";
+import photo3 from "@/assets/wellnessinfo/3-wellness.webp";
+
+const imageMap: Record<number, { photo: string }> = {
+  13: { photo: photo1 },
+  12: { photo: photo2 },
+  14: { photo: photo3 },
+};
 
 type Wellness = {
   id: number;
   name: string;
   description: string;
-  images: string[];
-  price: number;
 };
 
 const WellnessComponents = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { setReservationData, goToStep } = useReservation();
 
   const { data: wellnessList, loading, error } = useFetchData<Wellness[]>("/services/wellness");
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -24,87 +32,99 @@ const WellnessComponents = () => {
     const parsedId = selectedFromUrl ? parseInt(selectedFromUrl) : null;
 
     if (wellnessList && wellnessList.length > 0) {
-      if (parsedId && wellnessList.some(w => w.id === parsedId)) {
+      if (parsedId && wellnessList.some((w) => w.id === parsedId)) {
         setSelectedId(parsedId);
       } else if (selectedId === null) {
         setSelectedId(wellnessList[0].id);
       }
     }
-  }, [wellnessList, selectedId, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wellnessList]);
 
   if (loading) return <p>Loading wellness options...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!wellnessList || wellnessList.length === 0) return <p>No wellness options found.</p>;
 
-  const selectedWellness = wellnessList.find(w => w.id === selectedId);
-  const { setReservationData, goToStep } = useReservation();
+  const selectedWellness = wellnessList.find((w) => w.id === selectedId);
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      {/* Tabs */}
-      <div className="flex overflow-x-auto border-b border-gray-300 mb-6">
-        {wellnessList.map(wellness => (
+    <div className="max-w-7xl mx-auto mt-10 shadow rounded overflow-hidden min-h-[600px]">
+      {/* Mobile tab-style selector */}
+      <nav className="md:hidden flex overflow-x-auto space-x-4 p-4 bg-gray-100">
+        {wellnessList.map(w => (
           <button
-            key={wellness.id}
-            onClick={() => setSelectedId(wellness.id)}
-            className={`whitespace-nowrap px-4 py-2 border-b-2 ${
-              wellness.id === selectedId ? "border-green-600 text-green-600 font-bold" : "border-transparent text-gray-600"
-            } hover:text-green-700`}
+            key={w.id}
+            onClick={() => setSelectedId(w.id)}
+            className={`px-4 py-2 rounded ${
+              w.id === selectedId ? "bg-green-600 text-white font-semibold" : "bg-white text-gray-800 border border-gray-300"
+            }`}
           >
-            {wellness.name}
+            {w.name}
           </button>
         ))}
-      </div>
+      </nav>
 
-      {/* Selected Wellness Details */}
-      {selectedWellness && (
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-3xl font-semibold mb-4">{selectedWellness.name}</h2>
-          <p className="mb-4 text-gray-700">{selectedWellness.description}</p>
-          <p className="text-lg font-semibold text-green-600 mb-6">
-            Cijena od {selectedWellness.price}€ / sat
-          </p>
+      <div className="flex flex-col md:flex-row">
+        {/* Sidebar for desktop */}
+        <aside className="hidden md:block w-[320px] flex-none bg-gray-100 p-6 overflow-y-auto">
+          <nav className="flex flex-col space-y-2">
+            {wellnessList.map((wellness) => (
+              <button
+                key={wellness.id}
+                onClick={() => setSelectedId(wellness.id)}
+                className={`p-3 rounded text-left w-full ${
+                  wellness.id === selectedId
+                    ? "bg-green-600 text-white font-semibold"
+                    : "hover:bg-green-200 text-gray-700"
+                }`}
+              >
+                {wellness.name}
+              </button>
+            ))}
+          </nav>
+        </aside>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(selectedWellness.images && selectedWellness.images.length > 0
-              ? selectedWellness.images.slice(0, 2)
-              : [null, null]
-            ).map((imgUrl, idx) =>
-              imgUrl ? (
-                <img
-                  key={idx}
-                  src={imgUrl}
-                  alt={`${selectedWellness.name} image ${idx + 1}`}
-                  className="rounded-lg object-cover w-full h-64"
-                />
-              ) : (
-                <div
-                  key={idx}
-                  className="rounded-lg bg-gray-300 flex items-center justify-center w-full h-64 text-gray-500"
+        {/* Main content */}
+        <main className="flex-grow bg-white p-8 flex flex-col">
+          {selectedWellness ? (
+            <>
+              <h2 className="text-3xl font-semibold mb-4">{selectedWellness.name}</h2>
+              <div className="flex justify-center mb-8">
+                {imageMap[selectedWellness.id]?.photo ? (
+                  <img
+                    src={imageMap[selectedWellness.id].photo}
+                    alt={`${selectedWellness.name} photo`}
+                    className="rounded-lg object-cover max-h-[400px] w-auto"
+                  />
+                ) : (
+                  <div className="rounded-lg bg-gray-300 w-full max-w-lg h-[400px] flex items-center justify-center text-gray-500">
+                    No photo available
+                  </div>
+                )}
+              </div>
+              <p className="mb-6 text-gray-700">{selectedWellness.description}</p>
+
+              <div className="mt-auto flex justify-end">
+                <button
+                  onClick={() => {
+                    setReservationData({
+                      category: "wellness",
+                      reservation_items: [{ service_id: selectedWellness.id, quantity: 1 }],
+                    });
+                    goToStep("category");
+                    navigate("/rezervacije");
+                  }}
+                  className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
                 >
-                  No image available
-                </div>
-              )
-            )}
-          </div>
-
-          <button
-  onClick={() => {
-    if (selectedWellness) {
-      setReservationData({
-        category: "wellness",
-        reservation_items: [{ service_id: selectedWellness.id, quantity: 1 }],
-      });
-      goToStep("category");
-      navigate("/rezervacije");
-    }
-  }}
-  className="mt-6 bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
->
-  Rezerviraj
-</button>
-        </div>
-      )}
+                  Rezerviraj
+                </button>
+              </div>
+            </>
+          ) : (
+            <p>Odaberite wellness opciju sa liste.</p>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

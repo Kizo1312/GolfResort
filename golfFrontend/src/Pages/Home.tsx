@@ -6,12 +6,12 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { Tereni } from '../components/Tereni';
-import aromaterapija from '../assets/wellness/aromaterapija.jpg';
+import aromaterapija from '../assets/wellness/aromaterapija.webp';
 import masaza from '../assets/wellness/masaza.webp';
-import sauna from '../assets/wellness/sauna.jpg';
+import sauna from '../assets/wellness/sauna.webp';
 import hero1 from '../assets/hero/HeroImage.jpg';
 import hero2 from '../assets/hero/HeroImage2.jpg';
-import hero3 from '../assets/hero/HeroImage3.jpg'
+import hero3 from '../assets/hero/HeroImage3.jpg';
 
 
 const wellnessServices = [
