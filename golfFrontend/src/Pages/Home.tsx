@@ -11,7 +11,8 @@ import masaza from '../assets/wellness/masaza.webp';
 import sauna from '../assets/wellness/sauna.webp';
 import hero1 from '../assets/hero/HeroImage.webp';
 import hero2 from '../assets/hero/HeroImage2.webp';
-import hero3 from '../assets/hero/HeroImage3.webp'
+import hero3 from '../assets/hero/HeroImage3.webp';
+import background from '../assets/background/backgroundteren.webp';
 
 
 const wellnessServices = [
@@ -110,10 +111,44 @@ const HomePage = () => {
         </Swiper>
       </div>
 
+      <div className="h-16 bg-gradient-to-b from-gray to-transparent"></div>
+
       {/* Explore Golf Courses Section */}
-      <section className="py-12 px-4 text-center">
-        <Tereni />
+        <section
+        className="relative py-16 px-4 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${background})` }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gray/35 backdrop-blur-[1px] z-0 rounded-none" />
+
+        {/* Content */}
+        <div className="relative z-10 max-w-[90vw] mx-auto">
+          <div className="bg-gray/50 bg-white/10 backdrop-blur-sm rounded-xl p-8 shadow-2xl max-w-6xl mx-auto border border-white/20 overflow-visible">
+            
+            <div className="max-w-[1200px] mx-auto text-center text-white mb-10">
+              <h2 className="text-4xl md:text-5xl font-semibold drop-shadow-lg mb-4">
+                Golf tereni
+              </h2>
+              <p className="text-lg md:text-xl drop-shadow-sm">
+                Istražite sve naše vrhunske terene – kliknite na teren kako biste saznali više.
+              </p>
+            </div>
+            <div>
+            <Tereni
+              style={{
+                width: '100%',
+                margin: '0 auto',
+                display: 'block',
+                overflow: 'visible',
+              }}
+            />
+            </div>
+          </div>
+        </div>
       </section>
+
+
+      <div className="h-8 bg-gradient-to-b from-gray to-transparent"></div>        
 
       {/* Wellness Section */}
       <section className="py-12 px-4">
