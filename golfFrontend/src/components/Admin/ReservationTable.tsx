@@ -28,10 +28,13 @@ type Props = {
 };
 
 const ReservationTable = ({ items }: Props) => {
-  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs().format("YYYY-MM-DD")
+  );
   const [filtered, setFiltered] = useState<Reservation[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [selectedReservation, setSelectedReservation] =
+    useState<Reservation | null>(null);
 
   const openEditModal = (reservation: Reservation) => {
     setSelectedReservation(reservation);
@@ -50,7 +53,9 @@ const ReservationTable = ({ items }: Props) => {
   }, [items, selectedDate]);
 
   const deleteReservation = async (id: number) => {
-    const confirm = window.confirm("Jeste li sigurni da želite obrisati ovu rezervaciju?");
+    const confirm = window.confirm(
+      "Jeste li sigurni da želite obrisati ovu rezervaciju?"
+    );
     if (!confirm) return;
 
     try {
@@ -60,6 +65,26 @@ const ReservationTable = ({ items }: Props) => {
     } catch (err: any) {
       alert("Greška: " + (err.message || "Neuspješno brisanje."));
     }
+  };
+
+  const calculateTotalPrice = (res: Reservation): number => {
+    let total = 0;
+
+    for (const item of res.reservation_items) {
+      const price = parseFloat(item.service?.price || "0");
+
+      // Check if it's a golf terrain (you can refine this check if needed)
+      const isTerrain = item.quantity === 1;
+
+      if (isTerrain && res.duration_minutes > 0) {
+        const hours = res.duration_minutes / 60;
+        total += hours * price;
+      } else {
+        total += item.quantity * price;
+      }
+    }
+
+    return total;
   };
 
   return (
@@ -75,6 +100,7 @@ const ReservationTable = ({ items }: Props) => {
       </div>
 
       {/* Header */}
+
       <div className="grid grid-cols-[60px_1fr_1fr_2fr_100px] gap-4 px-6 py-3 border-b font-semibold text-gray-700">
         <span>ID</span>
         <span>Datum</span>
@@ -99,13 +125,17 @@ const ReservationTable = ({ items }: Props) => {
                 {res.start_time} - {res.end_time}
               </span>
               <span>
-                <ul className="list-disc list-inside space-y-1">
+                <ul className="list-disc list-inside space-y-1 mb-2">
                   {res.reservation_items.map((item, i) => (
                     <li key={i}>
-                      {item.service?.name || "Nepoznata usluga"} ({item.quantity} × {item.service?.price} €)
+                      {item.service?.name || "Nepoznata usluga"} (
+                      {item.quantity} × {item.service?.price} €)
                     </li>
                   ))}
                 </ul>
+                <div className="font-semibold text-sm mt-1">
+                  Ukupno: {calculateTotalPrice(res).toFixed(2)} €
+                </div>
               </span>
               <div className="flex justify-end gap-4">
                 <button

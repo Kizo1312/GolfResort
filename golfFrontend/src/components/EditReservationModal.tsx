@@ -1,5 +1,7 @@
-import React, { useState } from "react";
 import { apiRequest } from "@/hooks/apiHookAsync";
+import { useEffect, useState, useMemo } from "react";
+import toast from "react-hot-toast";
+
 
 type Props = {
   isOpen: boolean;
@@ -15,43 +17,160 @@ const EditReservationModal = ({
   onUpdate,
 }: Props) => {
   const [date, setDate] = useState(reservation.date);
-  const [startTime, setStartTime] = useState(reservation.start_time);
+  const [startTime, setStartTime] = useState(reservation.start_time.slice(0, 5)); 
   const [duration, setDuration] = useState(reservation.duration_minutes);
-  const timeOptions = [];
+  const [busyRanges, setBusyRanges] = useState<
+    { start: string; end: string }[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(false)
+
+  const mainServiceId =
+    reservation.reservation_items?.[0]?.service?.id ||
+    reservation.reservation_items?.[0]?.service_id;
+
+  const timeOptions: string[] = [];
   for (let hour = 8; hour <= 20; hour++) {
-    const hourStr = hour.toString().padStart(2, "0") + ":00";
-    timeOptions.push(hourStr);
+    timeOptions.push(hour.toString().padStart(2, "0") + ":00");
   }
 
-  const handleSubmit = async () => {
-    try {
-      const formattedStartTime =
-        startTime.length === 5 ? `${startTime}:00` : startTime;
+  const addMinutes = (timeStr: string, mins: number): string => {
+    const [h, m, s] = timeStr.split(":").map(Number);
+    const date = new Date();
+    date.setHours(h, m + mins, s || 0, 0);
+    return date.toTimeString().slice(0, 8); 
+  };
 
-      const updatedReservation = {
-        user_id: reservation.user_id,
-        date,
-        start_time: formattedStartTime,
-        duration_minutes: duration,
-        reservation_items: reservation.reservation_items.map((item: any) => ({
-          service_id: item.service?.id || item.service_id,
-          quantity: item.quantity,
-        })),
-      };
+  const availableTimeOptions = useMemo(() => {
+    const now = new Date();
+    const isToday = date === now.toISOString().split("T")[0];
+    const closingTime = "20:00:00";
 
-      const res = await apiRequest(
+    return timeOptions.filter((time) => {
+      const proposedStart = time.length === 5 ? `${time}:00` : time;
+      const proposedEnd = addMinutes(proposedStart, duration);
+
+      if (isToday) {
+        const [hour, minute] = proposedStart.split(":").map(Number);
+        if (
+          hour < now.getHours() ||
+          (hour === now.getHours() && minute <= now.getMinutes())
+        ) {
+          return false;
+        }
+      }
+
+      if (proposedEnd > closingTime) {
+        return false;
+      }
+
+      const overlaps = busyRanges.some((range) => {
+        return proposedStart < range.end && proposedEnd > range.start;
+      });
+
+      return !overlaps;
+    });
+  }, [timeOptions, busyRanges, duration, date]);
+
+  
+  useEffect(() => {
+    if (!availableTimeOptions.includes(startTime)) {
+      setStartTime(availableTimeOptions[0] || "");
+    }
+  }, [availableTimeOptions]);
+
+  
+  useEffect(() => {
+    if (isOpen) {
+      setDate(reservation.date);
+      setStartTime(reservation.start_time.slice(0, 5));
+      setDuration(reservation.duration_minutes);
+    }
+  }, [isOpen, reservation]);
+
+  
+  useEffect(() => {
+    if (!mainServiceId || !date) return;
+
+    const fetchAvailability = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:5000/availability/${date}/${mainServiceId}`
+        );
+
+        if (!res.ok) {
+          if (res.status === 404) {
+            setBusyRanges([]);
+            return;
+          }
+          throw new Error("Greška u dohvatu dostupnosti");
+        }
+
+        let busy = await res.json();
+
+      
+        const currentStart =
+          reservation.start_time.length === 5
+            ? `${reservation.start_time}:00`
+            : reservation.start_time;
+
+        const [h, m, s] = currentStart.split(":").map(Number);
+        const endDate = new Date();
+        endDate.setHours(h, m + reservation.duration_minutes, s || 0, 0);
+        const currentEnd = endDate.toTimeString().slice(0, 5); // HH:MM
+
+        busy = busy.filter(
+          (range: any) =>
+            !(
+              range.start === currentStart.slice(0, 5) &&
+              range.end === currentEnd
+            )
+        );
+
+        setBusyRanges(busy);
+      } catch (err) {
+        console.error("Greška pri dohvaćanju dostupnosti:", err);
+        setBusyRanges([]);
+      }
+    };
+
+    fetchAvailability();
+  }, [date, mainServiceId, reservation]);
+
+ const handleSubmit = async () => {
+  const formattedStartTime =
+    startTime.length === 5 ? `${startTime}:00` : startTime;
+
+  const updatedReservation = {
+    user_id: reservation.user_id,
+    date,
+    start_time: formattedStartTime,
+    duration_minutes: duration,
+    reservation_items: reservation.reservation_items.map((item: any) => ({
+      service_id: item.service?.id || item.service_id,
+      quantity: item.quantity,
+    })),
+  };
+
+  try {
+    const response = await toast.promise(
+      apiRequest(
         `/reservations/${reservation.id}`,
         "PUT",
         updatedReservation
-      );
+      ),
+      {
+        loading: "Spremanje...",
+        success: "Rezervacija uspješno ažurirana!",
+        error: (err) => err.message || "Greška: nešto nije u redu.",
+      }
+    );
 
-      onUpdate(res);
-      onClose();
-      alert("Rezervacija uspješno ažurirana!");
-    } catch (err: any) {
-      alert("Greška: " + (err.message || "Neuspješna promjena rezervacije."));
-    }
-  };
+    onUpdate(response);
+    onClose();
+  } catch (err) {
+    // Error toast is already shown by toast.promise
+  }
+};
 
   if (!isOpen) return null;
 
@@ -78,11 +197,15 @@ const EditReservationModal = ({
               onChange={(e) => setStartTime(e.target.value)}
               className="border rounded p-2 w-full"
             >
-              {timeOptions.map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
+              {availableTimeOptions.length === 0 ? (
+                <option disabled>Nema slobodnih termina</option>
+              ) : (
+                availableTimeOptions.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))
+              )}
             </select>
           </label>
 

@@ -127,7 +127,7 @@ const ReservationCategory = () => {
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <h4 className="font-semibold">{t.name}</h4>
-                    <p className="text-sm text-gray-600">{t.description}</p>
+                   
                     <p className="text-sm text-green-700 font-medium mt-1">
                       {t.price} €
                     </p>
@@ -153,7 +153,7 @@ const ReservationCategory = () => {
             <p>
               <strong>{selectedTerrain.name}</strong>
             </p>
-            <p className="text-gray-600">{selectedTerrain.description}</p>
+           
             <p className="text-green-600 font-semibold">
               {selectedTerrain.price} €
             </p>
