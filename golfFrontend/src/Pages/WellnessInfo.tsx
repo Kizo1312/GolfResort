@@ -24,7 +24,11 @@ const WellnessComponents = () => {
   const [searchParams] = useSearchParams();
   const { setReservationData, goToStep } = useReservation();
 
-  const { data: wellnessList, loading, error } = useFetchData<Wellness[]>("/services/wellness");
+  const {
+    data: wellnessList,
+    loading,
+    error,
+  } = useFetchData<Wellness[]>("/services/wellness");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -43,26 +47,27 @@ const WellnessComponents = () => {
 
   if (loading) return <p>Loading wellness options...</p>;
   if (error) return <p>Error: {error}</p>;
-  if (!wellnessList || wellnessList.length === 0) return <p>No wellness options found.</p>;
+  if (!wellnessList || wellnessList.length === 0)
+    return <p>No wellness options found.</p>;
 
   const selectedWellness = wellnessList.find((w) => w.id === selectedId);
 
   return (
     <div className="max-w-7xl mx-auto mt-10 shadow rounded overflow-hidden min-h-[600px]">
-      {/* Mobile tab-style selector */}
-      <nav className="md:hidden flex overflow-x-auto space-x-4 p-4 bg-gray-100">
-        {wellnessList.map(w => (
-          <button
-            key={w.id}
-            onClick={() => setSelectedId(w.id)}
-            className={`px-4 py-2 rounded ${
-              w.id === selectedId ? "bg-green-600 text-white font-semibold" : "bg-white text-gray-800 border border-gray-300"
-            }`}
-          >
-            {w.name}
-          </button>
-        ))}
-      </nav>
+      {/* Mobile dropdown navigation */}
+      <div className="md:hidden p-4 bg-gray-100">
+        <select
+          value={selectedId ?? ""}
+          onChange={(e) => setSelectedId(Number(e.target.value))}
+          className="w-full p-2 border rounded"
+        >
+          {wellnessList.map((wellness) => (
+            <option key={wellness.id} value={wellness.id}>
+              {wellness.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="flex flex-col md:flex-row">
         {/* Sidebar for desktop */}
@@ -88,7 +93,9 @@ const WellnessComponents = () => {
         <main className="flex-grow bg-white p-8 flex flex-col">
           {selectedWellness ? (
             <>
-              <h2 className="text-3xl font-semibold mb-4">{selectedWellness.name}</h2>
+              <h2 className="text-3xl font-semibold mb-4">
+                {selectedWellness.name}
+              </h2>
               <div className="flex justify-center mb-8">
                 {imageMap[selectedWellness.id]?.photo ? (
                   <img
@@ -102,14 +109,18 @@ const WellnessComponents = () => {
                   </div>
                 )}
               </div>
-              <p className="mb-6 text-gray-700">{selectedWellness.description}</p>
+              <p className="mb-6 text-gray-700">
+                {selectedWellness.description}
+              </p>
 
               <div className="mt-auto flex justify-end">
                 <button
                   onClick={() => {
                     setReservationData({
                       category: "wellness",
-                      reservation_items: [{ service_id: selectedWellness.id, quantity: 1 }],
+                      reservation_items: [
+                        { service_id: selectedWellness.id, quantity: 1 },
+                      ],
                     });
                     goToStep("category");
                     navigate("/rezervacije");

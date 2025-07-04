@@ -59,20 +59,21 @@ const GolfCourses = () => {
 
   return (
     <div className="max-w-7xl mx-auto mt-10 shadow rounded overflow-hidden min-h-[600px]">
-      {/* Mobile tab navigation */}
-      <nav className="md:hidden flex overflow-x-auto space-x-4 p-4 bg-gray-100">
-        {golfCourses.map(c => (
-          <button
-            key={c.id}
-            onClick={() => setSelectedId(c.id)}
-            className={`px-4 py-2 rounded ${
-              c.id === selectedId ? "bg-green-600 text-white font-semibold" : "bg-white text-gray-800 border border-gray-300"
-            }`}
+
+      {/* Mobile dropdown navigation */}
+        <div className="md:hidden p-4 bg-gray-100">
+          <select
+            value={selectedId ?? ""}
+            onChange={(e) => setSelectedId(Number(e.target.value))}
+            className="w-full p-2 border rounded"
           >
-            {c.name}
-          </button>
-        ))}
-      </nav>
+            {golfCourses.map((course) => (
+              <option key={course.id} value={course.id}>
+                {course.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
       <div className="flex flex-col md:flex-row">
         {/* Sidebar for desktop */}
