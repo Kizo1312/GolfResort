@@ -25,6 +25,9 @@ const Register = () => {
     repeatPassword: "",
   });
 
+const [showPassword, setShowPassword] = useState(false);
+const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+
   // ▶️ login nakon uspješne registracije
   const autoLogin = async () => {
     try {
@@ -156,25 +159,47 @@ const Register = () => {
         />
 
         <label className="block mb-1">Lozinka</label>
+        <div className="relative mb-3">
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="Password"
           value={user.password}
           onChange={(e) => setUser({ ...user, password: e.target.value })}
-          className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="border p-2 block w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword((prev) => !prev)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-xl"
+          aria-label="Prikaži/sakrij lozinku"
+        >
+        {showPassword ? "👁️" : "👁️"}
+        </button>
+        </div>
         <p className="text-sm text-gray-500 mt-1 mb-3">
-        Lozinka mora imati najmanje 8 znakova, uključujući veliko slovo, malo slovo i broj.
-      </p>
+          Lozinka mora imati najmanje 8 znakova, uključujući veliko slovo, malo slovo i broj.
+        </p>
+
 
         <label className="block mb-1">Ponovite lozinku</label>
-        <input
-          type="password"
-          placeholder="Repeat Password"
-          value={user.repeatPassword}
-          onChange={(e) => setUser({ ...user, repeatPassword: e.target.value })}
-          className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-        />
+<div className="relative mb-3">
+  <input
+    type={showRepeatPassword ? "text" : "password"}
+    placeholder="Repeat Password"
+    value={user.repeatPassword}
+    onChange={(e) => setUser({ ...user, repeatPassword: e.target.value })}
+    className="border p-2 block w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
+  />
+  <button
+    type="button"
+    onClick={() => setShowRepeatPassword((prev) => !prev)}
+    className="absolute right-2 top-1/2 -translate-y-1/2 text-xl"
+    aria-label="Prikaži/sakrij ponovljenu lozinku"
+  >
+    {showRepeatPassword ? "👁️" : "👁️"}
+  </button>
+</div>
+
 
         <div className="w-full flex justify-end">
           <button
