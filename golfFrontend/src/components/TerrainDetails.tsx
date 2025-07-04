@@ -41,9 +41,9 @@ const TerrainDetails = ({ id }: Props) => {
         {/* Left side: info */}
         <div className="flex-1">
           <h2 className="text-2xl font-bold mb-2">{terrain.name}</h2>
-          <p className="text-gray-700 mb-4 max-h-32 overflow-y-auto">
-          {terrain.description}
-        </p>
+          <p className="text-gray-700 mb-4">
+          {terrain.description?.split(".")[0] + "."}
+          </p>
           <p className="text-lg font-semibold text-green-600">Cijena: {terrain.price} €</p>
         </div>
 

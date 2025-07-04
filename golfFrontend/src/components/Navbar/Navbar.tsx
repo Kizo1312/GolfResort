@@ -30,12 +30,12 @@ const Navbar = () => {
         <ul className="hidden md:flex gap-4 text-sm font-medium">
           <li>
             <NavLink to="/home" className={linkStyle}>
-              Home
+              Početna
             </NavLink>
           </li>
           <li>
             <NavLink to="/golf-tereni" className={linkStyle}>
-              Golf Courses
+              Golf Tereni
             </NavLink>
           </li>
           <li>
@@ -45,7 +45,7 @@ const Navbar = () => {
           </li>
           <li>
             <NavLink to="/rezervacije" className={linkStyle}>
-              Rezervacije
+              Rezerviraj
             </NavLink>
           </li>
 

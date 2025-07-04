@@ -25,6 +25,9 @@ const Register = () => {
     repeatPassword: "",
   });
 
+const [showPassword, setShowPassword] = useState(false);
+const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+
   // ▶️ login nakon uspješne registracije
   const autoLogin = async () => {
     try {
@@ -156,25 +159,124 @@ const Register = () => {
         />
 
         <label className="block mb-1">Lozinka</label>
-        <input
-          type="password"
-          placeholder="Password"
-          value={user.password}
-          onChange={(e) => setUser({ ...user, password: e.target.value })}
-          className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-        />
+        <div className="relative mb-3">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={user.password}
+            onChange={(e) => setUser({ ...user, password: e.target.value })}
+            className="border p-2 block w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-xl"
+            aria-label="Prikaži/sakrij lozinku"
+          >
+            {showPassword ? (
+              // Eye Off SVG (hidden)
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.255.241-2.454.675-3.55m3.675 6.45A3 3 0 1112 9c.795 0 1.515.31 2.05.825M15 15l6 6M3 3l18 18"
+                />
+              </svg>
+            ) : (
+              // Eye SVG (visible)
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.478 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
         <p className="text-sm text-gray-500 mt-1 mb-3">
-        Lozinka mora imati najmanje 8 znakova, uključujući veliko slovo, malo slovo i broj.
-      </p>
+          Lozinka mora imati najmanje 8 znakova, uključujući veliko slovo, malo
+          slovo i broj.
+        </p>
 
         <label className="block mb-1">Ponovite lozinku</label>
-        <input
-          type="password"
-          placeholder="Repeat Password"
-          value={user.repeatPassword}
-          onChange={(e) => setUser({ ...user, repeatPassword: e.target.value })}
-          className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-        />
+        <div className="relative mb-3">
+          <input
+            type={showRepeatPassword ? "text" : "password"}
+            placeholder="Repeat Password"
+            value={user.repeatPassword}
+            onChange={(e) =>
+              setUser({ ...user, repeatPassword: e.target.value })
+            }
+            className="border p-2 block w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+          <button
+            type="button"
+            onClick={() => setShowRepeatPassword((prev) => !prev)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-xl"
+            aria-label="Prikaži/sakrij ponovljenu lozinku"
+          >
+            {showPassword ? (
+              // Eye Off SVG (hidden)
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.255.241-2.454.675-3.55m3.675 6.45A3 3 0 1112 9c.795 0 1.515.31 2.05.825M15 15l6 6M3 3l18 18"
+                />
+              </svg>
+            ) : (
+              // Eye SVG (visible)
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.478 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
 
         <div className="w-full flex justify-end">
           <button

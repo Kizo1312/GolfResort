@@ -37,6 +37,10 @@ const MojProfil = () => {
 
   const { user, accessToken } = useAuth();
 
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
+
   useEffect(() => {
     if (!user || !accessToken) {
       // No logged-in user, clear form and data
@@ -210,29 +214,127 @@ const MojProfil = () => {
         </div>
         <div>
           <label className="block mb-1 font-medium">Trenutna lozinka</label>
-          <input
-            name="currentPassword"
-            type="password"
-            value={form.currentPassword || ""}
-            onChange={handleChange}
-            className="border p-2 w-full rounded"
-            placeholder="Unesi trenutnu lozinku"
-            disabled={!isEditing}
-          />
+          <div className="relative">
+            <input
+              name="currentPassword"
+              type={showCurrentPassword ? "text" : "password"}
+              value={form.currentPassword || ""}
+              onChange={handleChange}
+              className="border p-2 w-full pr-10 rounded"
+              placeholder="Unesi trenutnu lozinku"
+              disabled={!isEditing}
+            />
+            <button
+              type="button"
+              onClick={() => setShowCurrentPassword((prev) => !prev)}
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              aria-label="Prikaži/sakrij lozinku"
+            >
+              {showCurrentPassword ? (
+                // Eye Off SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.255.241-2.454.675-3.55m3.675 6.45A3 3 0 1112 9c.795 0 1.515.31 2.05.825M15 15l6 6M3 3l18 18"
+                  />
+                </svg>
+              ) : (
+                // Eye SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-.856 2.621-2.875 4.75-5.542 6A9.964 9.964 0 0112 19c-2.21 0-4.262-.714-5.958-1.933"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
+
         <div>
           <label className="block mb-1 font-medium">Nova lozinka</label>
-          <input
-            name="password"
-            type="password"
-            value={form.password || ""}
-            onChange={handleChange}
-            className="border p-2 w-full rounded"
-            placeholder="Unesi novu lozinku"
-            disabled={!isEditing}
-          />
+          <div className="relative">
+            <input
+              name="password"
+              type={showNewPassword ? "text" : "password"}
+              value={form.password || ""}
+              onChange={handleChange}
+              className="border p-2 w-full pr-10 rounded"
+              placeholder="Unesi novu lozinku"
+              disabled={!isEditing}
+            />
+            <button
+              type="button"
+              onClick={() => setShowNewPassword((prev) => !prev)}
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              aria-label="Prikaži/sakrij lozinku"
+            >
+              {showNewPassword ? (
+                // Eye Off SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.255.241-2.454.675-3.55m3.675 6.45A3 3 0 1112 9c.795 0 1.515.31 2.05.825M15 15l6 6M3 3l18 18"
+                  />
+                </svg>
+              ) : (
+                // Eye SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-.856 2.621-2.875 4.75-5.542 6A9.964 9.964 0 0112 19c-2.21 0-4.262-.714-5.958-1.933"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
           <p className="text-sm text-gray-500 mt-1">
-            Lozinka mora imati barem 8 znakova, uključujući velika i mala slova te broj.
+            Lozinka mora imati barem 8 znakova, uključujući velika i mala slova
+            te broj.
           </p>
         </div>
 
@@ -261,7 +363,8 @@ const MojProfil = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg max-w-sm mx-auto">
             <p className="mb-4 text-gray-800">
-              Jeste li sigurni da želite obrisati svoj profil? Vaš profil bit će nepovratno izbrisan.
+              Jeste li sigurni da želite obrisati svoj profil? Vaš profil bit će
+              nepovratno izbrisan.
             </p>
             <div className="flex justify-end space-x-4">
               <button
