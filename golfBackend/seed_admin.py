@@ -10,7 +10,7 @@ with app.app_context():
         admin = UserModel(
             name="Admin2",
             last_name="User2",
-            email="lavieshobaine@gmail.com",
+            email="pamatohaa@gmail.com",
             password=pbkdf2_sha256.hash("Admin123"),
             role="admin"
         )
