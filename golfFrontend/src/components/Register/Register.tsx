@@ -130,7 +130,7 @@ const [showRepeatPassword, setShowRepeatPassword] = useState(false);
             <label className="block mb-1">Ime</label>
             <input
               type="text"
-              placeholder="First Name"
+              placeholder="Vaše Ime"
               value={user.name}
               onChange={(e) => setUser({ ...user, name: e.target.value })}
               className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -141,7 +141,7 @@ const [showRepeatPassword, setShowRepeatPassword] = useState(false);
             <label className="block mb-1">Prezime</label>
             <input
               type="text"
-              placeholder="Last Name"
+              placeholder="Vaše Prezime"
               value={user.last_name}
               onChange={(e) => setUser({ ...user, last_name: e.target.value })}
               className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -162,7 +162,7 @@ const [showRepeatPassword, setShowRepeatPassword] = useState(false);
         <div className="relative mb-3">
           <input
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder="Lozinka"
             value={user.password}
             onChange={(e) => setUser({ ...user, password: e.target.value })}
             className="border p-2 block w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -223,7 +223,7 @@ const [showRepeatPassword, setShowRepeatPassword] = useState(false);
         <div className="relative mb-3">
           <input
             type={showRepeatPassword ? "text" : "password"}
-            placeholder="Repeat Password"
+            placeholder="Ponovite lozinku"
             value={user.repeatPassword}
             onChange={(e) =>
               setUser({ ...user, repeatPassword: e.target.value })

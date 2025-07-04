@@ -31,7 +31,7 @@ const Login = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.message || "Login neuspješan.");
+        toast.error(data.message || "Prijava neuspješna.");
         return;
       }
 
@@ -83,7 +83,7 @@ const Login = () => {
           <input
             id="password-field"
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder="Lozinka"
             value={credentials.password}
             onChange={(e) =>
               setCredentials({ ...credentials, password: e.target.value })

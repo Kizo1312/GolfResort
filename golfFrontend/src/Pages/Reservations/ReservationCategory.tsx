@@ -269,9 +269,7 @@ const ReservationCategory = () => {
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <h4 className="font-semibold">{w.name}</h4>
-                    <p className="text-gray-700 mb-4">
-                      {w.description?.split(".")[0] + "."}
-                    </p>
+                    <p className="text-sm text-gray-600">{w.description?.split(".")[0] + "."}</p>
                     <p className="text-sm text-green-700 font-medium mt-1">
                       {w.price} €
                     </p>

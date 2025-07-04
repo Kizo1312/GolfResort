@@ -62,7 +62,7 @@ const Navbar = () => {
               className="block px-4 py-2 rounded-lg text-gray-700 hover:bg-green-100 hover:text-green-700 font-semibold cursor-pointer"
               onClick={handleAuthClick}
             >
-              {user ? "Log out" : "Log in"}
+              {user ? "Odjavi se" : "Prijavi se"}
             </div>
           </li>
         </ul>

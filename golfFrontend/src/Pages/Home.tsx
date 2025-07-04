@@ -168,7 +168,7 @@ const HomePage = () => {
               <div className="p-6 flex flex-col flex-grow">
                 <h4 className="text-xl font-semibold mb-2">{service.title}</h4>
                 <p className="text-gray-700 flex-grow whitespace-pre-line">
-                  {service.description}
+                  {service.description?.split(".")[0] + "."}
                 </p>
                 <button
                   onClick={() => navigate(`/wellness?selectedId=${service.id}`)}
