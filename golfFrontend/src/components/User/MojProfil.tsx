@@ -227,10 +227,48 @@ const MojProfil = () => {
             <button
               type="button"
               onClick={() => setShowCurrentPassword((prev) => !prev)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-xl"
-              aria-label="Prikaži/sakrij trenutnu lozinku"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              aria-label="Prikaži/sakrij lozinku"
             >
-              {showCurrentPassword ? "👁️" : "👁️"}
+              {showCurrentPassword ? (
+                // Eye Off SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.255.241-2.454.675-3.55m3.675 6.45A3 3 0 1112 9c.795 0 1.515.31 2.05.825M15 15l6 6M3 3l18 18"
+                  />
+                </svg>
+              ) : (
+                // Eye SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-.856 2.621-2.875 4.75-5.542 6A9.964 9.964 0 0112 19c-2.21 0-4.262-.714-5.958-1.933"
+                  />
+                </svg>
+              )}
             </button>
           </div>
         </div>
@@ -250,10 +288,48 @@ const MojProfil = () => {
             <button
               type="button"
               onClick={() => setShowNewPassword((prev) => !prev)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-xl"
-              aria-label="Prikaži/sakrij novu lozinku"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              aria-label="Prikaži/sakrij lozinku"
             >
-              {showNewPassword ? "👁️" : "👁️"}
+              {showNewPassword ? (
+                // Eye Off SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.255.241-2.454.675-3.55m3.675 6.45A3 3 0 1112 9c.795 0 1.515.31 2.05.825M15 15l6 6M3 3l18 18"
+                  />
+                </svg>
+              ) : (
+                // Eye SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-.856 2.621-2.875 4.75-5.542 6A9.964 9.964 0 0112 19c-2.21 0-4.262-.714-5.958-1.933"
+                  />
+                </svg>
+              )}
             </button>
           </div>
           <p className="text-sm text-gray-500 mt-1">
