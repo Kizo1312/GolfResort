@@ -3,6 +3,25 @@ import { useTerrains } from "./Context/TerrainsContext";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "./Context/ModalContext";
 import { useReservation } from "./Context/ReservationContext";
+import map1 from "../assets/tereni/1-map.svg";
+import map2 from "../assets/tereni/2-map.svg";
+import map3 from "../assets/tereni/3-map.svg";
+import map4 from "../assets/tereni/4-map.svg";
+import map5 from "../assets/tereni/5-map.svg";
+import map6 from "../assets/tereni/6-map.svg";
+import map7 from "../assets/tereni/7-map.svg";
+import map8 from "../assets/tereni/8-map.svg";
+
+const terrainImages: Record<number, string> = {
+  1: map1,
+  2: map2,
+  3: map3,
+  4: map4, 
+  5: map5,
+  6: map6, 
+  7: map7, 
+  8: map8
+}
 
 type Props = {
   id: number;
@@ -48,8 +67,12 @@ const TerrainDetails = ({ id }: Props) => {
         </div>
 
         {/* Right side: placeholder image */}
-        <div className="w-full md:w-1/2 h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-          Slika terena
+        <div className="w-full md:w-1/2 min-h-[150px] rounded-lg overflow-hidden flex items-center justify-center">
+         <img
+            src={terrainImages[id]}
+            alt={`Mapa terena ${terrain.name}`}
+            className="max-w-full max-h-full object-contain"
+          />
         </div>
       </div>
 

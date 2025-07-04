@@ -3,6 +3,37 @@ import { useFetchData } from "@/hooks/useFetchData";
 import { useReservation } from "@/components/Context/ReservationContext";
 import { useNavigate } from "react-router-dom";
 import { useTerrains } from "@/components/Context/TerrainsContext";
+import map1 from "../../assets/tereni/1-map.svg";
+import map2 from "../../assets/tereni/2-map.svg";
+import map3 from "../../assets/tereni/3-map.svg";
+import map4 from "../../assets/tereni/4-map.svg";
+import map5 from "../../assets/tereni/5-map.svg";
+import map6 from "../../assets/tereni/6-map.svg";
+import map7 from "../../assets/tereni/7-map.svg";
+import map8 from "../../assets/tereni/8-map.svg";
+import wellness1 from "../../assets/wellness/aromaterapija.webp";
+import wellness2 from "../../assets/wellness/masaza.webp";
+import wellness3 from "../../assets/wellness/sauna.webp";
+import golfkategorija from "../../assets/hero/HeroImage.webp";
+import wellnesskategorija from "../../assets/hero/HeroImage3.webp";
+
+const terrainImages: Record<number, string> = {
+  1: map1,
+  2: map2,
+  3: map3,
+  4: map4, 
+  5: map5,
+  6: map6, 
+  7: map7, 
+  8: map8,
+}
+
+const wellnessImages: Record<number, string> = {
+  12: wellness2,
+  13: wellness3,
+  14: wellness1,
+}
+
 
 type Terrain = {
   id: number;
@@ -67,13 +98,13 @@ const ReservationCategory = () => {
                 key: "golf",
                 title: "Golf Courses",
                 desc: "Rezervirajte vrhunske golf terene.",
-                img: "https://source.unsplash.com/400x300/?golf",
+                img: golfkategorija,
               },
               {
                 key: "wellness",
                 title: "Wellness",
                 desc: "Opustite se u wellness oazi.",
-                img: "https://source.unsplash.com/400x300/?spa",
+                img: wellnesskategorija,
               },
             ].map((c) => (
               <button
@@ -115,19 +146,21 @@ const ReservationCategory = () => {
             {tereni?.map((t) => (
               <li
                 key={t.id}
-                className="flex bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition"
+                className="flex items-center bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition"
               >
-                <div className="w-32 h-24 bg-gray-200 flex-shrink-0">
-                  <img
-                    src="https://source.unsplash.com/128x96/?golfcourse"
-                    alt={t.name}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-32 h-24 flex justify-center items-center flex-shrink-0 pl-2">
+                 <img
+                  src={terrainImages[t.id]}
+                  alt={`Mapa terena ${t.name}`}
+                  className="max-w-full max-h-full object-contain"
+                />
                 </div>
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <h4 className="font-semibold">{t.name}</h4>
-                   
+                     <p className="text-gray-700 mb-4">
+                      {t.description?.split(".")[0] + "."}
+                      </p>                   
                     <p className="text-sm text-green-700 font-medium mt-1">
                       {t.price} €
                     </p>
@@ -149,15 +182,31 @@ const ReservationCategory = () => {
       {category === "golf" && selectedTerrain && (
         <>
           <h3 className="text-xl font-medium mt-4">Odabrani teren</h3>
-          <div className="p-4 border rounded bg-white shadow">
-            <p>
-              <strong>{selectedTerrain.name}</strong>
-            </p>
-           
-            <p className="text-green-600 font-semibold">
+          <div className="p-4 border rounded bg-white shadow flex flex-col justify-between h-full">
+            <div>
+              <p>
+                <strong>{selectedTerrain.name}</strong>
+              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <div className="w-32 h-24 flex justify-center items-center flex-shrink-0 pl-2">
+                  <img
+                    src={terrainImages[selectedTerrain.id]}
+                    alt={`Mapa terena ${selectedTerrain.name}`}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+                <p className="text-gray-700 mb-4">
+                  {selectedTerrain.description?.split(".")[0] + "."}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-green-600 font-semibold self-end">
               {selectedTerrain.price} €
             </p>
           </div>
+
+        
 
           <h3 className="text-xl font-medium mt-4">Dodatne usluge</h3>
           {dodatneUsluge?.map((u) => (
@@ -210,12 +259,12 @@ const ReservationCategory = () => {
                 key={w.id}
                 className="flex bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition"
               >
-                <div className="w-32 h-24 bg-gray-200 flex-shrink-0">
+                <div className="w-32 h-24 flex-shrink-0">
                   <img
-                    src="https://source.unsplash.com/128x96/?spa"
-                    alt={w.name}
-                    className="w-full h-full object-cover"
-                  />
+                  src={wellnessImages[w.id]}
+                  alt={`Wellness usluga: ${w.name}`}
+                  className="max-w-full max-h-full object-contain"
+                />
                 </div>
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
@@ -244,7 +293,9 @@ const ReservationCategory = () => {
           <h3 className="text-xl font-medium">
             Odabrali ste: {selectedWellness.name}
           </h3>
-          <p className="text-gray-700">{selectedWellness.description}</p>
+          <p className="text-gray-700 mb-4">
+            {selectedWellness.description?.split(".")[0] + "."}
+          </p>
           <p className="text-green-700 font-semibold pt-1">
             {selectedWellness.price} €
           </p>

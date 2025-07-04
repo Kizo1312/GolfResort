@@ -17,6 +17,7 @@ const RezervacijaTermin = () => {
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [busyRanges, setBusyRanges] = useState<{ start: string; end: string }[]>([]);
   const navigate = useNavigate();
+  const [showError, setShowError] = useState(false);
 
   const mainService = reservation.reservation_items?.[0];
   const mainServiceId = mainService?.service_id;
@@ -277,33 +278,43 @@ const RezervacijaTermin = () => {
       )}
 
       {mainServiceId && (
-        <div className="flex justify-between pt-10">
+        <div className="flex flex-wrap justify-between items-start gap-4 pt-10">
           <button
             onClick={() => navigate("/rezervacije")}
             className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded"
           >
             Natrag
           </button>
-          <button
-            onClick={() => {
-              if (!user) {
-                open("auth");
-                return;
-              }
-              if (!reservation.start_time || !reservation.date) {
-                alert("Molimo odaberite termin prije potvrde.");
-                return;
-              }
-              navigate("/rezervacija/pregled");
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded"
-          >
-            ✅ Potvrdi
-          </button>
+
+          <div className="flex flex-col items-end">
+            <button
+              onClick={() => {
+                if (!user) {
+                  open("auth");
+                  return;
+                }
+                if (!reservation.start_time || !reservation.date) {
+                  setShowError(true);
+                  return;
+                }
+                navigate("/rezervacija/pregled");
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded"
+            >
+              ✅ Potvrdi
+            </button>
+
+            {showError && (
+              <p className="text-sm text-red-500 mt-2 text-right max-w-[200px]">
+                Molimo odaberite termin i datum prije potvrde.
+              </p>
+            )}
+          </div>
         </div>
       )}
-    </div>
-  );
-};
+
+        </div>
+      )}
+    
 
 export default RezervacijaTermin;

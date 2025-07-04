@@ -89,12 +89,12 @@ const HomePage = () => {
                 style={{ backgroundImage: `url(${slide.image})` }}
               >
                 {/* Dynamic Overlay */}
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                  <div className="bg-white/80 p-8 rounded-lg shadow-lg text-center max-w-xl">
+                <div className="absolute inset-0 bg-gray/35 flex items-center justify-center ">
+                  <div className="bg-white/70 p-8 rounded-lg shadow-lg text-center max-w-xl shadow-2x">
                     <h2 className="text-4xl font-bold text-gray-900 mb-4">
                       {slide.title}
                     </h2>
-                    <p className="text-lg text-gray-700 mb-6">
+                    <p className="text-lg text-gray-900 mb-6">
                       {slide.description}
                     </p>
                     <button
@@ -119,13 +119,13 @@ const HomePage = () => {
         style={{ backgroundImage: `url(${background})` }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gray/35 backdrop-blur-[1px] z-0 rounded-none" />
+        <div className="absolute inset-0 bg-gray/50 backdrop-blur-[1px] z-0 rounded-none" />
 
         {/* Content */}
         <div className="relative z-10 max-w-[90vw] mx-auto">
-          <div className="bg-gray/50 bg-white/10 backdrop-blur-sm rounded-xl p-8 shadow-2xl max-w-6xl mx-auto border border-white/20 overflow-visible">
+          <div className="bg-gray/50 bg-white/13 backdrop-blur-sm rounded-xl p-8 shadow-2xl max-w-6xl mx-auto border border-white/20 overflow-visible">
             
-            <div className="max-w-[1200px] mx-auto text-center text-white mb-10">
+            <div className="max-w-[1200px] mx-auto text-center text-white drop-shadow mb-10">
               <h2 className="text-4xl md:text-5xl font-semibold drop-shadow-lg mb-4">
                 Golf tereni
               </h2>
