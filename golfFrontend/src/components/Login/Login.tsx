@@ -83,7 +83,7 @@ const Login = () => {
           <input
             id="password-field"
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder="Lozinka"
             value={credentials.password}
             onChange={(e) =>
               setCredentials({ ...credentials, password: e.target.value })
