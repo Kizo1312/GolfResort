@@ -18,6 +18,7 @@ const Login = () => {
   const { close } = useModal();
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const fetchUser = async () => {
     try {
@@ -79,16 +80,27 @@ const Login = () => {
         />
 
         <label htmlFor="password-field">Lozinka</label>
-        <input
-          id="password-field"
-          type="password"
-          placeholder="Password"
-          value={credentials.password}
-          onChange={(e) =>
-            setCredentials({ ...credentials, password: e.target.value })
-          }
-          className="border p-2 mb-3 block w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-        />
+<div className="relative mb-3">
+  <input
+    id="password-field"
+    type={showPassword ? "text" : "password"}
+    placeholder="Password"
+    value={credentials.password}
+    onChange={(e) =>
+      setCredentials({ ...credentials, password: e.target.value })
+    }
+    className="border p-2 block w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
+  />
+  <button
+    type="button"
+    onClick={() => setShowPassword((prev) => !prev)}
+    className="absolute right-2 top-1/2 -translate-y-1/2 text-xl"
+    aria-label="Toggle password visibility"
+  >
+    {showPassword ? "👁️" : "👁️"}
+  </button>
+</div>
+
 
         <div className="w-full flex justify-end">
           <button
