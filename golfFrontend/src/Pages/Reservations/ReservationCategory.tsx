@@ -21,19 +21,18 @@ const terrainImages: Record<number, string> = {
   1: map1,
   2: map2,
   3: map3,
-  4: map4, 
+  4: map4,
   5: map5,
-  6: map6, 
-  7: map7, 
+  6: map6,
+  7: map7,
   8: map8,
-}
+};
 
 const wellnessImages: Record<number, string> = {
   12: wellness2,
   13: wellness3,
   14: wellness1,
-}
-
+};
 
 type Terrain = {
   id: number;
@@ -68,8 +67,10 @@ const ReservationCategory = () => {
     "/services/dodatna%20usluga"
   );
 
-  const selectedTerrain = reservation.reservation_items?.[0]
-    ? getById(reservation.reservation_items[0].service_id)
+  const selectedTerrain: Terrain | null = reservation.reservation_items?.[0]
+    ? (getById(
+        reservation.reservation_items[0].service_id
+      ) as unknown as Terrain)
     : null;
 
   const handleOdaberiTeren = (t: Terrain) => {
@@ -146,31 +147,41 @@ const ReservationCategory = () => {
             {tereni?.map((t) => (
               <li
                 key={t.id}
-                className="flex items-center bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition"
+                className={`flex items-center bg-white shadow rounded-xl overflow-hidden transition ${
+                  t.inventory === 0
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:ring-2 hover:ring-green-500"
+                }`}
               >
                 <div className="w-32 h-24 flex justify-center items-center flex-shrink-0 pl-2">
-                 <img
-                  src={terrainImages[t.id]}
-                  alt={`Mapa terena ${t.name}`}
-                  className="max-w-full max-h-full object-contain"
-                />
+                  <img
+                    src={terrainImages[t.id]}
+                    alt={`Mapa terena ${t.name}`}
+                    className="max-w-full max-h-full object-contain"
+                  />
                 </div>
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <h4 className="font-semibold">{t.name}</h4>
-                     <p className="text-gray-700 mb-4">
+                    <p className="text-gray-700 mb-4">
                       {t.description?.split(".")[0] + "."}
-                      </p>                   
+                    </p>
                     <p className="text-sm text-green-700 font-medium mt-1">
                       {t.price} €
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleOdaberiTeren(t)}
-                    className="mt-2 bg-green-600 text-white px-4 py-1 rounded text-sm self-start"
-                  >
-                    Odaberi
-                  </button>
+                  {t.inventory > 0 ? (
+                    <button
+                      onClick={() => handleOdaberiTeren(t)}
+                      className="mt-2 bg-green-600 text-white px-4 py-1 rounded text-sm self-start"
+                    >
+                      Odaberi
+                    </button>
+                  ) : (
+                    <span className="mt-2 text-red-500 text-sm font-medium">
+                      Nedostupno
+                    </span>
+                  )}
                 </div>
               </li>
             ))}
@@ -206,8 +217,6 @@ const ReservationCategory = () => {
             </p>
           </div>
 
-        
-
           <h3 className="text-xl font-medium mt-4">Dodatne usluge</h3>
           {dodatneUsluge?.map((u) => (
             <ExtraRow
@@ -236,14 +245,27 @@ const ReservationCategory = () => {
               Otkaži
             </button>
 
+            {selectedTerrain.inventory === 0 && (
+              <p className="text-red-600 font-medium mt-2">
+                Ovaj teren trenutno nije dostupan za rezervaciju.
+              </p>
+            )}
+
             <button
               onClick={() => {
-                goToStep("termin");
-                navigate("/rezervacija/termin");
+                if (selectedTerrain.inventory > 0) {
+                  goToStep("termin");
+                  navigate("/rezervacija/termin");
+                }
               }}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded"
+              disabled={selectedTerrain.inventory === 0}
+              className={`px-6 py-2 rounded font-semibold transition ${
+                selectedTerrain.inventory === 0
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700 text-white"
+              }`}
             >
-              Nastavi
+              {selectedTerrain.inventory === 0 ? "Nedostupno" : "Nastavi"}
             </button>
           </div>
         </>
@@ -261,15 +283,17 @@ const ReservationCategory = () => {
               >
                 <div className="w-32 h-24 flex-shrink-0">
                   <img
-                  src={wellnessImages[w.id]}
-                  alt={`Wellness usluga: ${w.name}`}
-                  className="max-w-full max-h-full object-contain"
-                />
+                    src={wellnessImages[w.id]}
+                    alt={`Wellness usluga: ${w.name}`}
+                    className="max-w-full max-h-full object-contain"
+                  />
                 </div>
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <h4 className="font-semibold">{w.name}</h4>
-                    <p className="text-sm text-gray-600">{w.description?.split(".")[0] + "."}</p>
+                    <p className="text-sm text-gray-600">
+                      {w.description?.split(".")[0] + "."}
+                    </p>
                     <p className="text-sm text-green-700 font-medium mt-1">
                       {w.price} €
                     </p>
@@ -311,7 +335,7 @@ const ReservationCategory = () => {
                   duration_minutes: undefined,
                   user_id: undefined,
                 });
-                navigate("/rezervacije"); 
+                navigate("/rezervacije");
               }}
               className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded"
             >

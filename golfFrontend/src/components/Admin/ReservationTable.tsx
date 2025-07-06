@@ -10,6 +10,7 @@ type ReservationItem = {
     id: number;
     name: string;
     price: string;
+    category: string;
   };
 };
 
@@ -72,12 +73,10 @@ const ReservationTable = ({ items }: Props) => {
 
     for (const item of res.reservation_items) {
       const price = parseFloat(item.service?.price || "0");
+      const category = item.service?.category;
 
-      // Check if it's a golf terrain (you can refine this check if needed)
-      const isTerrain = item.quantity === 1;
-
-      if (isTerrain && res.duration_minutes > 0) {
-        const hours = res.duration_minutes / 60;
+      const hours = res.duration_minutes / 60;
+      if (category === "golf teren" && res.duration_minutes > 0) {
         total += hours * price;
       } else {
         total += item.quantity * price;
