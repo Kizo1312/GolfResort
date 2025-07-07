@@ -35,13 +35,19 @@ const localizer = dateFnsLocalizer({
 });
 
 const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
-  const [view, setView] = useState<View>("week");
+  const [view, setView] = useState<View>("month");
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
-  const monthEvents: Event[] = reservations.map((res) => ({
-    title: "",
-    start: new Date(`${res.date}T00:00:00`),
-    end: new Date(`${res.date}T23:59:59`),
+  const groupedByDate: { [date: string]: number } = {};
+
+  reservations.forEach(res => {
+    groupedByDate[res.date] = (groupedByDate[res.date] || 0) + 1;
+  });
+
+  const monthEvents: Event[] = Object.entries(groupedByDate).map(([date, count]) => ({
+    title: `Broj rezervacija: ${count}`,
+    start: new Date(`${date}T00:00:00`),
+    end: new Date(`${date}T23:59:59`),
     allDay: true,
   }));
 
@@ -59,6 +65,8 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
     };
   });
 
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
   const events = view === "month" ? monthEvents : detailedEvents;
 
   return (
@@ -72,7 +80,23 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
         endAccessor="end"
         selectable
         view={view}
+        date={selectedDate}
+        onNavigate={(date) => setSelectedDate(date)}
         onView={(newView) => setView(newView)}
+        onSelectSlot={({start}) => {
+          if (view === "month" && start instanceof Date) {
+            setSelectedDate(start);
+            setView("day");
+          }
+        }}
+        onSelectEvent={(event) => {
+          if (view === "month" && event?.start) {
+            setSelectedDate(event.start);
+            setView("day");
+          } else if (event.resource) {
+            setSelectedReservation(event.resource);
+          }
+        }}
         style={{ height: 600 }}
         step={15}
         timeslots={2}
@@ -81,8 +105,8 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
         dayLayoutAlgorithm="no-overlap"
         eventPropGetter={() => ({
           style: {
-            backgroundColor: "#5882a7", // neutral gray
-            color: "#ffffff", // dark slate for contrast
+            backgroundColor: "#5882a7", 
+            color: "#ffffff", 
             borderRadius: "6px",
             padding: "4px 6px",
             fontSize: "0.875rem",
@@ -90,11 +114,6 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
           },
         })}
         tooltipAccessor={(event) => String(event.title ?? "")}
-        onSelectEvent={(event) => {
-          if (view !== "month" && event.resource) {
-            setSelectedReservation(event.resource);
-          }
-        }}
         messages={{
           next: "Sljedeći",
           previous: "Prethodni",
