@@ -2,7 +2,6 @@ import { apiRequest } from "@/hooks/apiHookAsync";
 import { useEffect, useState, useMemo } from "react";
 import toast from "react-hot-toast";
 
-
 type Props = {
   isOpen: boolean;
   onClose: () => void;
@@ -17,12 +16,14 @@ const EditReservationModal = ({
   onUpdate,
 }: Props) => {
   const [date, setDate] = useState(reservation.date);
-  const [startTime, setStartTime] = useState(reservation.start_time.slice(0, 5)); 
+  const [startTime, setStartTime] = useState(
+    reservation.start_time.slice(0, 5)
+  );
   const [duration, setDuration] = useState(reservation.duration_minutes);
   const [busyRanges, setBusyRanges] = useState<
     { start: string; end: string }[]
   >([]);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const mainServiceId =
     reservation.reservation_items?.[0]?.service?.id ||
@@ -37,7 +38,7 @@ const EditReservationModal = ({
     const [h, m, s] = timeStr.split(":").map(Number);
     const date = new Date();
     date.setHours(h, m + mins, s || 0, 0);
-    return date.toTimeString().slice(0, 8); 
+    return date.toTimeString().slice(0, 8);
   };
 
   const availableTimeOptions = useMemo(() => {
@@ -71,14 +72,12 @@ const EditReservationModal = ({
     });
   }, [timeOptions, busyRanges, duration, date]);
 
-  
   useEffect(() => {
     if (!availableTimeOptions.includes(startTime)) {
       setStartTime(availableTimeOptions[0] || "");
     }
   }, [availableTimeOptions]);
 
-  
   useEffect(() => {
     if (isOpen) {
       setDate(reservation.date);
@@ -87,7 +86,6 @@ const EditReservationModal = ({
     }
   }, [isOpen, reservation]);
 
-  
   useEffect(() => {
     if (!mainServiceId || !date) return;
 
@@ -107,7 +105,6 @@ const EditReservationModal = ({
 
         let busy = await res.json();
 
-      
         const currentStart =
           reservation.start_time.length === 5
             ? `${reservation.start_time}:00`
@@ -136,41 +133,41 @@ const EditReservationModal = ({
     fetchAvailability();
   }, [date, mainServiceId, reservation]);
 
- const handleSubmit = async () => {
-  const formattedStartTime =
-    startTime.length === 5 ? `${startTime}:00` : startTime;
+  const handleSubmit = async () => {
+    const formattedStartTime =
+      startTime.length === 5 ? `${startTime}:00` : startTime;
 
-  const updatedReservation = {
-    user_id: reservation.user_id,
-    date,
-    start_time: formattedStartTime,
-    duration_minutes: duration,
-    reservation_items: reservation.reservation_items.map((item: any) => ({
-      service_id: item.service?.id || item.service_id,
-      quantity: item.quantity,
-    })),
+    const updatedReservation = {
+      user_id: reservation.user_id,
+      date,
+      start_time: formattedStartTime,
+      duration_minutes: duration,
+      reservation_items: reservation.reservation_items.map((item: any) => ({
+        service_id: item.service?.id || item.service_id,
+        quantity: item.quantity,
+      })),
+    };
+
+    try {
+      const response = await toast.promise(
+        apiRequest(
+          `/reservations/${reservation.id}`,
+          "PUT",
+          updatedReservation
+        ),
+        {
+          loading: "Spremanje...",
+          success: "Rezervacija uspješno ažurirana!",
+          error: (err) => err.message || "Greška: nešto nije u redu.",
+        }
+      );
+
+      onUpdate(response);
+      onClose();
+    } catch (err) {
+      // Error toast is already shown by toast.promise
+    }
   };
-
-  try {
-    const response = await toast.promise(
-      apiRequest(
-        `/reservations/${reservation.id}`,
-        "PUT",
-        updatedReservation
-      ),
-      {
-        loading: "Spremanje...",
-        success: "Rezervacija uspješno ažurirana!",
-        error: (err) => err.message || "Greška: nešto nije u redu.",
-      }
-    );
-
-    onUpdate(response);
-    onClose();
-  } catch (err) {
-    // Error toast is already shown by toast.promise
-  }
-};
 
   if (!isOpen) return null;
 
@@ -209,15 +206,23 @@ const EditReservationModal = ({
             </select>
           </label>
 
-          <label className="block">
-            Trajanje (min):
-            <input
-              type="number"
-              value={duration}
-              onChange={(e) => setDuration(Number(e.target.value))}
-              className="border rounded p-2 w-full"
-            />
-          </label>
+          {reservation.reservation_items?.[0]?.service?.category !==
+            "wellness" && (
+            <label className="block">
+              Trajanje (min):
+              <select
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+                className="border rounded p-2 w-full"
+              >
+                {[60, 120, 180, 240].map((val) => (
+                  <option key={val} value={val}>
+                    {val} minuta
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">
