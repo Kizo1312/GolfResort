@@ -86,6 +86,9 @@ const ReservationCategory = () => {
       reservation_items: [{ service_id: w.id, quantity: 1 }],
     });
   };
+  const sortedTereni = tereni?.sort((a,b) => a.id -b.id)
+  const sortedByAvailable = sortedTereni?.sort((a, b) => (a.inventory === 0 ? 1 : 0) - (b.inventory === 0 ? 1 : 0));
+
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto p-6">
@@ -143,8 +146,9 @@ const ReservationCategory = () => {
       {category === "golf" && !selectedTerrain && (
         <>
           <h3 className="text-xl font-medium mt-4">Odaberi teren</h3>
+         
           <ul className="space-y-4">
-            {tereni?.map((t) => (
+            {sortedByAvailable?.map((t) => (
               <li
                 key={t.id}
                 className={`flex items-center bg-white shadow rounded-xl overflow-hidden transition ${

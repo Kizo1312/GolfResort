@@ -2,14 +2,21 @@ import React, { useState } from "react";
 import { useModal } from "../Context/ModalContext";
 import { useAuth } from "../Context/AuthContext";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isOn, setIsOn] = useState(false);
   const { open } = useModal();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleAuthClick = () => {
-    if (user) logout();
+    if (user) {
+
+      logout();
+      navigate("/home")
+    }
+      
     else open("auth");
   };
 
