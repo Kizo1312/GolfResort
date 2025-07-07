@@ -76,11 +76,13 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
         style={{ height: 600 }}
         step={15}
         timeslots={2}
+        min={new Date(1970, 1, 1, 8, 0)}
+        max={new Date(1970, 1, 1, 20, 0)}
         dayLayoutAlgorithm="no-overlap"
         eventPropGetter={() => ({
           style: {
-            backgroundColor: "#e2e8f0", // neutral gray
-            color: "#1e293b", // dark slate for contrast
+            backgroundColor: "#5882a7", // neutral gray
+            color: "#ffffff", // dark slate for contrast
             borderRadius: "6px",
             padding: "4px 6px",
             fontSize: "0.875rem",
