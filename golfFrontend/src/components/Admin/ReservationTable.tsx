@@ -36,6 +36,11 @@ const ReservationTable = ({ items }: Props) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] =
     useState<Reservation | null>(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const [reservationToDelete, setReservationToDelete] =
+    useState<Reservation | null>(null);
 
   const openEditModal = (reservation: Reservation) => {
     setSelectedReservation(reservation);
@@ -54,15 +59,10 @@ const ReservationTable = ({ items }: Props) => {
   }, [items, selectedDate]);
 
   const deleteReservation = async (id: number) => {
-    const confirm = window.confirm(
-      "Jeste li sigurni da želite obrisati ovu rezervaciju?"
-    );
-    if (!confirm) return;
-
     try {
       await apiRequest(`/reservations/${id}`, "DELETE");
       setFiltered((prev) => prev.filter((r) => r.id !== id));
-      alert("Rezervacija uspješno obrisana.");
+      setShowSuccessModal(true);
     } catch (err: any) {
       alert("Greška: " + (err.message || "Neuspješno brisanje."));
     }
@@ -138,11 +138,15 @@ const ReservationTable = ({ items }: Props) => {
               </span>
               <div className="flex justify-end gap-4">
                 <button
-                  onClick={() => deleteReservation(res.id)}
-                  className="text-red-600 hover:underline text-sm"
+                  onClick={() => {
+                    setReservationToDelete(res);
+                    setShowConfirmDelete(true);
+                  }}
+                  className="text-red-500 hover:underline text-sm"
                 >
                   Obriši
                 </button>
+
                 <button
                   onClick={() => openEditModal(res)}
                   className="text-blue-600 hover:underline text-sm"
@@ -163,6 +167,62 @@ const ReservationTable = ({ items }: Props) => {
           onUpdate={handleUpdate}
         />
       )}
+      
+{showConfirmDelete && reservationToDelete && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+      <p className="mb-4 text-gray-800">
+        Jeste li sigurni da želite obrisati rezervaciju za{" "}
+        <strong>{dayjs(reservationToDelete.date).format("DD. MM. YYYY.")}</strong> u{" "}
+        <strong>{reservationToDelete.start_time}</strong>?
+      </p>
+      <div className="flex justify-end space-x-4">
+        <button
+          onClick={() => {
+            setShowConfirmDelete(false);
+            setReservationToDelete(null);
+          }}
+          className="px-4 py-2 border rounded hover:bg-gray-100"
+        >
+          Odustani
+        </button>
+        <button
+          onClick={async () => {
+            setShowConfirmDelete(false);
+            if (reservationToDelete) {
+              await deleteReservation(reservationToDelete.id);
+            }
+            setReservationToDelete(null);
+          }}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Obriši rezervaciju
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showSuccessModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+      <p className="mb-4 text-green-700 font-medium">
+        Rezervacija je uspješno obrisana.
+      </p>
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowSuccessModal(false)}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          U redu
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+      
     </div>
   );
 };
