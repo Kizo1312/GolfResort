@@ -24,9 +24,7 @@ type Props = {
   reservations: Reservation[];
 };
 
-const locales = {
-  hr: hr,
-};
+const locales = { hr };
 
 const localizer = dateFnsLocalizer({
   format,
@@ -37,10 +35,11 @@ const localizer = dateFnsLocalizer({
 });
 
 const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
-  const [view, setView] = useState<View>("month");
+  const [view, setView] = useState<View>("week");
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
   const monthEvents: Event[] = reservations.map((res) => ({
-    title: "", // No visible text for month cells
+    title: "",
     start: new Date(`${res.date}T00:00:00`),
     end: new Date(`${res.date}T23:59:59`),
     allDay: true,
@@ -51,13 +50,12 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
       .map((item) => `${item.service?.name} (${item.quantity}x)`)
       .join(", ");
 
-    const title = `${r.start_time} - ${r.end_time}: ${itemsStr}`;
-
     return {
-      title,
+      title: itemsStr,
       start: new Date(`${r.date}T${r.start_time}`),
       end: new Date(`${r.date}T${r.end_time}`),
       allDay: false,
+      resource: r, // Pass full reservation
     };
   });
 
@@ -72,31 +70,29 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
         events={events}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 500 }}
-        selectable={true}
+        selectable
         view={view}
         onView={(newView) => setView(newView)}
-        onSelectSlot={(slotInfo) => {
-          if (view === "month" && slotInfo.start) {
-            const clickedDate = slotInfo.start.toISOString().split("T")[0];
-            console.log("Kliknut datum (slot):", clickedDate);
-          }
-        }}
+        style={{ height: 600 }}
+        step={15}
+        timeslots={2}
+        dayLayoutAlgorithm="no-overlap"
+        eventPropGetter={() => ({
+          style: {
+            backgroundColor: "#e2e8f0", // neutral gray
+            color: "#1e293b", // dark slate for contrast
+            borderRadius: "6px",
+            padding: "4px 6px",
+            fontSize: "0.875rem",
+            border: "none",
+          },
+        })}
+        tooltipAccessor={(event) => String(event.title ?? "")}
         onSelectEvent={(event) => {
-          if (view === "month" && event.start) {
-            const clickedDate = event.start.toISOString().split("T")[0];
-            console.log("Kliknut datum (event):", clickedDate);
+          if (view !== "month" && event.resource) {
+            setSelectedReservation(event.resource);
           }
         }}
-        eventPropGetter={() => {
-          if (view === "month") {
-            return {
-              className: "cursor-pointer bg-blue-50 hover:bg-blue-100",
-            };
-          }
-          return {};
-        }}
-        
         messages={{
           next: "Sljedeći",
           previous: "Prethodni",
@@ -109,10 +105,41 @@ const ReservationCalendar: React.FC<Props> = ({ reservations }) => {
           time: "Vrijeme",
           event: "Događaj",
           noEventsInRange: "Nema događaja u ovom rasponu.",
-          showMore: (total) => `Broj rezervacija: ${total}  `,
+          showMore: (total) => `Broj rezervacija: ${total}`,
         }}
-        tooltipAccessor={(event) => String(event.title)}
       />
+
+      {/* Modal sa detaljima rezervacije */}
+      {selectedReservation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+            <h4 className="text-lg font-semibold mb-2">Detalji rezervacije</h4>
+            <p className="text-sm text-gray-700 mb-1">
+              📅 Datum: <strong>{selectedReservation.date}</strong>
+            </p>
+            <p className="text-sm text-gray-700 mb-1">
+              🕒 Vrijeme: <strong>{selectedReservation.start_time} – {selectedReservation.end_time}</strong>
+            </p>
+            <p className="text-sm text-gray-700 mb-2">🔧 Usluge:</p>
+            <ul className="text-sm text-gray-800 list-disc list-inside mb-4">
+              {selectedReservation.reservation_items.map((item, idx) => (
+                <li key={idx}>
+                  {item.service?.name} ({item.quantity}x)
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setSelectedReservation(null)}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+              >
+                Zatvori
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
