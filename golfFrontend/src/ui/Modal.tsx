@@ -37,7 +37,7 @@ const Modal = () => {
                     : "text-gray-500 hover:text-blue-600"
                 }`}
               >
-                Login
+                Prijava
               </button>
               <button
                 onClick={() => setActiveTab("register")}
@@ -47,7 +47,7 @@ const Modal = () => {
                     : "text-gray-500 hover:text-blue-600"
                 }`}
               >
-                Register
+                Registracija
               </button>
             </div>
 

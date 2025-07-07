@@ -183,7 +183,7 @@ const MojeRezervacije = () => {
               if (item.service.category === "golf teren") {
                 return sum + item.price_at_booking * (rez.duration_minutes / 60);
               }
-              return sum + item.quantity * item.price_at_booking;
+              return sum + item.quantity * item.price_at_booking  * (rez.duration_minutes / 60);
             }, 0)
             .toFixed(2)}{" "}
           €

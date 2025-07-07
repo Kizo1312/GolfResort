@@ -80,7 +80,7 @@ const ReservationTable = ({ items }: Props) => {
       if (category === "golf teren" && res.duration_minutes > 0) {
         total += hours * price;
       } else {
-        total += item.quantity * price;
+        total += item.quantity * price * hours ;
       }
     }
 

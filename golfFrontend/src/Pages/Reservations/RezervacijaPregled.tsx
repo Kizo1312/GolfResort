@@ -38,27 +38,33 @@ const RezervacijaPregled = () => {
   }, []);
 
   const ukupnaCijena = () => {
-    const main =
-      mainService?.quantity && getById(mainService.service_id)?.price
-        ? isGolf
-          ? mainService.quantity *
-            (reservation.duration_minutes! / 60) *
-            parseFloat(getById(mainService.service_id)?.price.toString() || "0")
-          : mainService.quantity *
-            parseFloat(getById(mainService.service_id)?.price.toString() || "0")
-        : 0;
+  const main =
+    mainService?.quantity && getById(mainService.service_id)?.price
+      ? isGolf
+        ? mainService.quantity *
+          (reservation.duration_minutes! / 60) *
+          parseFloat(getById(mainService.service_id)?.price.toString() || "0")
+        : mainService.quantity *
+          parseFloat(getById(mainService.service_id)?.price.toString() || "0")
+      : 0;
 
-    const extras = dodatne.reduce((sum, d) => {
-      const cijena =
-        d.quantity && getById(d.service_id)?.price
-          ? d.quantity *
-            parseFloat(getById(d.service_id)?.price.toString() || "0")
-          : 0;
-      return sum + cijena;
-    }, 0);
+  const extras = dodatne.reduce((sum, d) => {
+    const service = getById(d.service_id);
+    const basePrice = parseFloat(service?.price?.toString() || "0");
+    const isTimed =
+      service?.category === "dodatna usluga" &&
+      typeof reservation.duration_minutes === "number";
 
-    return (main + extras).toFixed(2);
-  };
+    const cijena = isTimed
+      ? d.quantity * (reservation.duration_minutes! / 60) * basePrice
+      : d.quantity * basePrice;
+
+    return sum + cijena;
+  }, 0);
+
+  return (main + extras).toFixed(2);
+};
+
 
   const handleSubmit = async () => {
     if (!reservation.date || !reservation.start_time || !user?.id) {

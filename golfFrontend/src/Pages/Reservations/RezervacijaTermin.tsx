@@ -121,26 +121,32 @@ const RezervacijaTermin = () => {
   };
 
   const ukupnaCijena = () => {
-    const main =
-      mainService?.quantity && getService(mainService.service_id)?.price
-        ? isGolf && typeof selectedDuration === "number"
-          ? mainService.quantity *
-            selectedDuration *
-            parseFloat(getService(mainService.service_id)?.price.toString() || "0")
-          : mainService.quantity *
-            parseFloat(getService(mainService.service_id)?.price.toString() || "0")
-        : 0;
+  const main =
+    mainService?.quantity && getService(mainService.service_id)?.price
+      ? isGolf && typeof selectedDuration === "number"
+        ? mainService.quantity *
+          selectedDuration *
+          parseFloat(getService(mainService.service_id)?.price.toString() || "0")
+        : mainService.quantity *
+          parseFloat(getService(mainService.service_id)?.price.toString() || "0")
+      : 0;
 
-    const extras = dodatne.reduce((sum, d) => {
-      const cijena =
-        d.quantity && getService(d.service_id)?.price
-          ? d.quantity * parseFloat(getService(d.service_id)?.price.toString() || "0")
-          : 0;
-      return sum + cijena;
-    }, 0);
+  const extras = dodatne.reduce((sum, d) => {
+    const service = getService(d.service_id);
+    const basePrice = parseFloat(service?.price.toString() || "0");
+    let cijena = 0;
 
-    return (main + extras).toFixed(2);
-  };
+    if (service?.category === "dodatna usluga" && typeof selectedDuration === "number") {
+      cijena = d.quantity * selectedDuration * basePrice;
+    } else {
+      cijena = d.quantity * basePrice;
+    }
+
+    return sum + cijena;
+  }, 0);
+
+  return (main + extras).toFixed(2);
+};
 
   const handleStartTimeChange = (value: string) => {
     setReservationData({
