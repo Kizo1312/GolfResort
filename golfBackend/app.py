@@ -25,6 +25,9 @@ def create_app(db_url=None):
     f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@"
     f"{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 )
+    
+    print("Connected to DB:", app.config["SQLALCHEMY_DATABASE_URI"])
+
 
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

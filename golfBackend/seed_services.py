@@ -1,6 +1,7 @@
 from app import create_app
 from db import db
 from models.service import ServiceModel
+from sqlalchemy import text
 
 app = create_app()
 
@@ -131,4 +132,9 @@ with app.app_context():
             service = ServiceModel(**data)
             db.session.add(service)
     db.session.commit()
+
+    # 🔧 Fix sequence so new inserts don’t clash with existing IDs
+    db.session.execute(text("SELECT setval('services_id_seq', (SELECT MAX(id) FROM services));"))
+    db.session.commit()
+
     print("✅ Services successfully inserted.")

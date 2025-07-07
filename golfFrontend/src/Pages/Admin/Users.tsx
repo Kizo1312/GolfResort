@@ -24,6 +24,9 @@ const Users = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -71,7 +74,7 @@ const Users = () => {
   }, [dropdownOpen]);
 
   const handleDelete = async (userId: number) => {
-    if (!confirm("Jeste li sigurni da želite obrisati korisnika?")) return;
+    
     try {
       await apiRequest(`/users/${userId}`, "DELETE");
       fetchUsers();
@@ -201,7 +204,10 @@ const Users = () => {
                 Uredi
               </button>
               <button
-                onClick={() => handleDelete(user.id)}
+                onClick={() => {
+                  setUserToDelete(user);
+                  setShowConfirmDelete(true);
+                }}
                 className="text-red-500 hover:underline text-sm"
               >
                 Obriši
@@ -210,6 +216,43 @@ const Users = () => {
           </li>
         ))}
       </ul>
+
+      {showConfirmDelete && userToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <p className="mb-4 text-gray-800">
+              Jeste li sigurni da želite obrisati korisnika{" "}
+              <strong>
+                {userToDelete.name} {userToDelete.last_name}
+              </strong>
+              ?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => {
+                  setShowConfirmDelete(false);
+                  setUserToDelete(null);
+                }}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
+                Odustani
+              </button>
+              <button
+                onClick={async () => {
+                  setShowConfirmDelete(false);
+                  if (userToDelete) {
+                    await handleDelete(userToDelete.id);
+                  }
+                  setUserToDelete(null);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Obriši
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
