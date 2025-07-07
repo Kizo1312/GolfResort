@@ -59,21 +59,20 @@ const GolfCourses = () => {
 
   return (
     <div className="max-w-7xl mx-auto mt-10 shadow rounded overflow-hidden min-h-[600px]">
-
       {/* Mobile dropdown navigation */}
-        <div className="md:hidden p-4 bg-gray-100">
-          <select
-            value={selectedId ?? ""}
-            onChange={(e) => setSelectedId(Number(e.target.value))}
-            className="w-full p-2 border rounded"
-          >
-            {golfCourses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="md:hidden p-4 bg-gray-100">
+        <select
+          value={selectedId ?? ""}
+          onChange={(e) => setSelectedId(Number(e.target.value))}
+          className="w-full p-2 border rounded"
+        >
+          {golfCourses.map((course) => (
+            <option key={course.id} value={course.id}>
+              {course.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="flex flex-col md:flex-row">
         {/* Sidebar for desktop */}
@@ -99,7 +98,9 @@ const GolfCourses = () => {
         <main className="flex-grow bg-white p-8 flex flex-col">
           {selectedCourse ? (
             <>
-              <h2 className="text-3xl font-semibold mb-4">{selectedCourse.name}</h2>
+              <h2 className="text-3xl font-semibold mb-4">
+                {selectedCourse.name}
+              </h2>
               <div className="flex justify-center mb-8">
                 {imageMap[selectedCourse.id]?.photo ? (
                   <img
@@ -113,14 +114,21 @@ const GolfCourses = () => {
                   </div>
                 )}
               </div>
-              <p className="mb-6 text-gray-700">{selectedCourse.description}</p>
+              <p
+                className="mb-6 text-gray-700"
+                style={{ textAlign: "justify" }}
+              >
+                {selectedCourse.description}
+              </p>
 
               <div className="mt-auto flex justify-end">
                 <button
                   onClick={() => {
                     setReservationData({
                       category: "golf",
-                      reservation_items: [{ service_id: selectedCourse.id, quantity: 1 }],
+                      reservation_items: [
+                        { service_id: selectedCourse.id, quantity: 1 },
+                      ],
                     });
                     goToStep("category");
                     navigate("/rezervacije");

@@ -109,7 +109,8 @@ const WellnessComponents = () => {
                   </div>
                 )}
               </div>
-              <p className="mb-6 text-gray-700">
+              <p className="mb-6 text-gray-700"
+                style={{ textAlign: 'justify' }}>
                 {selectedWellness.description}
               </p>
 
