@@ -102,12 +102,14 @@ const ItemTable = ({ items, onUpdate }: Props) => {
                 >
                   Uredi
                 </button>
-                <button
-                  onClick={() => open("delete-item", { item, onUpdate })}
-                  className="text-red-500 hover:underline text-sm"
-                >
-                  Obriši
-                </button>
+                {!isGolf && (
+                  <button
+                    onClick={() => open("delete-item", { item, onUpdate })}
+                    className="text-red-500 hover:underline text-sm"
+                  >
+                    Obriši
+                  </button>
+                )}
               </div>
             </li>
           );

@@ -11,9 +11,9 @@ import map5 from "../../assets/tereni/5-map.svg";
 import map6 from "../../assets/tereni/6-map.svg";
 import map7 from "../../assets/tereni/7-map.svg";
 import map8 from "../../assets/tereni/8-map.svg";
-import wellness1 from "../../assets/wellness/aromaterapija.webp";
-import wellness2 from "../../assets/wellness/masaza.webp";
-import wellness3 from "../../assets/wellness/sauna.webp";
+import wellness1 from "../../assets/wellness/ilustracija_aromaterapija.webp";
+import wellness2 from "../../assets/wellness/ilustracija_masaza.webp";
+import wellness3 from "../../assets/wellness/ilustracija_sauna.webp";
 import golfkategorija from "../../assets/hero/HeroImage.webp";
 import wellnesskategorija from "../../assets/hero/HeroImage3.webp";
 
@@ -281,7 +281,7 @@ const ReservationCategory = () => {
                 key={w.id}
                 className="flex bg-white shadow rounded-xl overflow-hidden hover:ring-2 hover:ring-green-500 transition"
               >
-                <div className="w-32 h-24 flex-shrink-0">
+                <div className="w-32 h-24 flex justify-center items-center flex-shrink-0 pl-2">
                   <img
                     src={wellnessImages[w.id]}
                     alt={`Wellness usluga: ${w.name}`}
@@ -314,19 +314,35 @@ const ReservationCategory = () => {
       {/* Potvrda wellness usluge */}
       {category === "wellness" && selectedWellness && (
         <>
-          <h3 className="text-xl font-medium">
-            Odabrali ste: {selectedWellness.name}
-          </h3>
-          <p className="text-gray-700 mb-4">
-            {selectedWellness.description?.split(".")[0] + "."}
-          </p>
-          <p className="text-green-700 font-semibold pt-1">
-            {selectedWellness.price} €
-          </p>
+          <h3 className="text-xl font-medium mt-4">Odabrana wellness usluga</h3>
+
+          <div className="p-4 border rounded bg-white shadow flex flex-col justify-between h-full">
+            <div>
+              <p>
+                <strong>{selectedWellness.name}</strong>
+              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <div className="w-32 h-24 flex justify-center items-center flex-shrink-0 pl-2">
+                  <img
+                    src={wellnessImages[selectedWellness.id]}
+                    alt={`Slika usluge ${selectedWellness.name}`}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+                <p className="text-gray-700 mb-4">
+                  {selectedWellness.description?.split(".")[0] + "."}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-green-600 font-semibold self-end">
+              {selectedWellness.price} €
+            </p>
+          </div>
+
           <div className="mt-6 flex justify-between">
             <button
               onClick={() => {
-                // Clear reservation
                 setReservationData({
                   category: category,
                   reservation_items: [],
@@ -354,6 +370,7 @@ const ReservationCategory = () => {
           </div>
         </>
       )}
+
     </div>
   );
 };
