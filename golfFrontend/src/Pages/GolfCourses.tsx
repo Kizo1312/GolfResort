@@ -56,6 +56,7 @@ const GolfCourses = () => {
   if (!golfCourses || golfCourses.length === 0) return <p>No golf courses found.</p>;
 
   const selectedCourse = golfCourses.find((c) => c.id === selectedId);
+  const sortedCourses =golfCourses.sort((a,b) => a.id - b.id )
 
   return (
     <div className="max-w-7xl mx-auto mt-10 shadow rounded overflow-hidden min-h-[600px]">
@@ -67,7 +68,7 @@ const GolfCourses = () => {
             onChange={(e) => setSelectedId(Number(e.target.value))}
             className="w-full p-2 border rounded"
           >
-            {golfCourses.map((course) => (
+            {sortedCourses.map((course) => (
               <option key={course.id} value={course.id}>
                 {course.name}
               </option>
