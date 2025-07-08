@@ -6,6 +6,7 @@ import os
 from resources.users import blp as UserBlueprint
 from resources.services import blp as ServiceBlueprint
 from resources.reservations import blp as RegistrationBlueprint
+from resources.analytics import blp as AnalyticsBlueprint
 from dotenv import load_dotenv
 from flask_mail import Mail
 from extensions import mail
@@ -53,6 +54,7 @@ def create_app(db_url=None):
     app.register_blueprint(UserBlueprint)
     app.register_blueprint(ServiceBlueprint)
     app.register_blueprint(RegistrationBlueprint)
+    app.register_blueprint(AnalyticsBlueprint)
 
 
     jwt = JWTManager(app)
