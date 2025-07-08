@@ -44,7 +44,8 @@ const MojeRezervacije = () => {
   const itemsPerPage = 5;
   const [cancelingId, setCancelingId] = useState<number | null>(null);
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
-  const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
+  const [reservationToCancel, setReservationToCancel] =
+    useState<Reservation | null>(null);
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -117,7 +118,10 @@ const MojeRezervacije = () => {
     }
 
     return reservations.map((rez) => (
-      <div key={rez.id} className="relative bg-white shadow rounded p-6 space-y-2 mb-6">
+      <div
+        key={rez.id}
+        className="relative bg-white shadow rounded p-6 space-y-2 mb-6"
+      >
         {activeTab === "active" &&
           (cancelingId === rez.id ? (
             <div className="absolute top-2 right-2 flex items-center space-x-2 text-gray-600 text-sm font-medium">
@@ -167,9 +171,13 @@ const MojeRezervacije = () => {
           <ul className="list-disc list-inside text-sm">
             {rez.reservation_items.map((item, i) => (
               <li key={i}>
-                {item.service.name} ({item.service.category}) – {item.quantity} × {item.price_at_booking} € ={" "}
+                {item.service.name} ({item.service.category}) – {item.quantity}{" "}
+                × {item.price_at_booking} € ={" "}
                 {item.service.category === "golf teren"
-                  ? (item.price_at_booking * (rez.duration_minutes / 60)).toFixed(2)
+                  ? (
+                      item.price_at_booking *
+                      (rez.duration_minutes / 60)
+                    ).toFixed(2)
                   : (item.quantity * item.price_at_booking).toFixed(2)}{" "}
                 €
               </li>
@@ -181,9 +189,18 @@ const MojeRezervacije = () => {
           {rez.reservation_items
             .reduce((sum, item) => {
               if (item.service.category === "golf teren") {
-                return sum + item.price_at_booking * (rez.duration_minutes / 60);
+                return (
+                  sum + item.price_at_booking * (rez.duration_minutes / 60)
+                );
+              } else if (item.service.category === "wellness") {
+                return sum + item.quantity * item.price_at_booking;
               }
-              return sum + item.quantity * item.price_at_booking  * (rez.duration_minutes / 60);
+              return (
+                sum +
+                item.quantity *
+                  item.price_at_booking *
+                  (rez.duration_minutes / 60)
+              );
             }, 0)
             .toFixed(2)}{" "}
           €
@@ -208,7 +225,9 @@ const MojeRezervacije = () => {
   const selectedReservations =
     activeTab === "active" ? activeReservations : pastReservations;
   const paginatedReservations = paginate(selectedReservations);
-  const totalPages = Math.ceil((selectedReservations?.length || 0) / itemsPerPage);
+  const totalPages = Math.ceil(
+    (selectedReservations?.length || 0) / itemsPerPage
+  );
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 space-y-6">
@@ -219,7 +238,9 @@ const MojeRezervacije = () => {
         <button
           onClick={() => setActiveTab("past")}
           className={`px-4 py-2 rounded ${
-            activeTab === "past" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
+            activeTab === "past"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-700"
           }`}
         >
           Protekle
@@ -227,7 +248,9 @@ const MojeRezervacije = () => {
         <button
           onClick={() => setActiveTab("active")}
           className={`px-4 py-2 rounded ${
-            activeTab === "active" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
+            activeTab === "active"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-700"
           }`}
         >
           Aktivne
@@ -239,8 +262,10 @@ const MojeRezervacije = () => {
           <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
             <p className="mb-4 text-gray-800">
               Jeste li sigurni da želite otkazati ovu rezervaciju za{" "}
-              <strong>{dayjs(reservationToCancel.date).format("DD. MM. YYYY.")}</strong> u{" "}
-              <strong>{reservationToCancel.start_time}</strong>?
+              <strong>
+                {dayjs(reservationToCancel.date).format("DD. MM. YYYY.")}
+              </strong>{" "}
+              u <strong>{reservationToCancel.start_time}</strong>?
             </p>
             <div className="flex justify-end space-x-4">
               <button
@@ -286,7 +311,9 @@ const MojeRezervacije = () => {
             Stranica {currentPage} od {totalPages}
           </span>
           <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
             className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-300 disabled:opacity-50"
           >

@@ -79,8 +79,10 @@ const ReservationTable = ({ items }: Props) => {
       const hours = res.duration_minutes / 60;
       if (category === "golf teren" && res.duration_minutes > 0) {
         total += hours * price;
+      } else if (category === "wellness") {
+        total += price;
       } else {
-        total += item.quantity * price * hours ;
+        total += item.quantity * price * hours;
       }
     }
 
@@ -168,62 +170,61 @@ const ReservationTable = ({ items }: Props) => {
           onUpdate={handleUpdate}
         />
       )}
-      
-{showConfirmDelete && reservationToDelete && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
-      <p className="mb-4 text-gray-800">
-        Jeste li sigurni da želite obrisati rezervaciju za{" "}
-        <strong>{dayjs(reservationToDelete.date).format("DD. MM. YYYY.")}</strong> u{" "}
-        <strong>{reservationToDelete.start_time}</strong>?
-      </p>
-      <div className="flex justify-end space-x-4">
-        <button
-          onClick={() => {
-            setShowConfirmDelete(false);
-            setReservationToDelete(null);
-          }}
-          className="px-4 py-2 border rounded hover:bg-gray-100"
-        >
-          Odustani
-        </button>
-        <button
-          onClick={async () => {
-            setShowConfirmDelete(false);
-            if (reservationToDelete) {
-              await deleteReservation(reservationToDelete.id);
-            }
-            setReservationToDelete(null);
-          }}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-        >
-          Obriši rezervaciju
-        </button>
-      </div>
-    </div>
-  </div>
-)}
 
-{showSuccessModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
-      <p className="mb-4 text-green-700 font-medium">
-        Rezervacija je uspješno obrisana.
-      </p>
-      <div className="flex justify-end">
-        <button
-          onClick={() => setShowSuccessModal(false)}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-        >
-          U redu
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      {showConfirmDelete && reservationToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <p className="mb-4 text-gray-800">
+              Jeste li sigurni da želite obrisati rezervaciju za{" "}
+              <strong>
+                {dayjs(reservationToDelete.date).format("DD. MM. YYYY.")}
+              </strong>{" "}
+              u <strong>{reservationToDelete.start_time}</strong>?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => {
+                  setShowConfirmDelete(false);
+                  setReservationToDelete(null);
+                }}
+                className="px-4 py-2 border rounded hover:bg-gray-100"
+              >
+                Odustani
+              </button>
+              <button
+                onClick={async () => {
+                  setShowConfirmDelete(false);
+                  if (reservationToDelete) {
+                    await deleteReservation(reservationToDelete.id);
+                  }
+                  setReservationToDelete(null);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Obriši rezervaciju
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-
-      
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <p className="mb-4 text-green-700 font-medium">
+              Rezervacija je uspješno obrisana.
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                U redu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
