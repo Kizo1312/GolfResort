@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type ModalType = "auth" | "terrain-details" | "edit-item" | "edit-user" | "delete-item" | "create-item" | null;
+type ModalType = "auth" | "terrain-details" | "terrain-analytics" | "edit-item" | "edit-user" | "delete-item" | "create-item" | null;
 
 interface ModalContextType {
   isOpen: boolean;

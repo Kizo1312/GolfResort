@@ -8,6 +8,8 @@ import TerrainDetails from "../components/TerrainDetails";
 import EditUserModal from "@/components/EditUserModal";
 import DeleteItemModal from "@/components/DeleteItemModal";
 import CreateItemModal from "@/components/CreateItemModal";
+import TerenAnalyticsModal from "@/components/TerenAnalyticsModal";
+
 const Modal = () => {
   const { isOpen, modalType, modalProps, close } = useModal();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
@@ -63,6 +65,11 @@ const Modal = () => {
         )}
 
         {modalType === "terrain-details" && <TerrainDetails {...modalProps} />}
+
+        {modalType === "terrain-analytics" && (
+          <TerenAnalyticsModal {...modalProps} />
+        )}
+
 
         {modalType === "edit-user" && (
           <EditUserModal

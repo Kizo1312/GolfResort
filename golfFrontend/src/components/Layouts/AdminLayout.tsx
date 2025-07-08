@@ -101,6 +101,19 @@ const AdminLayout = () => {
                 REZERVACIJE
               </NavLink>
             </li>
+             {/* ANALITIKA */}
+            <li>
+              <NavLink
+                to="/admin/analitika"
+                className={({ isActive }) =>
+                  isActive
+                    ? "block px-4 py-2 rounded-lg bg-green-600 text-white font-semibold"
+                    : "block px-4 py-2 rounded-lg text-gray-700 hover:bg-green-100 hover:text-green-700 font-semibold"
+                }
+              >
+                ANALITIKA
+              </NavLink>
+            </li>
           </ul>
 
           <div className="pt-6 border-t mt-6">
