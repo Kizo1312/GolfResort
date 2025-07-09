@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 const TOTAL_FRAMES = 16;
-const FRAME_RATE = 50; // ms between frames
+const FRAME_RATE = 65; // ms between frames
 
 export default function GolfLoader() {
   const [frame, setFrame] = useState(1);
