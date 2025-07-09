@@ -87,6 +87,7 @@ class CreateReservation(MethodView):
                             total_reserved += res_item.quantity
 
                 if total_reserved + requested_quantity > service.inventory:
+                    
                     abort(409, message=f"Usluga {service.name} nije dostupna u odabranoj količini")
 
        

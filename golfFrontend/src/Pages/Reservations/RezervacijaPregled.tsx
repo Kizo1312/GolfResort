@@ -38,33 +38,32 @@ const RezervacijaPregled = () => {
   }, []);
 
   const ukupnaCijena = () => {
-  const main =
-    mainService?.quantity && getById(mainService.service_id)?.price
-      ? isGolf
-        ? mainService.quantity *
-          (reservation.duration_minutes! / 60) *
-          parseFloat(getById(mainService.service_id)?.price.toString() || "0")
-        : mainService.quantity *
-          parseFloat(getById(mainService.service_id)?.price.toString() || "0")
-      : 0;
+    const main =
+      mainService?.quantity && getById(mainService.service_id)?.price
+        ? isGolf
+          ? mainService.quantity *
+            (reservation.duration_minutes! / 60) *
+            parseFloat(getById(mainService.service_id)?.price.toString() || "0")
+          : mainService.quantity *
+            parseFloat(getById(mainService.service_id)?.price.toString() || "0")
+        : 0;
 
-  const extras = dodatne.reduce((sum, d) => {
-    const service = getById(d.service_id);
-    const basePrice = parseFloat(service?.price?.toString() || "0");
-    const isTimed =
-      service?.category === "dodatna usluga" &&
-      typeof reservation.duration_minutes === "number";
+    const extras = dodatne.reduce((sum, d) => {
+      const service = getById(d.service_id);
+      const basePrice = parseFloat(service?.price?.toString() || "0");
+      const isTimed =
+        service?.category === "dodatna usluga" &&
+        typeof reservation.duration_minutes === "number";
 
-    const cijena = isTimed
-      ? d.quantity * (reservation.duration_minutes! / 60) * basePrice
-      : d.quantity * basePrice;
+      const cijena = isTimed
+        ? d.quantity * (reservation.duration_minutes! / 60) * basePrice
+        : d.quantity * basePrice;
 
-    return sum + cijena;
-  }, 0);
+      return sum + cijena;
+    }, 0);
 
-  return (main + extras).toFixed(2);
-};
-
+    return (main + extras).toFixed(2);
+  };
 
   const handleSubmit = async () => {
     if (!reservation.date || !reservation.start_time || !user?.id) {
@@ -100,17 +99,17 @@ const RezervacijaPregled = () => {
       if (!res.ok) {
         const data = await res.json();
         setSubmitError(data.message);
-        return
-        
+        return;
       }
 
       toast.success("Rezervacija uspješno kreirana!");
-      resetReservation();
-      navigate("/rezervacija/uspjeh");
+      setTimeout(() => {
+        setIsLoading(false);
+        navigate("/rezervacija/uspjeh");
+        resetReservation();
+      }, 1000);
     } catch (err: any) {
       toast.error(err.message || "Greška pri rezervaciji.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
