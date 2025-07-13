@@ -1,22 +1,22 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Modal from './ui/Modal';
+import Modal from "./ui/Modal";
 import { useEffect } from "react";
 // Context
 import { AuthProvider } from "./components/Context/AuthContext";
 import { useModal } from "./components/Context/ModalContext";
 
 // Layouts & Pages
-import HomePage from './Pages/Home';
+import HomePage from "./Pages/Home";
 import RezervacijaUspjeh from "@/Pages/Reservations/RezervacijaUspjeh";
 import RezervacijaPregled from "@/Pages/Reservations/RezervacijaPregled";
 import RezervacijaTermin from "@/Pages/Reservations/RezervacijaTermin";
-import ReservationCategory from './Pages/Reservations/ReservationCategory';
-import AdminLayout from './components/Layouts/AdminLayout';
-import UserLayout from './components/Layouts/UserLayout';
+import ReservationCategory from "./Pages/Reservations/ReservationCategory";
+import AdminLayout from "./components/Layouts/AdminLayout";
+import UserLayout from "./components/Layouts/UserLayout";
 import GolfCourses from "./Pages/GolfCourses";
 import WellnessInfo from "./Pages/WellnessInfo";
-import MojeRezervacije from './Pages/MojeRezervacije';
+import MojeRezervacije from "./Pages/MojeRezervacije";
 // Admin Pages
 
 import Tereni from "@/Pages/Admin/Tereni";
@@ -33,64 +33,64 @@ import UserDashboard from "./components/User/UserDashboard";
 
 const App = () => {
   return (
-      <Router>
-        <Toaster position="top-center" />
-        <Modal />
+    <Router>
+      <Toaster position="top-center" />
+      <Modal />
 
-        <Routes>
-          {/* User Routes */}
-          <Route path="/" element={<UserLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="home" element={<HomePage />} />
-            <Route path="rezervacije" element={<ReservationCategory />} />
-            <Route path="/rezervacija/termin" element={<RezervacijaTermin />} />
-            <Route
-              path="/rezervacija/pregled"
-              element={
-                <ProtectedRoute requiredRole="user">
-                  <RezervacijaPregled />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rezervacija/uspjeh"
-              element={
-                <ProtectedRoute requiredRole="user">
-                  <RezervacijaUspjeh />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="golf-tereni" element={<GolfCourses />} />
-            <Route path="wellness" element={<WellnessInfo />} />  
-            <Route
-              path="/moje-rezervacije"
-              element={
-                <ProtectedRoute>
-                  <UserDashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-
-          {/* Admin Routes - ZAŠTIĆENO */}
+      <Routes>
+        {/* User Routes */}
+        <Route path="/" element={<UserLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="home" element={<HomePage />} />
+          <Route path="rezervacije" element={<ReservationCategory />} />
+          <Route path="/rezervacija/termin" element={<RezervacijaTermin />} />
           <Route
-            path="/admin"
+            path="/rezervacija/pregled"
             element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminLayout />
+              <ProtectedRoute requiredRole="user">
+                <RezervacijaPregled />
               </ProtectedRoute>
             }
-          > 
-            <Route index element={<Dashboard />} />
-            <Route path="tereni" element={<Tereni />} />
-            <Route path="dodatne-usluge" element={<Addons />} />
-            <Route path="wellness-usluge" element={<Wellness />} />
-            <Route path="korisnici" element={<Users />} />
-            <Route path="rezervacije" element={<Reservations />} />
-            <Route path="analitika" element={<Analitika />} />
-          </Route>
-        </Routes>
-      </Router>
+          />
+          <Route
+            path="/rezervacija/uspjeh"
+            element={
+              <ProtectedRoute requiredRole="user">
+                <RezervacijaUspjeh />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="golf-tereni" element={<GolfCourses />} />
+          <Route path="wellness" element={<WellnessInfo />} />
+          <Route
+            path="/moje-rezervacije"
+            element={
+              <ProtectedRoute>
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        {/* Admin Routes - ZAŠTIĆENO */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="tereni" element={<Tereni />} />
+          <Route path="dodatne-usluge" element={<Addons />} />
+          <Route path="wellness-usluge" element={<Wellness />} />
+          <Route path="korisnici" element={<Users />} />
+          <Route path="rezervacije" element={<Reservations />} />
+          <Route path="analitika" element={<Analitika />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 };
 
