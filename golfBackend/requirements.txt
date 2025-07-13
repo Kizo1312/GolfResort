@@ -9,3 +9,5 @@ passlib
 psycopg2-binary
 marshmallow-sqlalchemy
 flask-mail
+
+gunicorn
