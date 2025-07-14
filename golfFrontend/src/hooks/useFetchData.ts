@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 export function useFetchData<T>(endpoint: string) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = () => {
+    console.log("VITE_API_BASE in useFetchData:", API_BASE);
+
     setLoading(true);
-    fetch(`http://127.0.0.1:5000${endpoint}`)
+    fetch(`${API_BASE}${endpoint}`)
       .then((res) => {
         if (!res.ok) throw new Error("Greška prilikom dohvata podataka");
         return res.json();
@@ -26,7 +30,3 @@ export function useFetchData<T>(endpoint: string) {
 
   return { data, loading, error, refetch: fetchData };
 }
-
-
-
-

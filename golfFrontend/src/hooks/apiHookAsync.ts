@@ -1,3 +1,5 @@
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 export async function apiRequest<T>(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
@@ -6,7 +8,7 @@ export async function apiRequest<T>(
   const token = localStorage.getItem("token");
   console.log("TOKEN:", token);
 
-  const res = await fetch(`http://127.0.0.1:5000${endpoint}`, {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -20,6 +22,5 @@ export async function apiRequest<T>(
     throw new Error(errorData.message || "Neuspješni zahtjev.");
   }
 
-  const data = await res.json();
-  return data;
+  return res.json();
 }
