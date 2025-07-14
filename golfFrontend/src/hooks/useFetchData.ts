@@ -8,6 +8,7 @@ export function useFetchData<T>(endpoint: string) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = () => {
+    console.log("useFetchData hook mounted");
     console.log("VITE_API_BASE in useFetchData:", API_BASE);
 
     setLoading(true);
