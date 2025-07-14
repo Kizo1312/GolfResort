@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useModal } from "../Context/ModalContext";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 type UserInfo = {
   name: string;
@@ -25,13 +26,13 @@ const Register = () => {
     repeatPassword: "",
   });
 
-const [showPassword, setShowPassword] = useState(false);
-const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   // ▶️ login nakon uspješne registracije
   const autoLogin = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/login", {
+      const res = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

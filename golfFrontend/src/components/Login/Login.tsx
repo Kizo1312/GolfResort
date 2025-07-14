@@ -3,6 +3,7 @@ import { useModal } from "../Context/ModalContext";
 import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 type Credentials = {
   email: string;
@@ -22,7 +23,7 @@ const Login = () => {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/login", {
+      const res = await fetch(`${API_BASE}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
